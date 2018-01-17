@@ -11,6 +11,3 @@
     
     Link: https://github.com/uwrobotics/RobotRacing2017
     
-    
-       
-    
