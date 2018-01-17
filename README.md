@@ -7,6 +7,5 @@
     
 ### MSG For RR2018 Developers: 
     
-    You can refer last year's comp code for dev or develop your own! 
-    Link: https://github.com/uwrobotics/RobotRacing2017
+    You can refer last year's comp code for dev or develop your own! Link: https://github.com/uwrobotics/RobotRacing2017
     
