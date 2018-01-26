@@ -1,0 +1,54 @@
+<launch>
+  <!-- param name="device" command="$(find vis)/src/camera_parameters.sh" / -->
+
+  <!--<node ns ="left" name="usb_cam_left" pkg="usb_cam" type="usb_cam_node" output="screen" >
+    <param name="video_device" value="/dev/cam_left" />
+    <param name="image_width" value="640" />
+    <param name="image_height" value="480" />
+    <param name="pixel_format" value="mjpeg" />
+    <param name="camera_frame_id" value="usb_cam_left" />
+    <param name="io_method" value="mmap"/>
+    <param name="gain_automatic" value="false" />
+
+    <param name="auto_white_balance" value="true" />
+    <param name="contrast" value="64" />
+    <param name="sharpness" value="233" />
+  </node>
+  <node ns ="right" name="usb_cam_right" pkg="usb_cam" type="usb_cam_node" output="screen" >
+    <param name="video_device" value="/dev/cam_right" />
+    <param name="image_width" value="640" />
+    <param name="image_height" value="480" />
+    <param name="pixel_format" value="mjpeg" />
+    <param name="camera_frame_id" value="usb_cam_right" />
+    <param name="io_method" value="mmap"/>
+    <param name="gain_automatic" value="false" />
+
+    <param name="auto_white_balance" value="true" />
+    <param name="contrast" value="64" />
+    <param name="sharpness" value="20" />
+  </node> -->
+
+  <node ns ="left" name="output_video_cam_left" pkg="image_view" type="image_view" respawn="false" output="screen">
+       <remap from="image" to="/left/usb_cam_left/image_raw" />
+       <param name="autosize" value="true" />
+   </node>
+
+   <node ns ="right" name="output_video_cam_right" pkg="image_view" type="image_view" respawn="false" output="screen">
+       <remap from="image" to="/right/usb_cam_right/image_raw" />
+       <param name="autosize" value="true" />
+   </node>
+
+   <include ns ="left" file="$(find vis)/launch/vis_left.launch" />
+   <include ns ="right" file="$(find vis)/launch/vis_right.launch" />
+   
+
+  <node ns ="left" name="output_video_left" pkg="image_view" type="image_view" respawn="false" output="screen">
+       <remap from="image" to="/output_video_left" />
+       <param name="autosize" value="true" />
+   </node>
+
+   <node ns ="right" name="output_video_right" pkg="image_view" type="image_view" respawn="false" output="screen">
+       <remap from="image" to="/output_video_right" />
+       <param name="autosize" value="true" />
+   </node>
+</launch>

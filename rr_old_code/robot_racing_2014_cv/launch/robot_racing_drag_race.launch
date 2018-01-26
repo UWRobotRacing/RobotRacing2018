@@ -1,0 +1,10 @@
+<launch>
+
+	<node pkg="robot_racing_2014_cv"
+		type="drag_race_cv"
+		name="drag_race_cv">
+		<param name="debug_flag" type="bool" value="true" />
+		<param name="output_video_flag" type="bool" value="true" />
+	</node>
+
+</launch>

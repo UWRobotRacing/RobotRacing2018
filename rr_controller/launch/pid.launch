@@ -1,0 +1,16 @@
+<launch>
+
+  <!-- Get parameters from .yaml file -->
+  <rosparam file="$(find rr_controller)/launch/controller.yaml"/>
+
+  <!-- Launch nodes -->
+  <node pkg="rr_controller" type="rr_controller" name="controller" output="screen" required="true"/>
+
+  <node pkg="rr_test_controller" type="rr_test_controller" name="controller_test" output="screen" required="true"/>
+
+  <node pkg="rosserial_python" type="serial_node.py" name="serial_node" output="screen" required="true">
+      <param name="~port" value="/dev/arduino"/>
+      <param name="~baud" value="115200"/>
+  </node>
+
+</launch>

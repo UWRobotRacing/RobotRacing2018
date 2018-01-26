@@ -1,0 +1,27 @@
+%YAML:1.0
+#Size of Bird's Eye View grid
+bev_width: 250
+bev_height: 250
+bev_resolution: 0.05
+
+# 4 point coordinates in image plane. Note: OpenCV Image coordinates are in [x,y], where X is a column index (0 left, positive rightwards), and Y is a row index (0 top, positive downwards)
+# image_coords: [[0, 0], [400, 0], [0, 1600], [400, 1600]]
+image_coords: !!opencv-matrix
+   rows: 4
+   cols: 2
+   dt: f
+   data: [ 0., 0., 400., 0., 0., 1600., 400., 1600]
+
+# 4 corresponding world coordinates, same format
+# world_coords: [[0, 0], [250, 0], [120, 250], [130, 250]]
+world_coords: !!opencv-matrix
+   rows: 4
+   cols: 2
+   dt: f
+   data: [ 0., 0., 250., 0., 120., 250., 130., 250]
+
+multibounds: !!opencv-matrix
+   rows: 3
+   cols: 6
+   dt: d
+   data: [0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5]

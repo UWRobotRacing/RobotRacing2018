@@ -1,0 +1,18 @@
+<launch>
+  	<!-- Controller wt/ Arduino -->
+	<!-- node pkg="rosserial_python" type="serial_node.py" name="serial_node" output="screen" required="true">
+      <param name="~port" value="/dev/arduino" />
+      <param name="~baud" value="115200" />
+  	</node -->
+
+  	<include file="$(find rr_controller)/launch/controller.launch" />
+
+  	<!-- Laser Mapper -->
+  	<include file="$(find rr_mapper)/launch/mapper.launch" />
+
+	<!-- Camera -->
+    <!-- include file="$(find vis)/launch/dual_cam_vis.launch" /-->
+
+    <!-- Path Planner -->
+    <include file="$(find rr_path_planner)/launch/trajectory_rollout.launch" />	
+</launch>

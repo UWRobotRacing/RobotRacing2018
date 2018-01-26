@@ -1,0 +1,36 @@
+<launch>
+
+<!-- Camera Node -->
+<node name="camera1" pkg="ximea_camera" type="ximea_camera_node" output="screen" >
+
+  <param name="camera_name" type="string" value="camera1" />
+  <param name="info_url" type="string" value="package://mcptam/calibrations/camera1.yaml" />
+	
+	<param name="serial_no" type="string" value="32300651" />
+  <param name="auto_exposure" type="bool" value="false" />
+  <param name="exposure_time" type="int" value="5000" />  
+  <param name="frame_rate" type="int" value="40" />
+  <param name="cams_on_bus" type="int" value="3" />
+  <param name="greyscale" type="bool" value="true" /> 
+  
+  <param name="binning" type="bool" value="false" />
+  <param name="downsample_scale" type="int" value="2" />
+  
+<!--  
+  <param name="rect_left" type="int" value="316" />
+  <param name="rect_top" type="int" value="270" />
+  <param name="rect_width" type="int" value="640" />
+  <param name="rect_height" type="int" value="480" />
+-->
+
+  <param name="rect_left" type="int" value="172" />
+  <param name="rect_top" type="int" value="274" />
+  <param name="rect_width" type="int" value="940" />
+  <param name="rect_height" type="int" value="480" />
+</node>
+
+</launch>
+
+
+
+

@@ -1,0 +1,13 @@
+<launch>    
+  ### Insert parameters #########################
+  <rosparam file="$(find rr_mapper)/launch/parameters/rr_mapper.yaml"/>
+
+  <node pkg="urg_node" name="urg_node" type="urg_node">
+    <param name="serial_port" type ="string" value="/dev/ttyACM0" />
+    <param name="error_limit" type="int" value="0" />
+    <param name="baud_rate" type="int" value="115200" />
+  </node>
+    
+  <node pkg="rr_mapper" name="rr_mapper" type="rr_mapper" output="screen">
+  </node>   
+</launch>

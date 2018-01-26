@@ -1,0 +1,45 @@
+<launch>		
+
+	<node pkg="mocap_optitrack" 
+		type="mocap_node" 
+		name="mocap_node" 
+		respawn="false"
+		launch-prefix=""
+		required="false">
+		<rosparam file="$(find mocap_optitrack)/config/mocap.yaml" command="load" />
+    </node>
+
+    <!-- Launch GPS from another launch file, require setup. -->
+    <!-- ARDUINO -->
+    <node pkg="rosserial_python" type="serial_node.py" name="serial_node" output="screen">
+        <param name="~port" value="/dev/arduino" />
+        <param name="~baud" value="115200" />
+    </node>
+
+    <!-- IMU -->
+    <node pkg="microstrain_3dmgx2_imu" type="imu_node"
+    	name="imu_node" output="screen"
+    	required="false">
+        <param name="port" type="string" value="/dev/imu_rr" />
+        <param name="autocalibrate" type="bool" value="false" />
+        <param name="assume_calibrated" type="bool" value="true" />
+        <param name="autostart" type="bool" value="true" />
+    </node>
+
+	<node pkg="robotracing_pid_control" 
+		type="robotracing_pid" 
+		name="robotracing_pid"
+		output = "screen">
+		<param name="Param_Kp_lat" type="double" value="1" />
+		<param name="Param_Kd_lat" type="double" value="0.0" />
+		<param name="Param_Ki_lat" type="double" value="0.0" />
+		<param name="Param_look_ahead" type="double" value="0.7" />
+
+		<param name="Param_Kp_long" type="double" value="0.050" />
+		<param name="Param_Kd_long" type="double" value="0.1" />
+		<param name="Param_Ki_long" type="double" value="0.0" />
+		<param name="Param_Kf_long" type="double" value="1.0" />
+		<param name="Vel_Desired" type="double" value="1.5" />
+	</node>
+			
+</launch>

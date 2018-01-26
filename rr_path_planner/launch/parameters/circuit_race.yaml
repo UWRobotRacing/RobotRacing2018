@@ -1,0 +1,43 @@
+################################
+##  Trajectory Rollout Node   ##
+################################
+#Map Size
+TrajRoll/MAP_WIDTH:            600
+TrajRoll/MAP_HEIGHT:           400
+TrajRoll/RESOLUTION:           0.01
+
+#Trajectory Generation Parameters
+TrajRoll/PLANNER_VELOCITY:     1.0
+TrajRoll/NUM_PATHS:            101
+TrajRoll/TRAJECTORY_STEPS:     100
+TrajRoll/dt:                   0.025
+TrajRoll/OBS_THRESHOLD:        0
+TrajRoll/MIN_STOPPING_DIST:      0.2
+
+#Desired Path Setup
+TrajRoll/ANGLE_WEIGHT:         0     # More angle weight, more cost
+TrajRoll/DISTANCE_WEIGHT:      1     # More distance weight, less cost
+TrajRoll/ANGLE_WEIGHT_DIFF:    0     # for PID only
+TrajRoll/K_heading:            1
+
+#Desired Velocity Setup
+TrajRoll/UX_DESIRED:           0.1
+TrajRoll/MIN_ACCELERATION_ANGLE:  0.087
+TrajRoll/STRAIGHT_SPEED:       0.1
+
+#Vehicle Parameters
+TrajRoll/MAX_STEERING_ANGLE:   0.7
+TrajRoll/CAR_WIDTH:            0.30
+TrajRoll/DIST_COST_FACTOR:     2.0
+TrajRoll/MIN_OFFSET_DIST:      0.05
+
+#End Line Detection
+
+TrajRoll/HORIZONTAL_LINE_RATIO:  1
+TrajRoll/HORIZONTAL_LINE_THICKENESS: 0
+
+#For Debugging 
+#Visualization
+TrajRoll/VISUALIZATION:        true
+TrajRoll/DEBUG_ON:             false
+TrajRoll/Check_Traffic:        true

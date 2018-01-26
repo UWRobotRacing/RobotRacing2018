@@ -1,0 +1,41 @@
+################################
+##     Laser Mapping Node     ##:
+################################
+#Names#
+LaserMapper/Occupancy_Grid_Name:            "/map"
+LaserMapper/Laser_Scan_Name:                "/scan"
+
+#Obstacle#
+LaserMapper/NO_OBS:                         0
+LaserMapper/OBS:                            400
+LaserMapper/UNKNOWN:                        -1
+LaserMapper/OBS_SCALE:                      1
+LaserMapper/INFLATE_OBS:                    8
+LaserMapper/LASER_ORIENTATION:              -1
+
+#Map Parameters#
+#map_res in meter
+LaserMapper/map_res:                        0.01
+LaserMapper/map_W:                          600
+LaserMapper/map_H:                          400
+LaserMapper/map_orientation:                0
+
+#Scan parameters#
+#Angles are in radian, range in meter
+LaserMapper/max_angle:                      1.35
+LaserMapper/min_angle:                      -1.35
+LaserMapper/minrange:                       0.20
+LaserMapper/maxrange:                       4
+LaserMapper/samplerate:                     1
+LaserMapper/scan_processing_subsample:      0
+LaserMapper/mechanical_offset:              0
+
+
+LaserMapper/vis_left_msg/offset_height:     75
+LaserMapper/vis_left_msg/offset_width:      73
+
+LaserMapper/vis_right_msg/offset_height:    63
+LaserMapper/vis_right_msg/offset_width:     295
+
+#Debugging#
+LaserMapper/DEBUG:                          false

@@ -1,0 +1,86 @@
+################################
+##  Trajectory Rollout Node   ##
+################################
+#Trajectory Generation Parameters
+TrajRoll/NUM_PATHS:          31
+TrajRoll/OBS_THRESHOLD:      60
+TrajRoll/BIAS_CENTER:        0         #0: No bias, 1: full bias
+TrajRoll/STRAIGHTLINE_LIMIT: 4
+TrajRoll/ANGLE_LIMIT:        0.5
+TrajRoll/MIN_DISTANCE:       0.7
+TrajRoll/X_START:            0.0
+TrajRoll/Y_START:            0.05
+TrajRoll/dt:                 0.05
+TrajRoll/enable:             true      #This is only for initial testing
+
+#Desired Path Setup
+TrajRoll/ANGLE_WEIGHT:       1.8      #More angle weight, more cost
+TrajRoll/DISTANCE_WEIGHT:    0.5        #More distance weight, less cost
+TrajRoll/K_heading:          1.5
+
+#Desired Velocity Setup
+TrajRoll/UX_DESIRED:         2.0
+TrajRoll/ANGLE_VEL_DAMP:     0
+
+#Vehicle Parameters
+TrajRoll/MAX_STEERING_ANGLE: 0.8  #In radians
+TrajRoll/CAR_WIDTH:          0.
+
+#For Debugging 
+TrajRoll/VISUALIZATION:      true
+TrajRoll/DEBUG_ON:           true
+TrajRoll/BAD_DATA_LIMIT:     1
+
+#Offset box params
+TrajRoll/OFFSET_WIDTH:       0
+TrajRoll/OFFSET_HEIGHT:      0
+
+##  PID Controller            ##
+
+#Configurations
+PIDController/PID_DEBUG:         false
+PIDController/PID_Enabled:       true
+
+#Longitudinal PID Gains
+PIDController/Kp_long:       0.0
+PIDController/Kd_long:       0.0
+PIDController/Ki_long:       0
+PIDController/Kf_long:       1.25
+
+#Draw Obstacle Line
+Draw_Obs_Lines/OFFSET_HEADING:  1.55
+Draw_Obs_Lines/OFFSET_DISTANCE: 0
+Draw_Obs_Lines/line_length:     3
+Draw_Obs_Lines/nan_count:    0
+
+
+################################
+##     Laser Mapping Node     ##
+################################
+LaserMapper/enable:          true
+
+#Obstacle#
+LaserMapper/NO_OBS:          0
+LaserMapper/OBS:             1
+LaserMapper/UNKNOWN:         0.5
+LaserMapper/OBS_SCALE:       100
+
+#Map Parameters#
+#map_res in meter
+LaserMapper/map_res:         0.02
+LaserMapper/map_W:           300
+LaserMapper/map_H:           500
+LaserMapper/map_orientation: 3.1415926
+LaserMapper/INFLATE_OBS:     8
+
+#Scan parameters#
+#Angles are in radian, range in meter
+LaserMapper/max_angle:        1
+LaserMapper/min_angle:        -1
+LaserMapper/minrange:        0.001
+LaserMapper/maxrange:        40
+LaserMapper/samplerate:      1
+
+#Debugging#
+LaserMapper/DEBUG:           false
+LaserMapper/VISION_ON:       true

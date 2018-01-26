@@ -1,0 +1,21 @@
+<launch>
+  <param name="device" command="$(find rr_traffic_light)/src/camera_parameters_tl.sh"/>
+
+  <node ns ="traffic_light" name="usb_cam_traffic_light" pkg="usb_cam" type="usb_cam_node" output="screen" >
+    <param name="video_device" value="/dev/video3" />
+    <param name="image_width" value="640" />
+    <param name="image_height" value="480" />
+    <param name="pixel_format" value="mjpeg" />
+    <!-- param name="camera_frame_id" value="usb_cam_traffic_light" /-->
+    <!-- param name="io_method" value="mmap"/-->
+    <!-- param name="gain_automatic" value="true" /-->
+  </node>
+
+  <rosparam file="$(find rr_traffic_light)/launch/traff_param.yaml"/>
+
+  <!-- node ns ="traffic_light" name="output_video_cam_traffic_light" pkg="image_view" type="image_view" respawn="false" output="screen">
+       <remap from="image" to="/traffic_light/usb_cam_traffic_light/image_raw" />
+       <param name="autosize" value="true" />
+  </node -->
+
+</launch>

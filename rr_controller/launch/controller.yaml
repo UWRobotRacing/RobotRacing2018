@@ -1,0 +1,24 @@
+########################
+##  Controller Node   ##
+########################
+
+# Configurations
+PIDController/PID_DEBUG:     false
+PIDController/PID_Enabled:   false
+
+# Longitudinal PID Gains
+PIDController/velocity/Kp_:       10.0
+PIDController/velocity/Kd_:       0.6
+PIDController/velocity/Ki_:       200.0
+PIDController/velocity/Kf_:       40.0
+
+# Lateral PID Gains
+PIDController/steer/Kp_:        0.6
+PIDController/steer/Kd_:        1.9
+PIDController/steer/Ki_:        -0.0005
+PIDController/steer/Kf_:        3
+
+# Velocity Topics
+PIDController/velocity/measured_topic:    "/arduino/enc_vel"
+PIDController/velocity/reference_topic:   "/PathPlanner/vel_level"
+PIDController/velocity/pub_topic:         "/controller/vel_cmd"

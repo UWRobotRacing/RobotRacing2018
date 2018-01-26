@@ -1,0 +1,71 @@
+################################
+##  Trajectory Rollout Node   ##
+################################
+#Map Size
+TrajRoll/MAP_WIDTH:            600
+TrajRoll/MAP_HEIGHT:           400
+TrajRoll/RESOLUTION:           0.01
+
+#Trajectory Generation Parameters
+TrajRoll/NUM_PATHS:            21
+TrajRoll/TRAJECTORY_STEPS:     75
+TrajRoll/dt:                   0.025
+TrajRoll/OBS_THRESHOLD:        0
+TrajRoll/BIAS_CENTER:          0         #0: No bias, 1: full bias
+TrajRoll/STRAIGHTLINE_LIMIT:   4
+TrajRoll/ANGLE_LIMIT:          0.3
+TrajRoll/MIN_DISTANCE:         0.2
+TrajRoll/X_START:              0
+TrajRoll/Y_START:              -2
+TrajRoll/enable:               false      #This is only for initial testing
+
+#Desired Path Setup
+TrajRoll/ANGLE_WEIGHT:         0     # More angle weight, more cost
+TrajRoll/DISTANCE_WEIGHT:      1     # More distance weight, less cost
+TrajRoll/ANGLE_WEIGHT_DIFF:    0     # for PID only
+TrajRoll/K_heading:            1
+
+#Desired Velocity Setup
+TrajRoll/UX_DESIRED:           1.0
+TrajRoll/MIN_ACCELERATION_ANGLE:  0.087
+TrajRoll/STRAIGHT_SPEED:       2.0
+TrajRoll/ANGLE_VEL_DAMP:       0
+
+#Vehicle Parameters
+TrajRoll/MAX_STEERING_ANGLE:   0.8
+#0.5     #In radians
+TrajRoll/CAR_WIDTH:            0.27
+TrajRoll/DIST_COST_FACTOR:     1.0
+
+#For Debugging
+
+TrajRoll/DEBUG_ON:             false
+TrajRoll/BAD_DATA_LIMIT:       0
+
+#Offset box params
+TrajRoll/OFFSET_WIDTH:         0.2
+TrajRoll/OFFSET_HEIGHT:        0.2
+TrajRoll/MIN_OFFSET_DIST:      0.05
+TrajRoll/MIN_STOPPING_DIST:      0.2
+
+#Visualization
+TrajRoll/VISUALIZATION:        true
+
+#var I added
+TrajRoll/Check_Traffic:         false
+TrajRoll/PLANNER_VELOCITY:      2.0
+
+TrajRoll/DRAW_ALL_PATHS:       true
+TrajRoll/ALL_PATH_COLOUR_R:    99.0
+TrajRoll/ALL_PATH_COLOUR_G:    99.0
+TrajRoll/ALL_PATH_COLOUR_B:    99.0
+TrajRoll/ALL_PATH_COLOUR_A:    1.0
+TrajRoll/ALL_PATH_SCALE:       0.01
+
+TrajRoll/DRAW_CHOSEN_PATHS:    true
+TrajRoll/CHOSEN_PATH_LIFE_TIME: 0.02
+TrajRoll/CHOSEN_PATH_COLOUR_R:  1.0
+TrajRoll/CHOSEN_PATH_COLOUR_G:  1.0
+TrajRoll/CHOSEN_PATH_COLOUR_B:  1.0
+TrajRoll/CHOSEN_PATH_COLOUR_A:  1.0
+TrajRoll/CHOSEN_PATH_SCALE:    0.05

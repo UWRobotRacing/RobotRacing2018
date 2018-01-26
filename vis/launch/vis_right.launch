@@ -1,0 +1,22 @@
+<launch>
+	<node pkg="vis"
+		type="lineNode"
+		name="vis_right"/>
+	<param name="Debug_Flag" type="bool" value="true" />
+	
+	<param name="Camera_Source_Topic" type="string" value="/right/usb_cam_right/image_raw" />
+	<param name="Output_Image_topic" type="string" value="/output_video_right" />
+	<param name="Output_Pointlist_topic" type ="string" value="/output_point_list_right"/>
+	<param name="PointListOut" type="bool" value="true" />
+	
+	<param name="Blob_Size" type="int" value="15" />
+	<param name="Fixed_Threshold" type="int" value="2" />
+	<param name="Adaptive_HSV_Max_S" type ="int" value = "64"/>
+	<param name="Adaptive_HSV_Min_V" type ="int" value = "-24"/>
+	<param name="Adaptive_HSV_MPatch_Size" type ="int" value = "25"/>
+
+	<!-- param name="Fixed_Threshold" type="int" value="2" / -->
+	
+	<param name="OpenCVMatFile" type="string" value="$(find vis)/launch/vision_params_right.yaml" />
+	<!-- FYI: OpenCV Image coordinates are in [x,y], where X is a column index (0 left), and Y is a row index (0 top) -->
+</launch>

@@ -1,0 +1,10 @@
+<launch>
+
+  <!-- <include file="$(find vis)/launch/dual_cam_vis.launch" /> -->
+  
+  ### Insert parameters #########################
+  <rosparam file="$(find rr_path_planner)/launch/parameters/rr_path_planner.yaml"/>
+
+  <node pkg="rr_path_planner" name="rr_path_planner" type="rr_path_planner" output="screen">
+  </node>  
+</launch>

@@ -1,0 +1,26 @@
+<launch>
+  	<!-- Controller wt/ Arduino -->
+	  <node pkg="rosserial_python" type="serial_node.py" name="serial_node" output="screen" required="true">
+      <param name="~port" value="/dev/arduino" />
+      <param name="~baud" value="115200" />
+  	</node>
+
+  	<!-- Speed Controller -->
+    <include file="$(find rr_controller)/launch/controller.launch" />
+
+  	<!-- Laser Mapper -->
+  	<include file="$(find rr_mapper)/launch/mapper.launch" />
+
+	  <!-- Camera -->   
+    <include file="$(find vis)/launch/dual_cam_vis.launch" />
+    
+    <!-- Path Planner -->
+    <include file="$(find rr_path_planner)/launch/trajectory_rollout.launch" />	
+
+    <!-- Traffic Light Detection -->
+    <include file="$(find rr_vision)/rr_traffic_light/launch/rr_trafficlight.launch" /> 
+    
+    <!-- Traffic Light Camera -->
+    <include file="$(find rr_vision)/rr_traffic_light/launch/traffic_light_camera.launch" /> 
+    
+</launch>

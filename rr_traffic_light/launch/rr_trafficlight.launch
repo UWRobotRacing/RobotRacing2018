@@ -1,0 +1,20 @@
+<launch>
+	
+	<!-- Traffic Light Camera --> 
+   <include file="$(find rr_traffic_light)/launch/traffic_light_camera.launch" />
+    
+	<node pkg="rr_traffic_light"
+		type="rr_traffic_light"
+		name="rr_traffic_light" 
+		output="screen"/>
+	<param name="R_Threshold_High" type="double" value="-.5" />
+	<param name="G_Threshold_Low" type="double" value=".5" />
+	<param name="diff_Threshold" type="int" value="400" />
+	<param name="CheckbackFrames" type="int" value="3" />
+	<param name="Testmode" type="int" value="0" />
+	<param name="Camera_Source_Topic" type="string" value="/traffic_light/usb_cam_traffic_light/image_raw" />
+	
+	<!--	<rosparam file="$(find rr_traffic_light)/launch/traff_param.yaml" command	="load" /> -->
+	/>
+
+</launch>

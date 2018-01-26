@@ -1,0 +1,26 @@
+<launch>
+
+<!-- Camera Node -->
+<node name="RRCamera" pkg="ximea_camera" type="ximea_camera_node" output="screen" >
+
+  <param name="camera_name" type="string" value="camera1" />
+  <param name="info_url" type="string" value="package://ximea_camera/launch/camera1.yaml" />
+
+  <param name="image_data_format" type="string" value="XI_RGB24" />
+  <param name="auto_exposure" type="bool" value="false" />
+  <param name="exposure_time" type="int" value="5000" />  
+  <param name="frame_rate" type="int" value="40" />
+  <param name="cams_on_bus" type="int" value="1" />
+<!--
+  <param name="rect_left" type="int" value="172" />
+  <param name="rect_top" type="int" value="274" />
+  <param name="rect_width" type="int" value="940" />
+  <param name="rect_height" type="int" value="480" />
+-->
+</node>
+
+</launch>
+
+
+
+

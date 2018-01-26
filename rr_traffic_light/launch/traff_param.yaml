@@ -1,0 +1,60 @@
+# Morphological Transform Params
+/rr_traffic_light/morphology_func: 3
+  # 1 = ?
+  # 2 = MORPH_OPEN
+  # 3 = MORPH_CLOSE
+  # 4 = MORPH_GRADIENT
+  # 5 = MOPRH_TOPHAT
+  # 6 = MORPH_BLACKHAT
+/rr_traffic_light/morph_element_radius: 4
+
+# Determines what part on radius to get color from as % (0-1) of radius
+/rr_traffic_light/get_color_radius_factor: 0.5
+
+# Control whether image windows will open
+/rr_traffic_light/window_toggle: 0
+
+# Slider Parameters
+/rr_traffic_light/trackbar_toggle: 0
+/rr_traffic_light/multithreshold_toggle: 0
+
+# Publisher and Subscriber Names
+/rr_traffic_light/traff_light_pub_topic: "/rr_traffic_light/traffic_light_go"
+/rr_traffic_light/traff_light_image_sub_topic: "/traffic_light/usb_cam_traffic_light/image_raw"
+/rr_traffic_light/traff_light_super_enable_sub_topic: "/RR1/Enable"
+
+/rr_traffic_light/h_slider_max: 179
+/rr_traffic_light/s_slider_max: 255
+/rr_traffic_light/v_slider_max: 255
+
+# Vision Lows and Highs
+# Convert later to opencv style and store in array
+/rr_traffic_light/hue_low_bound: 20
+/rr_traffic_light/hue_high_bound: 50
+
+/rr_traffic_light/sat_low_bound: 20
+/rr_traffic_light/sat_high_bound: 255
+
+/rr_traffic_light/val_low_bound: 180
+/rr_traffic_light/val_high_bound: 255
+
+/rr_traffic_light/hue_low_bound_red: 90
+/rr_traffic_light/hue_high_bound_red: 140
+
+/rr_traffic_light/sat_low_bound_red: 20
+/rr_traffic_light/sat_high_bound_red: 255
+
+/rr_traffic_light/val_low_bound_red: 180
+/rr_traffic_light/val_high_bound_red: 255
+
+# Traffic Light Parameters
+/rr_traffic_light/greenlight_detect_rep_min: 3
+/rr_traffic_light/colour_threshold: 50
+
+# HoughCircles Paramters
+/rr_traffic_light/canny_param_high: 300
+/rr_traffic_light/canny_param_low: 15
+
+
+
+

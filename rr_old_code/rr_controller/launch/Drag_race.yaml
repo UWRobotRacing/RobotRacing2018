@@ -1,0 +1,27 @@
+################################
+##  PID DRAGE RACE Node       ##
+################################
+#Drag Race Parameters
+PIDController/look_ahead:         1.0
+PIDController/Vel_Desired:        1.5
+
+#Configuration
+PIDController/Enabled:            true
+PIDController/DEBUG:              true
+
+#Longitudinal PID Gains
+PIDController/Kp_long:            0.0
+PIDController/Kd_long:            0.0
+PIDController/Ki_long:            0.0
+PIDController/Kf_long:            1.25
+
+#Lateral PID Gains
+PIDController/Kp_lat:             0.65
+PIDController/Kd_lat:             0.15
+PIDController/Ki_lat:             0
+
+#POSITIVE IF LINE ON LEFT OF ROBOT
+PIDController/OFFSET_DISTANCE:    0.4
+PIDController/OFFSET_HEADING:     1.65
+PIDController/ANGLE_REJECT:       0.8
+PIDController/LAT_REJECT:         1

@@ -1,0 +1,45 @@
+<launch>	
+	### PARAMETERS TO USE ###
+	### Bright Day: exposure_time = 25, threshold_value = 200 ###
+	### Slightly Cloudy: exposure_time = 25, threshold_value = 155 ###
+
+	### Insert parameters #########################
+    <rosparam file="$(find robotracing_pid_control)/launch/Drag_race.yaml"/>
+ 	
+ 	<!-- Camera Node -->
+	<node name="RRCamera" pkg="ximea_camera" type="ximea_camera_node" output="screen" 
+	required = "true">
+
+	  <param name="camera_name" type="string" value="camera1" />
+	  <param name="info_url" type="string" value="package://ximea_camera/launch/camera1.yaml" />
+	  #data format was XI_RGB24||XI_MONO8#
+	  <param name="image_data_format" type="string" value="XI_RGB24" />
+	  <param name="auto_exposure" type="bool" value="false" />
+	  <param name="exposure_time" type="int" value="5000" />  
+	  <param name="frame_rate" type="int" value="100" />
+	  <param name="cams_on_bus" type="int" value="1" />
+	  
+	</node>
+
+ 	<node pkg="robot_racing_2014_cv"
+		type="robot_racing_2014_cv"
+		name="drag_race_cv"
+		required = "true">
+		<param name="threshold_value" type="int" value="150" />
+		<param name="debug_flag" type="bool" value="true" />
+	</node>
+
+    <!-- ARDUINO -->
+    <node pkg="rosserial_python" type="serial_node.py" name="serial_node" output="screen" required = "true">
+        <param name="~port" value="/dev/arduino" />
+        <param name="~baud" value="115200" />
+    </node>
+
+	<node pkg="robotracing_pid_control" 
+		type="robotracing_dragrace" 
+		name="robotracing_dragrace"
+		output = "screen"
+		required = "true">		
+	</node>
+		
+</launch>
