@@ -5,10 +5,6 @@
     <param name="~baud" value="115200" />
   </node>
 
-  <!-- Speed Controller -->
-  <!-- <include file="$(find rr_controller)/launch/controller.launch" /> -->
-
-
   <!-- Traffic Light Detection -->
   <!--include file="$(find rr_traffic_light)/launch/rr_trafficlight.launch" /--> 
 

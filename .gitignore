@@ -48,6 +48,8 @@ Temporary Items
 
 #temp files
 *.py~
+*.pyc
+*.bag
 *.c~
 *.cpp~
 

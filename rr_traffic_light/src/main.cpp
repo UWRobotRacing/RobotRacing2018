@@ -22,7 +22,6 @@
 
 int main(int argc, char **argv)
 {
-
   // Initiate trafficLight Node
   ros::init(argc, argv, "trafficLightNode");
   ros::NodeHandle nh_;
