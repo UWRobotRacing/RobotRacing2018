@@ -32,9 +32,6 @@ int     MaxChars;               /* max chars to read before beeping */
 * DESCRIPTION :
 *       File compression and decompression routines. 
 *
-* PUBLIC FUNCTIONS :
-*       int     FM_CompressFile( FileHandle )
-*       int     FM_DecompressFile( FileHandle )
 *
 * NOTES :
 *       These functions are a part of the FM suite;
