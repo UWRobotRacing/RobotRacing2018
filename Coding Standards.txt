@@ -7,14 +7,6 @@ https://google.github.io/styleguide/pyguide.html
 
 -Please fill out this header above all functions (http://syque.com/cstyle/ch4.5.htm)
 
-/*******************************************************************/
-
-int
-KB_GetLine( pKbdBuf, MaxChars )
-
-char    *pKbdBuf;               /* -> buffer for keyboard chars     */
-int     MaxChars;               /* max chars to read before beeping */
-
 /*
 * PURPOSE : Input line of text from keyboard
 *
@@ -26,6 +18,7 @@ int     MaxChars;               /* max chars to read before beeping */
 */
 
 -Please fill this header out above every source code file(including launch files and xml files)
+
 /***********************************************************************
 * FILENAME :        fmcompres.c             COMPETITION: IARRC 2018
 *
