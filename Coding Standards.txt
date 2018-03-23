@@ -8,13 +8,15 @@ https://google.github.io/styleguide/pyguide.html
 -Please fill out this header above all functions (http://syque.com/cstyle/ch4.5.htm)
 
 /*
-* PURPOSE : Input line of text from keyboard
+* PURPOSE: Input line of text from keyboard
 *
-* RETURN :  VALID_DATA = valid read
+* INPUTS:  text = text from keyboard
+*
+* RETURN:  VALID_DATA = valid read
 *                        (see keyboard.h for the rest)
 *
-* NOTES :   Unknown characters returned as '*'
-*           Backspace is the only editing allowed.
+* NOTES:   Unknown characters returned as '*'
+*          Backspace is the only editing allowed.
 */
 
 -Please fill this header out above every source code file(including launch files and xml files)
