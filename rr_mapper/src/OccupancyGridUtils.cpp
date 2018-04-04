@@ -7,7 +7,7 @@
 #include <nav_msgs/OccupancyGrid.h>
 #include <ros/console.h>
 
-#include <rr_libraries/OccupancyGridUtils.h>
+#include <OccupancyGridUtils.h>
 // TO IMPLEMENT
 // Function Name
 

@@ -4,6 +4,7 @@
 // Date: 2015 06 04
 
 #include "LaserMapper.h"
+#include <OccupancyGridUtils.h>
 #include <stdio.h>
 #include <math.h>
 #include <vector>
@@ -17,9 +18,6 @@
 #include <nav_msgs/OccupancyGrid.h>
 #include <sensor_msgs/LaserScan.h>
 #include <tf/transform_datatypes.h>
-
-// Custom Libraries
-#include <rr_libraries/OccupancyGridUtils.h>
 
 /* TODO: 1. Add Support for output in OpenCV Mat format
  *        
