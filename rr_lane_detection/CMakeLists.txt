@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(vis)
+project(lane_detection)
 
 set(CMAKE_BUILD_TYPE Debug)
 
@@ -11,5 +11,5 @@ catkin_package()
 include_directories(${OpenCV_INCLUDE_DIRS})
 include_directories(include ${catkin_INCLUDE_DIRS})
 
-add_executable(lineNode src/lineNode.cpp src/vision_fun_2015.cpp src/visionprocessor.cpp include/visionprocessor.hpp include/vision_fun_2015.hpp)
-target_link_libraries(lineNode ${catkin_LIBRARIES})
+add_executable(lane_detection src/lane_detection.cpp src/thresholding.cpp src/lane_detection_processor.cpp include/lane_detection_processor.hpp include/thresholding.hpp)
+target_link_libraries(lane_detection ${catkin_LIBRARIES})

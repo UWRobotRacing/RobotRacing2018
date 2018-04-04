@@ -1,6 +1,6 @@
 <launch>
 
-  <!-- <include file="$(find vis)/launch/dual_cam_vis.launch" /> -->
+  <!-- <include file="$(find lane_detection)/launch/dual_cam_lane_detection.launch" /> -->
   
   ### Insert parameters #########################
   <rosparam file="$(find rr_path_planner)/launch/parameters/drag_race.yaml"/>

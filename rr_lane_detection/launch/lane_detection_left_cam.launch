@@ -1,7 +1,12 @@
+<!--@file lane_detection_left_cam.launch
+ -  @brief This launch file is used to run the lane detection node on the
+ -       	 left camera
+ -  @author Matthew Post
+ -  @author Toni Ogunmade(oluwatoni)
+ -  @competition IARRC 2018
+ -->
 <launch>
-	<node pkg="vis"
-		type="lineNode"
-		name="vis_left"/>
+	<node pkg="lane_detection" type="lineNode" name="lane_detection_left"/>
 	<param name="Debug_Flag" type="bool" value="true" />
 	
 	<param name="Camera_Source_Topic" type="string" value="/left/usb_cam_left/image_raw" />
@@ -15,8 +20,6 @@
 	<param name="Adaptive_HSV_Min_V" type ="int" value = "-24"/>
 	<param name="Adaptive_HSV_MPatch_Size" type ="int" value = "25"/>
 
-	<!-- param name="Fixed_Threshold" type="int" value="2" / -->
-	
-	<param name="OpenCVMatFile" type="string" value="$(find vis)/launch/vision_params_left.yaml" />
+	<param name="OpenCVMatFile" type="string" value="$(find lane_detection)/launch/vision_params_left.yaml" />
 	<!-- FYI: OpenCV Image coordinates are in [x,y], where X is a column index (0 left), and Y is a row index (0 top) -->
 </launch>

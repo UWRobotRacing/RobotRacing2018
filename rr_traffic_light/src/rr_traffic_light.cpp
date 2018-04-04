@@ -33,11 +33,11 @@ TrafficLightProcessor::TrafficLightProcessor(ros::NodeHandle nh_): it_( nh_ )
   images.reserve(checkback);
 
   // Output image stream, binarized
-  nh_.param<std::string>("Output_Image_topic", binary_out_im, "/output_video");
+  nh_.param<std::string>("Output_Image_topic", binary_out_im_, "/output_video");
 
 
   // Publishers
-  image_pub_ = it_.advertise(binary_out_im, 1);
+  image_pub_ = it_.advertise(binary_out_im_, 1);
   tl_pub_name_ = "/enable";
   tl_state_pub = nh_.advertise<std_msgs::Int8>(tl_pub_name_, 1);
   red_pub =  nh_.advertise<std_msgs::Float32>("red_test", 1);
@@ -70,8 +70,8 @@ void TrafficLightProcessor::imageCallback(const sensor_msgs::Image::ConstPtr& ms
       printf("%d \n", framenum);
       curr_vec_index = framenum % checkback;
       prev_vec_index = (framenum + 1) % checkback;
-      cv_input_bridge = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
-      cv_input_bridge->image.copyTo(images.at(curr_vec_index));
+      cv_input_bridge_ = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
+      cv_input_bridge_->image.copyTo(images.at(curr_vec_index));
 
       if (framenum < checkback)
       {

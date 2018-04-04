@@ -46,10 +46,9 @@ class TrafficLightProcessor
         ros::Publisher green_pub;
 
         // Other variables
-        cv_bridge::CvImagePtr cv_input_bridge;
-        cv_bridge::CvImage cv_output_bridge;
-        cv::Mat im_input;
-    	std::string binary_out_im;
+        cv_bridge::CvImagePtr cv_input_bridge_;
+        cv_bridge::CvImage cv_output_bridge_;
+    	std::string binary_out_im_;
 	    image_transport::Publisher image_pub_; 
         std::vector<cv::Mat> images;
         std::vector<double> gPixel, rPixel;

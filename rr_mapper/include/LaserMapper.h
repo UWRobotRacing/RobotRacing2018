@@ -31,8 +31,8 @@ class LaserMapper
   private:
     // Methods
     void callBack(const sensor_msgs::LaserScan::ConstPtr& msg);
-    void visionCallBackLeft(const nav_msgs::OccupancyGrid::ConstPtr& msg);
-    void visionCallBackRight(const nav_msgs::OccupancyGrid::ConstPtr& msg);
+    void DetectLeftLane(const nav_msgs::OccupancyGrid::ConstPtr& msg);
+    void DetectRightLane(const nav_msgs::OccupancyGrid::ConstPtr& msg);
     void getParam();
     void initMap();
     void deleteMap();
@@ -44,14 +44,14 @@ class LaserMapper
     ros::NodeHandle n_;
     ros::Publisher map_pub_;
     ros::Subscriber scan_sub_;
-    ros::Subscriber vis_left_sub_;
-    ros::Subscriber vis_right_sub_;
+    ros::Subscriber lane_detection_left_sub_;
+    ros::Subscriber lane_detection_right_sub_;
 
     // Map Variables
     std::vector<double> belief_map_;
     nav_msgs::OccupancyGrid occu_msg_;
-    nav_msgs::OccupancyGrid vis_left_msg_;
-    nav_msgs::OccupancyGrid vis_right_msg_;
+    nav_msgs::OccupancyGrid lane_detection_left_msg_;
+    nav_msgs::OccupancyGrid lane_detection_right_msg_;
     sensor_msgs::LaserScan laser_msg_;
 
     std::string occupancy_grid_name_;
@@ -81,7 +81,7 @@ class LaserMapper
     double UNKNOWN_;
     double OBS_SCALE_;
 
-    // Vision Map Values
+    // lane_detection Map Values
     int offset_height_left_;
     int offset_height_right_;
     int offset_width_left_;
@@ -90,8 +90,8 @@ class LaserMapper
     // Debug Purposes
     bool DEBUG_;
     bool ready2Map_;
-    bool ready2MapVisLeft_;
-    bool ready2MapVisRight_;
+    bool ready2Maplane_detectionLeft_;
+    bool ready2Maplane_detectionRight_;
     bool check_traffic_;
 
 };

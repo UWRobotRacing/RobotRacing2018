@@ -31,11 +31,11 @@ LaserMapper/scan_processing_subsample:      0
 LaserMapper/mechanical_offset:              0
 
 
-LaserMapper/vis_left_msg/offset_height:     75
-LaserMapper/vis_left_msg/offset_width:      73
+LaserMapper/lane_detection_left_msg/offset_height:     75
+LaserMapper/lane_detection_left_msg/offset_width:      73
 
-LaserMapper/vis_right_msg/offset_height:    63
-LaserMapper/vis_right_msg/offset_width:     295
+LaserMapper/lane_detection_right_msg/offset_height:    63
+LaserMapper/lane_detection_right_msg/offset_width:     295
 
 #Debugging#
 LaserMapper/DEBUG:                          false

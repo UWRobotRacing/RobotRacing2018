@@ -1,5 +1,13 @@
+<!--@file dual_cam_lane_detection.launch
+ -  @brief This launch file is used to run the nodes publishing the camera 
+ -         streams for both cameras it then launches the lane detection 
+ -         software on both
+ -  @author Matthew Post
+ -  @author Toni Ogunmade(oluwatoni)
+ -  @competition IARRC 2018
+ -->
 <launch>
-  <param name="device" command="$(find vis)/src/camera_parameters.sh"/>
+  <param name="device" command="$(find lane_detection)/scripts/camera_parameters.sh"/>
 
   <node ns ="left" name="usb_cam_left" pkg="usb_cam" type="usb_cam_node" output="screen" >
     <param name="video_device" value="/dev/cam_left" />
@@ -27,9 +35,10 @@
 
     <param name="auto_white_balance" value="false" />
     <param name="contrast" value="64" />
-    <param name="sharpness" value="20" /> 191
+    <param name="sharpness" value="20" />
   </node>
-<!--
+
+<!-- Output the camera streams
   <node ns ="left" name="output_video_cam_left" pkg="image_view" type="image_view" respawn="false" output="screen">
        <remap from="image" to="/left/usb_cam_left/image_raw" />
        <param name="autosize" value="true" />
@@ -40,28 +49,6 @@
        <param name="autosize" value="true" />
    </node>
 -->
-   <include ns ="left" file="$(find vis)/launch/vis_left.launch" />
-   <include ns ="right" file="$(find vis)/launch/vis_right.launch" />
-   
-<!--
-  <node ns ="left" name="output_video_left" pkg="image_view" type="image_view" respawn="false" output="screen">
-       <remap from="image" to="/output_video_left" />
-       <param name="autosize" value="true" />
-   </node>
-
-   <node ns ="right" name="output_video_right" pkg="image_view" type="image_view" respawn="false" output="screen">
-       <remap from="image" to="/output_video_right" />
-       <param name="autosize" value="true" />
-   </node>
-
-     <node ns ="left" name="sobel_left" pkg="image_view" type="image_view" respawn="false" output="screen">
-       <remap from="image" to="/left/sobel_output" />
-       <param name="autosize" value="true" />
-   </node>
-
-   <node ns ="right" name="sobel_right" pkg="image_view" type="image_view" respawn="false" output="screen">
-       <remap from="image" to="/right/sobel_output" />
-       <param name="autosize" value="true" />
-   </node>
--->
+   <include ns ="left" file="$(find lane_detection)/launch/lane_detection_left_cam.launch" />
+   <include ns ="right" file="$(find lane_detection)/launch/lane_detection_right_cam.launch" />
 </launch>

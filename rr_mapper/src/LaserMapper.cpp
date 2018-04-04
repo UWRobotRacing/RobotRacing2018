@@ -29,8 +29,8 @@
 LaserMapper::LaserMapper()
 {
   // Initialize variables
-  ready2MapVisLeft_ = false;
-  ready2MapVisRight_ = false;
+  ready2Maplane_detectionLeft_ = false;
+  ready2Maplane_detectionRight_ = false;
   ready2Map_ = true;
 
   // Load Parameters
@@ -41,8 +41,8 @@ LaserMapper::LaserMapper()
   scan_sub_ = n_.subscribe<sensor_msgs::LaserScan>
                       (laser_scan_name_, 1, &LaserMapper::callBack, this);
 
-  vis_left_sub_ = n_.subscribe("/output_point_list_left", 1, &LaserMapper::visionCallBackLeft, this);
-  vis_right_sub_ = n_.subscribe("/output_point_list_right", 1, &LaserMapper::visionCallBackRight, this);
+  lane_detection_left_sub_ = n_.subscribe("/output_point_list_left", 1, &LaserMapper::DetectLeftLane, this);
+  lane_detection_right_sub_ = n_.subscribe("/output_point_list_right", 1, &LaserMapper::DetectRightLane, this);
 
   // Initialize an occupancy grid
   initMap();
@@ -75,29 +75,29 @@ void LaserMapper::getParam()
   n_.param<int>("LaserMapper/scan_processing_subsample", scan_subsample_, 0);
   n_.param<int>("LaserMapper/mechanical_offset", mech_offset_, 0);
 
-  n_.param<int>("LaserMapper/vis_left_msg/offset_height", offset_height_left_, -200);
-  n_.param<int>("LaserMapper/vis_left_msg/offset_width", offset_width_left_, 0);
-  n_.param<int>("LaserMapper/vis_right_msg/offset_height", offset_height_right_, -200);
-  n_.param<int>("LaserMapper/vis_right_msg/offset_width", offset_width_right_, 500);
+  n_.param<int>("LaserMapper/lane_detection_left_msg/offset_height", offset_height_left_, -200);
+  n_.param<int>("LaserMapper/lane_detection_left_msg/offset_width", offset_width_left_, 0);
+  n_.param<int>("LaserMapper/lane_detection_right_msg/offset_height", offset_height_right_, -200);
+  n_.param<int>("LaserMapper/lane_detection_right_msg/offset_width", offset_width_right_, 500);
 }
 
-void LaserMapper::visionCallBackLeft(const nav_msgs::OccupancyGrid::ConstPtr& msg)
+void LaserMapper::DetectLeftLane(const nav_msgs::OccupancyGrid::ConstPtr& msg)
 {
-  vis_left_msg_ = *msg;
+  lane_detection_left_msg_ = *msg;
 
-  if (!ready2MapVisLeft_)
-    ready2MapVisLeft_ = true;
-  // Assumes laser is much faster than vision data
+  if (!ready2Maplane_detectionLeft_)
+    ready2Maplane_detectionLeft_ = true;
+  // Assumes laser is much faster than lane_detection data
   // Note: modify this function after camera integration
 }
 
-void LaserMapper::visionCallBackRight(const nav_msgs::OccupancyGrid::ConstPtr& msg)
+void LaserMapper::DetectRightLane(const nav_msgs::OccupancyGrid::ConstPtr& msg)
 {
-  vis_right_msg_ = *msg;
+  lane_detection_right_msg_ = *msg;
 
-  if (!ready2MapVisRight_)
-    ready2MapVisRight_ = true;
-  // Assumes laser is much faster than vision data
+  if (!ready2Maplane_detectionRight_)
+    ready2Maplane_detectionRight_ = true;
+  // Assumes laser is much faster than lane_detection data
   // Note: modify this function after camera integration
 }
 
@@ -233,7 +233,7 @@ void LaserMapper::callBack(const sensor_msgs::LaserScan::ConstPtr& msg)
   if (!ready2Map_)
     ready2Map_ = true;
 
-  // Assumes laser is much faster than vision data
+  // Assumes laser is much faster than lane_detection data
   // Note: modify this function after camera integration
 }
 
@@ -285,12 +285,12 @@ void LaserMapper::processMap()
     std::max(static_cast<int>(weight), static_cast<int>(belief_map_[i]));
   }
 
-  // Join the vision occupancy and the laser occupancy together.
-  if (ready2Map_ && ready2MapVisLeft_ && ready2MapVisRight_)
+  // Join the lane_detection occupancy and the laser occupancy together.
+  if (ready2Map_ && ready2Maplane_detectionLeft_ && ready2Maplane_detectionRight_)
   {
     // ROS_INFO("Joining maps");
-    joinOccupancyGrid(occu_msg_, vis_left_msg_, offset_height_left_, offset_width_left_);
-    joinOccupancyGrid(occu_msg_, vis_right_msg_, offset_height_right_, offset_width_right_);
+    joinOccupancyGrid(occu_msg_, lane_detection_left_msg_, offset_height_left_, offset_width_left_);
+    joinOccupancyGrid(occu_msg_, lane_detection_right_msg_, offset_height_right_, offset_width_right_);
   }
 
   map_pub_.publish(occu_msg_);
