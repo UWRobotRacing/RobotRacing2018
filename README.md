@@ -22,23 +22,18 @@ Please fill out this header above all functions (Doxygen style)
 void get_cursor(int* row, int* col);
 ```
 Please fill this header out above every source code file(including launch files and xml files)
-``` cpp
-/***********************************************************************
-* FILENAME :        fmcompres.c             COMPETITION: IARRC 2018
-*
-* DESCRIPTION :
-*       File compression and decompression routines. 
-*
-*
-* NOTES :
-*       These functions are a part of the FM suite;
-*       See IMS FM0121 for detailed description.
-*
-* 
-* AUTHOR :    Toni Ogunmade 
-*
-*
-*/
+```
+/** @file console.h
+ *  @brief Function prototypes for the console driver.
+ *
+ *  This contains the prototypes for the console
+ *  driver and eventually any macros, constants,
+ *  or global variables you will need.
+ *
+ *  @author YOUR NAME (GITHUB_USERNAME)
+ *  @author Toni Ogunmade(oluwatoni)
+ *  @competition IARRC 2018
+ */
 ```
 
 ### Moving forward:
