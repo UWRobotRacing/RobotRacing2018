@@ -1,0 +1,28 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "",
+        "limitSymbolsToIncludedHeaders": true
+      },
+      "includePath": [
+        "/home/parallels/catkin_ws/devel/include",
+        "/opt/ros/kinetic/include",
+        "/home/parallels/catkin_ws/src/autorally/autorally_control/include",
+        "/home/parallels/catkin_ws/src/autorally/autorally_core/include",
+        "/home/parallels/catkin_ws/src/RobotRacing2018/rr_lane_detection/include",
+        "/home/parallels/catkin_ws/src/RobotRacing2018/rr_drivers/microstrain_3dmgx2_imu/include",
+        "/home/parallels/catkin_ws/src/RobotRacing2018/rr_libraries/include",
+        "/home/parallels/catkin_ws/src/RobotRacing2018/rr_mapper/include",
+        "/home/parallels/catkin_ws/src/RobotRacing2018/rr_path_planner/include",
+        "/home/parallels/catkin_ws/src/RobotRacing2018/rr_traffic_light/include",
+        "/home/parallels/catkin_ws/src/ros_canopen/socketcan_bridge/include",
+        "/home/parallels/catkin_ws/src/ros_canopen/socketcan_interface/include",
+        "/home/parallels/catkin_ws/src/twist_mux/include",
+        "/home/parallels/catkin_ws/src/RobotRacing2018/rr_drivers/urg_node/include",
+        "/usr/include"
+      ],
+      "name": "Linux"
+    }
+  ]
+}
