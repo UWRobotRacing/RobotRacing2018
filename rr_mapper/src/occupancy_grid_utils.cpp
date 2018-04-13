@@ -1,48 +1,46 @@
-// Copyright [2015] University of Waterloo Robotics Team
-// Occupancy Grid Utility Functions
-// Author: Jungwook Lee
-// Date: 2015 06 04
+/** @file laser_mapper.hpp
+ *  @author Jungwook Lee
+ *  @author Toni Ogunmade(oluwatoni)
+ *  @competition IARRC 2018
+ */
 
 // ROS headers
 #include <nav_msgs/OccupancyGrid.h>
 #include <ros/console.h>
 
-#include <OccupancyGridUtils.h>
-// TO IMPLEMENT
-// Function Name
+#include <occupancy_grid_utils.hpp>
 
-/*
-Joints 2 occupancy grid given a set of grid. The from_grid will be resized based on 
-the size of the old grid and the values will be added to the occupancy grid. In our
-case we use binary, so no need to actually add but do a bitwise or. Once the grid has 
-been joined, the pointer to the occupancy grid is returned.
-
-Parameters: a set of grid to be joined, and offset in x and y directions.
+/** @brief joins two occupancy grids with the same resolution
+ * 
+ *  Joints 2 occupancy grid given a set of grid. The from_grid will be resized based on 
+ *  the size of the old grid and the values will be added to the occupancy grid. In our
+ *  case we use binary, so no need to actually add but do a bitwise or. Once the grid has 
+ *  been joined, the pointer to the occupancy grid is returned.
+ *  
+ *  @param to_grid a grid to be joined
+ *  @param from_grid destination grid to be joined
+ *  @param offsetHeight an offset factored into the join
+ *  @param offsetWidth an offset factored into the join
+ *  @return NONE
 */
 
-void joinOccupancyGrid(nav_msgs::OccupancyGrid &to_grid,
+void JoinOccupancyGrid(nav_msgs::OccupancyGrid &to_grid,
                         nav_msgs::OccupancyGrid &from_grid,
                         int offsetHeight, int offsetWidth)
 {
   // Load The two grids
   if (&to_grid == NULL || &from_grid == NULL)
   {
-    ROS_ERROR("joinOccupancyGrid: Grid object NULL.");
+    ROS_ERROR("JoinOccupancyGrid: Grid object NULL.");
     return;
   }
-
-  // if (offsetHeight < 0 || offsetWidth < 0 )
-  // {
-  //   ROS_ERROR("joinOccupancyGrid: Input offsets are negative.");
-  //   return;
-  // }
 
   int resolution = to_grid.info.resolution;
 
   // TODO(jungwook): Handle Resolution Change
   if (to_grid.info.resolution != from_grid.info.resolution)
   {
-    ROS_ERROR("joinOccupancyGrid: Resolution mismatch.");
+    ROS_ERROR("JoinOccupancyGrid: Resolution mismatch.");
     return;
   }
 
@@ -86,32 +84,22 @@ void joinOccupancyGrid(nav_msgs::OccupancyGrid &to_grid,
   return;
 }
 
-/*
-Resizes the occupancy grid based on the given parameters.
-
-Parameters: starting location of the grid and the height and width of the new grid.
-
-nav_msgs::OccupancyGrid* resizeOccupancyGrid(nav_msgs::OccupancyGrid* grid, int height,
-                                            int width, int startX, int startY)
-{
-}
-*/
-
-/*
-Returns index of given (i,j) from a grid given max_width and max_height
-
-Parameters: starting location of the grid and the height and width of the new grid.
-Starts from (0,0)
---------> i
-********* |
-********* |
-********* |
-********* v j 
+/** @brief Returns index of given (i,j) from a grid given max_width and max_height
+ * 
+ *  Parameters: starting location of the grid and the height and width of the new grid.
+ *  Starts from (0,0)
+ *  --------> i
+ *  ********* |
+ *  ********* |
+ *  ********* |
+ *  ********* v j 
+ *
+ *  @parma i starting location of the grid(x-axis)
+ *  @parma j starting location of the grid(x-axis)
+ *  @parma max_width the width of the new grid.
 */
 int ijToIndex(int i, int j, int max_width)
 {
   // Debugging Code
-  // ROS_INFO("i,j,max_width: %d, %d, %d", i,j,max_width);
-  // ROS_INFO("output : %f",floor((max_width-1)*j)+(i));
   return floor((((max_width)*(j))-1)+i);
 }

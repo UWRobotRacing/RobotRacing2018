@@ -43,7 +43,7 @@ PathPlanner2k16::PathPlanner2k16() {
   //ros topics init
   //Normal Pub and Subscriber
   enable_sub = node.subscribe("/enable", 1, &PathPlanner2k16::EnableCallBack, this);
-  map_sub = node.subscribe("/map", 1, &PathPlanner2k16::processMap, this);
+  map_sub = node.subscribe("/map", 1, &PathPlanner2k16::ProcessMap, this);
   vel_pub = node.advertise<std_msgs::Float32>("/PathPlanner/vel_level", 1, true);
   steer_pub = node.advertise<std_msgs::Float32>("/PathPlanner/steer_cmd", 1, true);
 }
@@ -120,7 +120,6 @@ void PathPlanner2k16::getParams() {
 
   node.param<bool>("TrajRoll/VISUALIZATION", VISUALIZATION_, true);
   node.param<bool>("TrajRoll/DEBUG_ON", DEBUG_ON_, false);
-  node.param<bool>("TrajRoll/Check_Traffic", check_traffic_, true);
 
   //ROS_INFO("<<<<<<<< Loaded Parameters >>>>>>>>");
   if(DEBUG_ON_) {ROS_INFO("getaram() : Finished :1");}
@@ -183,14 +182,14 @@ void PathPlanner2k16::generateIdealPaths() {
   if(DEBUG_ON_) {ROS_INFO("generateIdealPaths() : Finished :4b");}
 }
 
-void PathPlanner2k16::processMap(const nav_msgs::OccupancyGrid::ConstPtr& msg) {
-  if(DEBUG_ON_) {ROS_INFO("processMap() : Called: started");}
+void PathPlanner2k16::ProcessMap(const nav_msgs::OccupancyGrid::ConstPtr& msg) {
+  if(DEBUG_ON_) {ROS_INFO("ProcessMap() : Called: started");}
   // Exit if not enabled
   
-  if (DEBUG_ON_) {ROS_INFO("PATH PLANNER: processMap: Start location (%d, %d)", X_START_,Y_START_);}
+  if (DEBUG_ON_) {ROS_INFO("PATH PLANNER: ProcessMap: Start location (%d, %d)", X_START_,Y_START_);}
   map_ = msg;
   if(enable.data==0) {
-    ROS_WARN("PathPlanner2k16: processMap: Enable is 0. No data Processing!!");
+    ROS_WARN("PathPlanner2k16: ProcessMap: Enable is 0. No data Processing!!");
     return;
   }
   generateRealPaths();

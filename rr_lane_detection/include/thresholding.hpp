@@ -15,4 +15,4 @@ void Multithreshold(const cv::Mat &input_image, const cv::Mat &bounds, cv::Mat &
 void FindWhite(const cv::Mat &input_image, const cv::Scalar bounds, int patch_size, cv::Mat &output_image);
 cv::Mat Skeletonize(const cv::Mat &image);
 cv::Mat GetContours(const cv::Mat &image, int min_size);
-#endif
+#endif //__THRESHOLDING_HPP

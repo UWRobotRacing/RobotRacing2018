@@ -1,6 +1,10 @@
-################################
-##     Laser Mapping Node     ##:
-################################
+# @file rr_mapper.yaml
+# @author Sirui Song
+# @author Jungwook Lee
+# @author Raymond Kuo
+# @author Toni Ogunmade(oluwatoni)
+# @competition IARRC 2018
+ 
 #Names#
 LaserMapper/Occupancy_Grid_Name:            "/map"
 LaserMapper/Laser_Scan_Name:                "/scan"
@@ -29,7 +33,6 @@ LaserMapper/maxrange:                       4
 LaserMapper/samplerate:                     1
 LaserMapper/scan_processing_subsample:      0
 LaserMapper/mechanical_offset:              0
-
 
 LaserMapper/lane_detection_left_msg/offset_height:     75
 LaserMapper/lane_detection_left_msg/offset_width:      73

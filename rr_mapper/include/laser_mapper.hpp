@@ -1,7 +1,10 @@
-// Copyright [2015] University of Waterloo Robotics Team
-// Robot Racing Laser Mapper Class
-// Author: Sirui Song, Jungwook Lee, Raymond Kuo
-// Date: 2015 06 04
+/** @file laser_mapper.hpp
+ *  @author Sirui Song
+ *  @author Jungwook Lee
+ *  @author Raymond Kuo
+ *  @author Toni Ogunmade(oluwatoni)
+ *  @competition IARRC 2018
+ */
 
 #ifndef LASERMAPPER_H
 #define LASERMAPPER_H
@@ -27,21 +30,21 @@ class LaserMapper
 {
   public:
     LaserMapper();
-    void processMap();
+    void ProcessMap();
   private:
     // Methods
-    void callBack(const sensor_msgs::LaserScan::ConstPtr& msg);
+    void CallBack(const sensor_msgs::LaserScan::ConstPtr& msg);
     void DetectLeftLane(const nav_msgs::OccupancyGrid::ConstPtr& msg);
     void DetectRightLane(const nav_msgs::OccupancyGrid::ConstPtr& msg);
-    void getParam();
-    void initMap();
-    void deleteMap();
-    void updateLaserMap(int x, int y, double value);
-    double checkMap(int x, int y);
-    void rayTracing(float angle, float range, int inflate_factor);
+    void GetParam();
+    void InitMap();
+    void DeleteMap();
+    void UpdateLaserMap(int x, int y, double value);
+    double CheckMap(int x, int y);
+    void RayTracing(float angle, float range, int inflate_factor);
 
     // ROS Variables
-    ros::NodeHandle n_;
+    ros::NodeHandle nh_;
     ros::Publisher map_pub_;
     ros::Subscriber scan_sub_;
     ros::Subscriber lane_detection_left_sub_;
@@ -92,7 +95,6 @@ class LaserMapper
     bool ready2Map_;
     bool ready2Maplane_detectionLeft_;
     bool ready2Maplane_detectionRight_;
-    bool check_traffic_;
 
 };
 

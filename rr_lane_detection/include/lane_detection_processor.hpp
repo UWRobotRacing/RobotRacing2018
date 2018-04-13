@@ -67,4 +67,4 @@ class lane_detection_processor
     void FindLanes(const sensor_msgs::Image::ConstPtr& msg);
 };
 
-#endif
+#endif //__LANE_DETECTION_PROCESSOR_HPP

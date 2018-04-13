@@ -63,3 +63,5 @@ Temporary Items
 
 #Rosbags because they are too big
 *.bag
+.vscode/c_cpp_properties.json
+.vscode/settings.json

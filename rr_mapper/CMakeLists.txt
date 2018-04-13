@@ -12,8 +12,6 @@ find_package(
 	roslint
 )
 
-find_package(rr_libraries REQUIRED)
-
 catkin_package(
 	INCLUDE_DIRS include
 	CATKIN_DEPENDS 
@@ -23,18 +21,11 @@ catkin_package(
 	sensor_msgs 
 	nav_msgs
 	tf
-	DEPENDS system_lib rr_libraries
 )
 
 roslint_cpp()
 
-# Get workspace directory for catkin
-# get_filename_component(PARENT_DIR ${PROJECT_SOURCE_DIR} PATH)
-# include_directories(include ${catkin_INCLUDE_DIRS} ${PARENT_DIR}/rr_libraries/include) 
-
 include_directories(include ${Boost_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS})
-include_directories(include ${roscpp_INCLUDE_DIRS} ${rr_libraries_INCLUDE_DIRS}) 
-
-add_executable(rr_mapper src/main.cpp src/LaserMapper.cpp src/OccupancyGridUtils.cpp)
-
-target_link_libraries(rr_mapper ${roscpp_LIBRARIES} ${rr_libraries_LIBRARIES}) 
+include_directories(include ${roscpp_INCLUDE_DIRS}) 
+add_executable(rr_mapper src/main.cpp src/laser_mapper.cpp src/occupancy_grid_utils.cpp)
+target_link_libraries(rr_mapper ${roscpp_LIBRARIES}) 

@@ -35,7 +35,7 @@ private:
     void generateRealPaths(); //paths with obstacle in real time
     int xyToMapIndex(double x, double y);
     std::vector<geometry_msgs::Point> rayTrace(double x0, double y0, double x1, double y1);
-    void processMap(const nav_msgs::OccupancyGrid::ConstPtr& msg);
+    void ProcessMap(const nav_msgs::OccupancyGrid::ConstPtr& msg);
     void EnableCallBack(const std_msgs::Int8::ConstPtr& msg);
     bool isCellOccupied(int index);
     int checkLength(int angle_index);
@@ -96,8 +96,6 @@ private:
     ros::Duration drag_duration_;
     bool start_recorded_; //used in drag mode to stop after a particular time
     ros::Time start_time_;
-
-    bool check_traffic_;
 
     // Offset box params, obs in the box is ignored
     double min_offset_dist_;
