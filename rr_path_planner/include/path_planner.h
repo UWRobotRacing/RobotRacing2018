@@ -65,7 +65,7 @@ private:
     double CAR_WIDTH_;
 
     // Trajectory Rollout Path variables
-    std::vector< std::vector <double> > anglesAndWeights;   //It is Nx2 matrix; 1st column is angle, 2nd column is weight
+    std::vector< std::vector <double> > angles_and_weights;   //It is Nx2 matrix; 1st column is angle, 2nd column is weight
     std::vector< std::vector <double> > path_distance;
     std::vector< std::vector < std::vector <int> > > trajectory;
     int NUM_PATHS_;

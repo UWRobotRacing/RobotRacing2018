@@ -28,7 +28,7 @@ PathPlanner::PathPlanner() {
   Init();
 
   //initializing angles and corresponding weights
-  anglesAndWeights = GetAnglesAndWeights(MAX_STEERING_ANGLE_, NUM_PATHS_);
+  angles_and_weights = GetAnglesAndWeights(MAX_STEERING_ANGLE_, NUM_PATHS_);
 
   //VISUALIZATION Pub
   if(VISUALIZATION_) {
@@ -73,7 +73,7 @@ void PathPlanner::Init() {
   trajectory_marker_vector.resize(NUM_PATHS_);
 
   //resizing the path variables
-  anglesAndWeights.resize(NUM_PATHS_, std::vector<double>(2, 0.0));
+  angles_and_weights.resize(NUM_PATHS_, std::vector<double>(2, 0.0));
   path_distance.resize(NUM_PATHS_, std::vector<double>(TRAJECTORY_STEPS_, 0.0));
   trajectory.resize(NUM_PATHS_);
   for(int i=0;i<NUM_PATHS_;i++)
@@ -163,19 +163,29 @@ std::vector< std::vector <double> > PathPlanner::GetAnglesAndWeights(double max_
   return angle_n_weights;
 }
 
+/** @brief generate paths based on the steering angles in angles_and_weights
+ *
+ *  theta is the steering angle
+ *  the steering angles are used to generate a list of point that is then
+ *  saved for later use
+ *  if VISUALIZATION_ is set it will be displayed
+ *
+ *  @return NONE
+ */
 void PathPlanner::GenerateIdealPaths() {
   for(int i=0;i<NUM_PATHS_;i++) {
     //initial state vector values of car
-    double x=X_START_;
-    double y=Y_START_;
-    double theta=0.0;
-    double dist=0.0;
+    double x = X_START_;
+    double y = Y_START_;
+    double theta = 0.0;
+    double dist = 0.0;
+
     for(int j=0;j<TRAJECTORY_STEPS_;j++) {
-      x+=PLANNER_VELOCITY_*sin(-theta)*dt_; //** robot dx as calculated by motion model
-      y+=PLANNER_VELOCITY_*cos(-theta)*dt_; //** -theta flips the Y axis. theta is measured around Y_axis
-      theta+=anglesAndWeights[i][0]*PLANNER_VELOCITY_*dt_;
+      x += PLANNER_VELOCITY_*sin(-theta)*dt_; //** robot dx as calculated by motion model
+      y += PLANNER_VELOCITY_*cos(-theta)*dt_; //** -theta flips the Y axis. theta is measured around Y_axis
+      theta += angles_and_weights[i][0]*PLANNER_VELOCITY_*dt_;
       dist += sqrt(pow(PLANNER_VELOCITY_*sin(theta)*dt_,2)+pow(PLANNER_VELOCITY_*cos(theta)*dt_,2));
-      path_distance[i][j]=dist;
+      path_distance[i][j] = dist;
       //compensating rectangluar car around x and y
       double x0 = x + (CAR_WIDTH_) * cos(theta);
       double y0 = y + (CAR_WIDTH_) * sin(theta);
@@ -189,8 +199,8 @@ void PathPlanner::GenerateIdealPaths() {
       }
       if(VISUALIZATION_) {
         geometry_msgs::Point p;
-        p.x=x;
-        p.y=y;
+        p.x = x;
+        p.y = y;
         trajectory_marker_vector[i].points.push_back(p);
         trajectory_points.points.push_back(p);
         for(std::vector<geometry_msgs::Point>::iterator it = new_point_list.begin();it<new_point_list.end();it++) {
@@ -208,6 +218,10 @@ void PathPlanner::GenerateIdealPaths() {
   if(DEBUG_ON_) {ROS_INFO("GenerateIdealPaths() : Finished :4b");}
 }
 
+/** @brief serves as the callback for the occupancy grid containing the lanes and obstacles
+ *  @param msg is a pointer to the OccupancyGrid object
+ *  @return NONE
+ */
 void PathPlanner::ProcessMap(const nav_msgs::OccupancyGrid::ConstPtr& msg) {
   if(DEBUG_ON_) {ROS_INFO("ProcessMap() : Called: started");}
   // Exit if not enabled
@@ -221,6 +235,9 @@ void PathPlanner::ProcessMap(const nav_msgs::OccupancyGrid::ConstPtr& msg) {
   GenerateRealPaths();
 }
 
+/** @brief score each path based on it's obstacle free length, 
+ *  @return NONE
+ */
 void PathPlanner::GenerateRealPaths() {
   //generating realtime path, avoiding obstacles
   if(DEBUG_ON_) {ROS_INFO("PATH PLANNER: generating RealPaths");}
@@ -233,24 +250,24 @@ void PathPlanner::GenerateRealPaths() {
   }
 
   //compute weights, select optimum path.
-  double dist=0.0;
-  double dist_cost=0.0;
-  double angle_cost=0.0;
-  double cost=0.0;
-  double highest_cost=0.0;
-  int index_of_longest_path=0;
-  int selected_path_index=0;
+  double dist = 0.0;
+  double dist_cost = 0.0;
+  double angle_cost = 0.0;
+  double cost = 0.0;
+  double highest_cost = 0.0;
+  int index_of_longest_path = 0;
+  int selected_path_index = 0;
   double selected_path_angle;
   double selected_path_distance;
 
   for(int i=0; i<NUM_PATHS_;i++) {
-    int index_of_path = CheckLength(i);
-    dist=path_distance[i][index_of_path];
+    int index_on_path = CheckLength(i);
+    dist = path_distance[i][index_on_path];
     dist_cost = DIST_COST_FACTOR_*dist; //(PLANNER_VELOCITY_*TRAJECTORY_STEPS_*dt_);
-    angle_cost = anglesAndWeights[i][1];
+    angle_cost = angles_and_weights[i][1];
     cost = dist_cost + angle_cost;
     if (DEBUG_ON_) {
-        ROS_INFO("PATH PLANNER: GenerateRealPaths: index_of_path at index %d = %d", i, index_of_path);
+        ROS_INFO("PATH PLANNER: GenerateRealPaths: index_of_path at index %d = %d", i, index_on_path);
         ROS_INFO("PATH PLANNER: GenerateRealPaths: Longest distance at index %d = %f", i, dist);
         ROS_INFO("PATH PLANNER: GenerateRealPaths: dist_cost %d = %f", i, dist_cost);
         ROS_INFO("PATH PLANNER: GenerateRealPaths: angle_cost %d = %f", i, angle_cost);
@@ -258,15 +275,15 @@ void PathPlanner::GenerateRealPaths() {
     }
     if (i == 0) {
       highest_cost = cost;
-      index_of_longest_path=index_of_path;
+      index_of_longest_path = index_on_path;
       selected_path_index = i;
     }
-    if(highest_cost<cost) {
-      highest_cost=cost;
-      selected_path_index=i;
-      index_of_longest_path=index_of_path;
-      selected_path_angle=anglesAndWeights[i][0];
-      selected_path_distance=dist;
+    if(highest_cost < cost) {
+      highest_cost = cost;
+      selected_path_index = i;
+      index_of_longest_path = index_on_path;
+      selected_path_angle = angles_and_weights[i][0];
+      selected_path_distance = dist;
     }
   }
     if (DEBUG_ON_) {
@@ -274,17 +291,9 @@ void PathPlanner::GenerateRealPaths() {
      ROS_INFO("PATH PLANNER: GenerateRealPaths: Longest Distance = %f", selected_path_distance);
      ROS_INFO("PATH PLANNER: GenerateRealPaths: selected Angle = %f", selected_path_angle);
   }
-  selected_path_index=NUM_PATHS_-selected_path_index-1;
+  selected_path_index = NUM_PATHS_ - selected_path_index - 1;
   ROS_INFO("PATH PLANNER: GenerateRealPaths: Selected path = %d, Longest Distance = %f, selected Angle = %f", selected_path_index,selected_path_distance,selected_path_angle);
-  //***************Publish start_line_detected_***********
-  //but before set the value of start_line_detected_ in obstacle detection
-  //******************************************************
-/*
-  velMsg.data = UX_DESIRED_;
-  if(selected_path_distance <= MIN_STOPPING_DIST_) {velMsg.data = 0.0;}
-  if(fabs(selected_path_angle) <= MIN_ACCELERATION_ANGLE_) {velMsg.data = STRAIGHT_SPEED_;}
-*/
-velMsg=Velocity(selected_path_distance,selected_path_angle);
+  velMsg = Velocity(selected_path_distance,selected_path_angle);
 
   if(DRAG_MODE_) {
     ros::Duration diff = ros::Time::now() - start_time_;
@@ -306,7 +315,10 @@ velMsg=Velocity(selected_path_distance,selected_path_angle);
   }
 }
 
-//this function returns the index of longest path
+/** @brief returns the obstacle free length of the supplied path
+ *  @param angle_index the path to be considered
+ *  @return the index of the farthest point along the path
+ */
 int PathPlanner::CheckLength(int angle_index) {
   int index_longest_path=0;
   for(int j=0;j<TRAJECTORY_STEPS_;j++) {
@@ -325,6 +337,10 @@ int PathPlanner::CheckLength(int angle_index) {
   return index_longest_path;
 }
 
+/** @brief returns if a cell is occupied or not
+ *  @param index the index of that cell on the OccupancyGrid
+ *  @return a boolean representing the state of the cell
+ */
 bool PathPlanner::IsCellOccupied(int index) {
   if(map_->data[index] != 0) {
     return true;
@@ -332,6 +348,20 @@ bool PathPlanner::IsCellOccupied(int index) {
     return false;
 }
 
+/**
+ * @brief draw the selected path over the OccupancyGrid
+ * 
+ * @param pub the markerArray publisher
+ * @param points the points along the selected path
+ * @param id the id
+ * @param index the index of the last point on the path
+ * @param R the red value of the markers
+ * @param G the green value of the markers 
+ * @param B the blue value of the markers 
+ * @param scale the scale of the markers
+ * @param alpha the transparency of the markers
+ * @return NONE
+ */
 void PathPlanner::DrawPath(ros::Publisher& pub, visualization_msgs::Marker& points,int id, int index, int R, int G, int B, float scale, float alpha) {
   points.header.frame_id = "/map";
   points.header.stamp = ros::Time::now();
@@ -355,6 +385,17 @@ void PathPlanner::DrawPath(ros::Publisher& pub, visualization_msgs::Marker& poin
   if(DEBUG_ON_) {ROS_INFO("DrawPath() : Finished for id=%d", id);}
 }
 
+/**
+ * @brief generate a list of points connecting the coordinates provided
+ *  
+ * Works based on Bresenham's line algorithm
+ * 
+ * @param x0 the x comp of the originating point
+ * @param y0 the y comp of the originating point
+ * @param x1 the x comp of the terminating point
+ * @param y1 the y comp of the terminating point
+ * @return std::vector<geometry_msgs::Point> the list of points
+ */
 std::vector<geometry_msgs::Point> PathPlanner::rayTrace(double x0, double y0, double x1, double y1) {
   // Bresenham's line algorithm
   float scale_factor = 100.0;
@@ -441,6 +482,13 @@ std::vector<geometry_msgs::Point> PathPlanner::rayTrace(double x0, double y0, do
   return new_list;
 }
 
+/**
+ * @brief sets the velocity of the car based on the length and curvature of the path selected
+ * 
+ * @param dist the length of the path
+ * @param steer the steering angle selected
+ * @return std_msgs::Float32 the goal velocity 
+ */
 std_msgs::Float32 PathPlanner::Velocity(double dist, double steer) {
   std_msgs::Float32 vel;
   if(dist <= MIN_STOPPING_DIST_) {
@@ -453,11 +501,23 @@ std_msgs::Float32 PathPlanner::Velocity(double dist, double steer) {
   return vel;
 }
 
+/**
+ * @brief sets the enable flag to the value of the msg
+ * 
+ * @param msg the enable message
+ */
 void PathPlanner::EnableCallBack(const std_msgs::Int8::ConstPtr& msg) {
   enable=*msg;
 }
 
 // Convert x,y in car frame to occupancy grid index
+/**
+ * @brief converts from the car frame to the occupancy grid frame
+ * 
+ * @param x the x coordinate of the point 
+ * @param y the y coordinate of the point
+ * @return int the index in the map frame of reference
+ */
 int PathPlanner::xyToMapIndex(double x, double y) {
   //** map W,H = 600cm,400cm but 1pixel in map = 1cm
   // Convert [m] to [pixel] in car coordinate. (origin at bottom middle of image)
