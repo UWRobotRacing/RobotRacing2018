@@ -1,11 +1,13 @@
-// Copyright [2016] University of Waterloo Robotics Team
-// Robot Racing Path Planner Node
-// Author: Ajay Kumar Singh
-// Previous old code Author: Sirui Song, Jungwook Lee
-// Date: 2016, 9th June
+/** @file laser_mapper.hpp
+ *  @author Ajay Kumar Singh
+ *  @author Jungwook Lee
+ *  @author Sirui Song
+ *  @author Toni Ogunmade(oluwatoni)
+ *  @competition IARRC 2018
+ */
 
-#ifndef PATHPLANNER2K16_H
-#define PATHPLANNER2K16_H
+#ifndef PATHPLANNER_H
+#define PATHPLANNER_H
 
 #include <iostream>
 #include <algorithm>
@@ -22,24 +24,24 @@
 #include <std_msgs/Bool.h>
 #include <visualization_msgs/Marker.h>
 
-class PathPlanner2k16 {
+class PathPlanner {
 public:
-    PathPlanner2k16();
+    PathPlanner();
 private:
     //functions
-    void init();
-    void getParams();
+    void Init();
+    void GetParams();
     //functions for path variables calculations
-    std::vector< std::vector <double> > getAnglesAndWeights(double max_angle, int num_paths);
-    void generateIdealPaths();  //paths without obstacle
-    void generateRealPaths(); //paths with obstacle in real time
+    std::vector< std::vector <double> > GetAnglesAndWeights(double max_angle, int num_paths);
+    void GenerateIdealPaths();  //paths without obstacle
+    void GenerateRealPaths(); //paths with obstacle in real time
     int xyToMapIndex(double x, double y);
     std::vector<geometry_msgs::Point> rayTrace(double x0, double y0, double x1, double y1);
     void ProcessMap(const nav_msgs::OccupancyGrid::ConstPtr& msg);
     void EnableCallBack(const std_msgs::Int8::ConstPtr& msg);
-    bool isCellOccupied(int index);
-    int checkLength(int angle_index);
-    std_msgs::Float32 velocity(double dist, double steer);
+    bool IsCellOccupied(int index);
+    int CheckLength(int angle_index);
+    std_msgs::Float32 Velocity(double dist, double steer);
 
     //ROS nodes, pub, sub, msgs & variables
     ros::NodeHandle node;
@@ -105,7 +107,7 @@ private:
     //Debug variables
     bool VISUALIZATION_;
     bool DEBUG_ON_;
-    void drawPath(ros::Publisher& pub, visualization_msgs::Marker& points,int id, int index, int R, int G, int B, float scale, float alpha);
+    void DrawPath(ros::Publisher& pub, visualization_msgs::Marker& points,int id, int index, int R, int G, int B, float scale, float alpha);
     int all_path_marker_id;  //used as an id for drawing path using visualization_msgs
     int selected_path_marker_id;
     ros::Publisher all_path_pub;

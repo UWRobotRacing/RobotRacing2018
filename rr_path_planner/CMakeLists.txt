@@ -22,13 +22,13 @@ catkin_package(
   DEPENDS system_lib
 )
 
-roslint_cpp(src/main.cpp src/PathPlanner2k16.cpp include/PathPlanner2k16.h)
+roslint_cpp(src/main.cpp src/path_planner.cpp include/path_planner.h)
 
 include_directories(include ${Boost_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS})
 add_executable(rr_path_planner src/main.cpp)
-add_library(PathPlanner2k16 src/PathPlanner2k16.cpp include/PathPlanner2k16.h)
+add_library(path_planner src/path_planner.cpp include/path_planner.h)
 
-## add_executable(rr_path_planner src/main.cpp src/rr_path_planner.cpp include/PathPlanner2k16.h)
+## add_executable(rr_path_planner src/main.cpp src/rr_path_planner.cpp include/path_planner.h)
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(rr_path_planner PathPlanner2k16 ${catkin_LIBRARIES})
+target_link_libraries(rr_path_planner path_planner ${catkin_LIBRARIES})

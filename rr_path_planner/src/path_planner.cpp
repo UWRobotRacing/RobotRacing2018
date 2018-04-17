@@ -1,33 +1,34 @@
-/***********************************************************************************
-  Robot Racer Motion PathPlanner2k16
-  Date:2k16, June 9th
+/** @file path_planner.cpp
+ *  Robot Racer Motion PathPlanner
+ *
+ *  Topics Subscribed:
+ *    /map
+ *    /enable       --std_msgs::Int8
+ *
+ *  Topics Published:
+ *    /PathPlanner/vel_level          --used by arduino
+ *    /PathPlanner/steer_cmd          --used by arduino
+ *
+ *  motion model used: 4 wheeled front steered car model
+ *
+ * If enable is off, then steering stops publishing anything! Velocity( publishes zero
+ * If distance to the object < MIN_DISTANCE_, then the vehicle stops
+ * Always assumes initial vehicle position is at (0,0) = mid bottom of the image
+ *
+ *  @author Ajay Kumar Singh
+ *  @author Toni Ogunmade
+ */
+#include <path_planner.h>
 
-  Topics Subscribed:
-    /map
-    /enable       --std_msgs::Int8
-
-  Topics Published:
-    /PathPlanner/vel_level          --used by long controller
-    /PathPlanner/steer_cmd          --used by arduino
-
-  motion model used: 4 wheeled front steered car model
-
-      ** If enable is off, then steering stops publishing anything! Velocity publishes zero
-      ** If distance to the object < MIN_DISTANCE_, then the vehicle stops
-      ** Always assumes initial vehicle position is at (0,0) = mid bottom of the image
-
-  Author: Ajay Kumar Singh
-  Previous old code Author: Sirui Song, Jungwook Lee
-
-************************************************************************************/
-#include <PathPlanner2k16.h>
-
-PathPlanner2k16::PathPlanner2k16() {
+/** @brief initializes the path planner object
+ *  @return NONE
+ */
+PathPlanner::PathPlanner() {
   // Setting initial variables and parameters
-  init();
+  Init();
 
   //initializing angles and corresponding weights
-  anglesAndWeights = getAnglesAndWeights(MAX_STEERING_ANGLE_, NUM_PATHS_);
+  anglesAndWeights = GetAnglesAndWeights(MAX_STEERING_ANGLE_, NUM_PATHS_);
 
   //VISUALIZATION Pub
   if(VISUALIZATION_) {
@@ -38,19 +39,22 @@ PathPlanner2k16::PathPlanner2k16() {
     //Y_axis_pub = node.advertise<visualization_msgs::Marker>("/Visualization/Y_axis", 1, true);
   }
   //initializing all possible paths of trajectory rollout
-  generateIdealPaths();
+  GenerateIdealPaths();
 
   //ros topics init
   //Normal Pub and Subscriber
-  enable_sub = node.subscribe("/enable", 1, &PathPlanner2k16::EnableCallBack, this);
-  map_sub = node.subscribe("/map", 1, &PathPlanner2k16::ProcessMap, this);
+  enable_sub = node.subscribe("/enable", 1, &PathPlanner::EnableCallBack, this);
+  map_sub = node.subscribe("/map", 1, &PathPlanner::ProcessMap, this);
   vel_pub = node.advertise<std_msgs::Float32>("/PathPlanner/vel_level", 1, true);
   steer_pub = node.advertise<std_msgs::Float32>("/PathPlanner/steer_cmd", 1, true);
 }
 
-void PathPlanner2k16::init() {
+/** @brief get the parameters and initialize the member variables
+ *  @return NONE
+ */
+void PathPlanner::Init() {
   enable.data=0;
-  getParams();
+  GetParams();
   // debug parameters
   all_path_marker_id=0; //id for the selected path marker
   selected_path_marker_id=1;
@@ -72,12 +76,21 @@ void PathPlanner2k16::init() {
   anglesAndWeights.resize(NUM_PATHS_, std::vector<double>(2, 0.0));
   path_distance.resize(NUM_PATHS_, std::vector<double>(TRAJECTORY_STEPS_, 0.0));
   trajectory.resize(NUM_PATHS_);
-  for(int i=0;i<NUM_PATHS_;i++) {trajectory[i].resize(TRAJECTORY_STEPS_);}
+  for(int i=0;i<NUM_PATHS_;i++)
+  {
+    trajectory[i].resize(TRAJECTORY_STEPS_);
+  }
 
-  if(DEBUG_ON_) {ROS_INFO("PATH PLANNER: init() : Finished Initializing :2");}
+  if(DEBUG_ON_)
+  {
+    ROS_INFO("PATH PLANNER: Init() : Finished Initializing :2");
+  }
 }
 
-void PathPlanner2k16::getParams() {
+/** @brief save the values of the ros parameters used for path generation
+ *  @return NONE
+ */
+void PathPlanner::GetParams() {
   node.param<bool>("TrajRoll/DRAG_MODE", DRAG_MODE_, false);
   node.param<int>("TrajRoll/DRAG_DURATION", DRAG_DURATION_, 5);
   node.param<int>("TrajRoll/DRAG_DURATION_NANO", DRAG_DURATION_NANO_, 5);
@@ -122,22 +135,35 @@ void PathPlanner2k16::getParams() {
   node.param<bool>("TrajRoll/DEBUG_ON", DEBUG_ON_, false);
 
   //ROS_INFO("<<<<<<<< Loaded Parameters >>>>>>>>");
-  if(DEBUG_ON_) {ROS_INFO("getaram() : Finished :1");}
+  if(DEBUG_ON_) 
+  {
+    ROS_INFO("getaram() : Finished :1");
+  }
 }
 
-std::vector< std::vector <double> > PathPlanner2k16::getAnglesAndWeights(double max_angle, int num_paths) {
-std::vector< std::vector <double> > angle_n_weights(num_paths,std::vector<double> (2, 0.0));
-  for(int i=0;i<num_paths;i++) {
+/** @brief get a list of weight for each of the angles under consideration
+ *  @param max_angle the largest angle under consideration
+ *  @param num_paths total number of paths to be rolled out
+ *  @return a vector of weights for each of the angles
+ */
+std::vector< std::vector <double> > PathPlanner::GetAnglesAndWeights(double max_angle, int num_paths)
+{
+  std::vector< std::vector <double> > angle_n_weights(num_paths, std::vector<double> (2, 0.0));
+  for(int i=0;i<num_paths;i++) 
+  {
     // angle range -max_angle to +max_angle divided equally in num_paths
     angle_n_weights[i][0] = (max_angle*2/(num_paths-1)*i) - max_angle;
     //gives maximum weight(1.0) at center path i.e. straight path. & with increase in angle from center, angle weight decreases.
     angle_n_weights[i][1] = 1.0-(abs(i-(num_paths/2)))*(0.01/num_paths);
   }
+  if(DEBUG_ON_)
+  {
+    ROS_INFO("GetAnglesAndWeights() : Finished :3");
+  }
   return angle_n_weights;
-  if(DEBUG_ON_) {ROS_INFO("getAnglesAndWeights() : Finished :3");}
 }
 
-void PathPlanner2k16::generateIdealPaths() {
+void PathPlanner::GenerateIdealPaths() {
   for(int i=0;i<NUM_PATHS_;i++) {
     //initial state vector values of car
     double x=X_START_;
@@ -175,27 +201,27 @@ void PathPlanner2k16::generateIdealPaths() {
   }
   if(!all_path_pub) {ROS_WARN("Invalid publisher");}
   if(VISUALIZATION_) {
-    drawPath(all_path_pub, trajectory_points, all_path_marker_id, -1, 50, 0, 0, 0.01, 1.0);
-    //drawPath(X_axis_pub, X_axis_marker_points, X_axis_marker_id, -1, 100, 0, 0, 0.05, 1.0);
-    //drawPath(Y_axis_pub, Y_axis_marker_points, Y_axis_marker_id, -1, 0, 0, 100, 0.05, 1.0);
+    DrawPath(all_path_pub, trajectory_points, all_path_marker_id, -1, 50, 0, 0, 0.01, 1.0);
+    //DrawPath(X_axis_pub, X_axis_marker_points, X_axis_marker_id, -1, 100, 0, 0, 0.05, 1.0);
+    //DrawPath(Y_axis_pub, Y_axis_marker_points, Y_axis_marker_id, -1, 0, 0, 100, 0.05, 1.0);
   }
-  if(DEBUG_ON_) {ROS_INFO("generateIdealPaths() : Finished :4b");}
+  if(DEBUG_ON_) {ROS_INFO("GenerateIdealPaths() : Finished :4b");}
 }
 
-void PathPlanner2k16::ProcessMap(const nav_msgs::OccupancyGrid::ConstPtr& msg) {
+void PathPlanner::ProcessMap(const nav_msgs::OccupancyGrid::ConstPtr& msg) {
   if(DEBUG_ON_) {ROS_INFO("ProcessMap() : Called: started");}
   // Exit if not enabled
   
   if (DEBUG_ON_) {ROS_INFO("PATH PLANNER: ProcessMap: Start location (%d, %d)", X_START_,Y_START_);}
   map_ = msg;
   if(enable.data==0) {
-    ROS_WARN("PathPlanner2k16: ProcessMap: Enable is 0. No data Processing!!");
+    ROS_WARN("PathPlanner: ProcessMap: Enable is 0. No data Processing!!");
     return;
   }
-  generateRealPaths();
+  GenerateRealPaths();
 }
 
-void PathPlanner2k16::generateRealPaths() {
+void PathPlanner::GenerateRealPaths() {
   //generating realtime path, avoiding obstacles
   if(DEBUG_ON_) {ROS_INFO("PATH PLANNER: generating RealPaths");}
   if(!start_recorded_) {  //used in drag mode to stop after a particular time
@@ -203,7 +229,7 @@ void PathPlanner2k16::generateRealPaths() {
     start_recorded_=true;
   }
   if(map_ == NULL) {
-    ROS_WARN("PATH PLANNER: generateRealPaths(): Null Pointer");
+    ROS_WARN("PATH PLANNER: GenerateRealPaths(): Null Pointer");
   }
 
   //compute weights, select optimum path.
@@ -218,17 +244,17 @@ void PathPlanner2k16::generateRealPaths() {
   double selected_path_distance;
 
   for(int i=0; i<NUM_PATHS_;i++) {
-    int index_of_path = checkLength(i);
+    int index_of_path = CheckLength(i);
     dist=path_distance[i][index_of_path];
     dist_cost = DIST_COST_FACTOR_*dist; //(PLANNER_VELOCITY_*TRAJECTORY_STEPS_*dt_);
     angle_cost = anglesAndWeights[i][1];
     cost = dist_cost + angle_cost;
     if (DEBUG_ON_) {
-        ROS_INFO("PATH PLANNER: generateRealPaths: index_of_path at index %d = %d", i, index_of_path);
-        ROS_INFO("PATH PLANNER: generateRealPaths: Longest distance at index %d = %f", i, dist);
-        ROS_INFO("PATH PLANNER: generateRealPaths: dist_cost %d = %f", i, dist_cost);
-        ROS_INFO("PATH PLANNER: generateRealPaths: angle_cost %d = %f", i, angle_cost);
-        ROS_INFO("PATH PLANNER: generateRealPaths: cost %d = %f", i, cost);
+        ROS_INFO("PATH PLANNER: GenerateRealPaths: index_of_path at index %d = %d", i, index_of_path);
+        ROS_INFO("PATH PLANNER: GenerateRealPaths: Longest distance at index %d = %f", i, dist);
+        ROS_INFO("PATH PLANNER: GenerateRealPaths: dist_cost %d = %f", i, dist_cost);
+        ROS_INFO("PATH PLANNER: GenerateRealPaths: angle_cost %d = %f", i, angle_cost);
+        ROS_INFO("PATH PLANNER: GenerateRealPaths: cost %d = %f", i, cost);
     }
     if (i == 0) {
       highest_cost = cost;
@@ -244,12 +270,12 @@ void PathPlanner2k16::generateRealPaths() {
     }
   }
     if (DEBUG_ON_) {
-     ROS_INFO("PATH PLANNER: generateRealPaths: Selected path = %d", selected_path_index);
-     ROS_INFO("PATH PLANNER: generateRealPaths: Longest Distance = %f", selected_path_distance);
-     ROS_INFO("PATH PLANNER: generateRealPaths: selected Angle = %f", selected_path_angle);
+     ROS_INFO("PATH PLANNER: GenerateRealPaths: Selected path = %d", selected_path_index);
+     ROS_INFO("PATH PLANNER: GenerateRealPaths: Longest Distance = %f", selected_path_distance);
+     ROS_INFO("PATH PLANNER: GenerateRealPaths: selected Angle = %f", selected_path_angle);
   }
   selected_path_index=NUM_PATHS_-selected_path_index-1;
-  ROS_INFO("PATH PLANNER: generateRealPaths: Selected path = %d, Longest Distance = %f, selected Angle = %f", selected_path_index,selected_path_distance,selected_path_angle);
+  ROS_INFO("PATH PLANNER: GenerateRealPaths: Selected path = %d, Longest Distance = %f, selected Angle = %f", selected_path_index,selected_path_distance,selected_path_angle);
   //***************Publish start_line_detected_***********
   //but before set the value of start_line_detected_ in obstacle detection
   //******************************************************
@@ -258,7 +284,7 @@ void PathPlanner2k16::generateRealPaths() {
   if(selected_path_distance <= MIN_STOPPING_DIST_) {velMsg.data = 0.0;}
   if(fabs(selected_path_angle) <= MIN_ACCELERATION_ANGLE_) {velMsg.data = STRAIGHT_SPEED_;}
 */
-velMsg=velocity(selected_path_distance,selected_path_angle);
+velMsg=Velocity(selected_path_distance,selected_path_angle);
 
   if(DRAG_MODE_) {
     ros::Duration diff = ros::Time::now() - start_time_;
@@ -275,19 +301,19 @@ velMsg=velocity(selected_path_distance,selected_path_angle);
   steer_pub.publish(steerMsg);
   //Publish for VISUALIZATION_: selected_path based on index_of_longest_path
   if(VISUALIZATION_) {
-    drawPath(selected_path_pub, trajectory_marker_vector[selected_path_index], selected_path_marker_id, index_of_longest_path, 0, 0, 50, 0.05, 1);
-    drawPath(rayTrace_pub, trajectory_marker_rayTrace[selected_path_index], trajectory_marker_rayTrace_id, -1, 0, 50, 50, 0.01, 0.5);
+    DrawPath(selected_path_pub, trajectory_marker_vector[selected_path_index], selected_path_marker_id, index_of_longest_path, 0, 0, 50, 0.05, 1);
+    DrawPath(rayTrace_pub, trajectory_marker_rayTrace[selected_path_index], trajectory_marker_rayTrace_id, -1, 0, 50, 50, 0.01, 0.5);
   }
 }
 
 //this function returns the index of longest path
-int PathPlanner2k16::checkLength(int angle_index) {
+int PathPlanner::CheckLength(int angle_index) {
   int index_longest_path=0;
   for(int j=0;j<TRAJECTORY_STEPS_;j++) {
     if(path_distance[angle_index][j] >= min_offset_dist_) {
       int spine_length = trajectory[angle_index][j].size();
       for(int k=0;k<spine_length;k++) {
-        if(isCellOccupied(trajectory[angle_index][j][k])) {
+        if(IsCellOccupied(trajectory[angle_index][j][k])) {
           //obstacle detected in the cell
           index_longest_path=j;
           return index_longest_path;
@@ -299,14 +325,14 @@ int PathPlanner2k16::checkLength(int angle_index) {
   return index_longest_path;
 }
 
-bool PathPlanner2k16::isCellOccupied(int index) {
+bool PathPlanner::IsCellOccupied(int index) {
   if(map_->data[index] != 0) {
     return true;
   }
     return false;
 }
 
-void PathPlanner2k16::drawPath(ros::Publisher& pub, visualization_msgs::Marker& points,int id, int index, int R, int G, int B, float scale, float alpha) {
+void PathPlanner::DrawPath(ros::Publisher& pub, visualization_msgs::Marker& points,int id, int index, int R, int G, int B, float scale, float alpha) {
   points.header.frame_id = "/map";
   points.header.stamp = ros::Time::now();
   points.ns = "Path Points";
@@ -326,10 +352,10 @@ void PathPlanner2k16::drawPath(ros::Publisher& pub, visualization_msgs::Marker& 
     points.points = newPoints;
   }
   pub.publish(points);
-  if(DEBUG_ON_) {ROS_INFO("drawPath() : Finished for id=%d", id);}
+  if(DEBUG_ON_) {ROS_INFO("DrawPath() : Finished for id=%d", id);}
 }
 
-std::vector<geometry_msgs::Point> PathPlanner2k16::rayTrace(double x0, double y0, double x1, double y1) {
+std::vector<geometry_msgs::Point> PathPlanner::rayTrace(double x0, double y0, double x1, double y1) {
   // Bresenham's line algorithm
   float scale_factor = 100.0;
   x0 *= scale_factor;
@@ -415,24 +441,24 @@ std::vector<geometry_msgs::Point> PathPlanner2k16::rayTrace(double x0, double y0
   return new_list;
 }
 
-std_msgs::Float32 PathPlanner2k16::velocity(double dist, double steer) {
+std_msgs::Float32 PathPlanner::Velocity(double dist, double steer) {
   std_msgs::Float32 vel;
   if(dist <= MIN_STOPPING_DIST_) {
     vel.data=0.0;
   }
   else {
     vel.data = std::min(0.75+(dist/(3+steer)),STRAIGHT_SPEED_);
-    ROS_INFO("PathPlanner2k16: Velocity: vel=%f",vel.data);
+    ROS_INFO("PathPlanner: Velocity(: vel=%f",vel.data);
   }
   return vel;
 }
 
-void PathPlanner2k16::EnableCallBack(const std_msgs::Int8::ConstPtr& msg) {
+void PathPlanner::EnableCallBack(const std_msgs::Int8::ConstPtr& msg) {
   enable=*msg;
 }
 
 // Convert x,y in car frame to occupancy grid index
-int PathPlanner2k16::xyToMapIndex(double x, double y) {
+int PathPlanner::xyToMapIndex(double x, double y) {
   //** map W,H = 600cm,400cm but 1pixel in map = 1cm
   // Convert [m] to [pixel] in car coordinate. (origin at bottom middle of image)
   double grid_x = round(x/resolution_);

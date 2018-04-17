@@ -278,11 +278,11 @@ void LaserMapper::CallBack(const sensor_msgs::LaserScan::ConstPtr& msg)
  *  if laser data is saved it starts the process of creating a map
  *  it raytraces the lidar data over the occupancy grid and adds the lanes 
  *  detected if they're available
+ *
  *  @return NONE
  */
 void LaserMapper::ProcessMap()
 {
-
   if (!ready2Map_)
     return;
 

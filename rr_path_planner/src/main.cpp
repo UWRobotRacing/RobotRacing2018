@@ -1,7 +1,9 @@
-// Copyright [2015] University of Waterloo Robotics Team
-// Robot Racing Path Planner Node
-// Author: Jungwook Lee
-// Date: 2015 07 09
+/** @file main.cpp
+ *  @author Jungwook Lee
+ *  @author Sirui Song
+ *  @author Toni Ogunmade(oluwatoni)
+ *  @competition IARRC 2018
+ */
 
 #include <ros/ros.h>
 #include <ros/console.h>
@@ -14,35 +16,41 @@
 #include <visualization_msgs/Marker.h>
 #include <vector>
 
-#include <PathPlanner2k16.h>
+#include <path_planner.h>
 
 ros::Subscriber enable_sub;
 bool enable;
 
+/** @brief handles the enable signal
+ *  @param enable_msg the enable signal
+ *  @return NONE
+ */
 void enable_cb(const std_msgs::Bool& enable_msg)
 {
     enable = enable_msg.data;
 }
 
+/** @brief starts the path_planner node
+ *
+ *  This node doesn't act until it gets the enable signal
+ *
+ *  @return NONE
+ */
 int main(int argc, char **argv)
 {
-  ros::init(argc, argv, "trajectory_generation");
+  ros::Init(argc, argv, "trajectory_generation");
   ros::NodeHandle n;
   ROS_INFO("trajectories Generation Initalized");
 
-  ros::Rate loop_rate(25);  //** frequency should be get using getParams for Synchronization
+  ros::Rate loop_rate(25);  //** frequency should be get using GetParams for Synchronization
   enable = false;
 
   // Debug Code
   // enable = true;
 
-  PathPlanner2k16 TrajGenerator;
+  PathPlanner TrajectoryGenerator;
 
-  while (ros::ok())
-  {
-    //PathPlanner TrajGenerator;
-    ros::spinOnce();
-  }
+  ros::spin();
 
   ROS_INFO("Trajectories Generation Completed");
   return 0;

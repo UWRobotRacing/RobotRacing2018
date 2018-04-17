@@ -1,12 +1,8 @@
-################################
-##  Trajectory Rollout Node   ##
-################################
-#Race Mode
-TrajRoll/DRAG_MODE:           true
-# In Nano Seconds
-TrajRoll/DRAG_DURATION:       90.0
-TrajRoll/DRAG_DURATION_NANO:  440000000
-
+# @file circuit_race.yaml
+# @author Sirui Song
+# @author Jungwook Lee
+# @author Toni Ogunmade(oluwatoni)
+# @competition IARRC 2018
 #Map Size
 TrajRoll/MAP_WIDTH:            600
 TrajRoll/MAP_HEIGHT:           400
@@ -27,19 +23,20 @@ TrajRoll/ANGLE_WEIGHT_DIFF:    0     # for PID only
 TrajRoll/K_heading:            1
 
 #Desired Velocity Setup
-TrajRoll/UX_DESIRED:           0.7
-TrajRoll/MIN_ACCELERATION_ANGLE:  0.20
-TrajRoll/STRAIGHT_SPEED:       5.3
+TrajRoll/UX_DESIRED:           0.1
+TrajRoll/MIN_ACCELERATION_ANGLE:  0.087
+TrajRoll/STRAIGHT_SPEED:       0.1
 
 #Vehicle Parameters
-TrajRoll/MAX_STEERING_ANGLE:   0.035
-TrajRoll/CAR_WIDTH:            0.21
-TrajRoll/DIST_COST_FACTOR:     10.0
+TrajRoll/MAX_STEERING_ANGLE:   0.7
+TrajRoll/CAR_WIDTH:            0.30
+TrajRoll/DIST_COST_FACTOR:     2.0
 TrajRoll/MIN_OFFSET_DIST:      0.05
 
 #End Line Detection
-TrajRoll/HORIZONTAL_LINE_RATIO:  0.65
-TrajRoll/HORIZONTAL_LINE_THICKENESS: 3
+
+TrajRoll/HORIZONTAL_LINE_RATIO:  1
+TrajRoll/HORIZONTAL_LINE_THICKENESS: 0
 
 #For Debugging 
 #Visualization

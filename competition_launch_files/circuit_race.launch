@@ -15,6 +15,6 @@
   <include file="$(find rr_mapper)/launch/mapper.launch" />
    
   <!-- Path Planner -->
-  <include file="$(find rr_path_planner)/launch/circuit_race.launch" />
+  <include file="$(find rr_path_planner)/launch/circuit_race_planner.launch" />
 
 </launch>
