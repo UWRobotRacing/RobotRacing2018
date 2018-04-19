@@ -16,7 +16,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES traffic_light
-#  LIBRARIES vis
+#  LIBRARIES lane_detection
 #  CATKIN_DEPENDS cv_bridge image_transport
 #  DEPENDS system_lib
 )
@@ -27,7 +27,7 @@ include_directories(include
 )
 
 
-add_executable(rr_traffic_light src/rr_traffic_light.cpp src/main.cpp ../vis/src/vision_fun_2015.cpp )
+add_executable(rr_traffic_light src/rr_traffic_light.cpp src/main.cpp)
 
 
 target_link_libraries(rr_traffic_light

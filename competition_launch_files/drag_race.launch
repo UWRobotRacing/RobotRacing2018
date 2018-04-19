@@ -1,0 +1,20 @@
+<launch>
+  <!-- Controller wt/ Arduino -->
+  <node pkg="rosserial_python" type="serial_node.py" name="serial_node" output="screen" respawn="true">
+    <param name="~port" value="/dev/ttyACM1" />
+    <param name="~baud" value="115200" />
+  </node>
+    
+  <!-- Traffic Light Detection -->
+  <include file="$(find rr_traffic_light)/launch/rr_traffic_light.launch" />
+
+  <!-- Camera -->
+  <include file="$(find lane_detection)/launch/dual_cam_lane_detection.launch" />
+
+  <!-- Laser Mapper -->
+  <include file="$(find rr_mapper)/launch/mapper.launch" />
+    
+  <!-- Path Planner -->
+  <include file="$(find rr_path_planner)/launch/drag_race_planner.launch" />	
+
+</launch>

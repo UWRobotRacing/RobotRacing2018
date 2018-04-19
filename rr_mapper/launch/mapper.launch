@@ -1,6 +1,12 @@
+<!--@file mapper.launch
+ -  @author Sirui Song
+ -  @author Jungwook Lee
+ -  @author Raymond Kuo
+ -  @author Toni Ogunmade(oluwatoni)
+ -  @competition IARRC 2018
+ -->
 <launch>    
-  ### Insert parameters #########################
-  <rosparam file="$(find rr_mapper)/launch/parameters/rr_mapper.yaml"/>
+  <rosparam file="$(find rr_mapper)/launch/rr_mapper.yaml"/>
 
   <node pkg="urg_node" name="urg_node" type="urg_node">
     <param name="serial_port" type ="string" value="/dev/ttyACM0" />
