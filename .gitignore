@@ -48,6 +48,8 @@ Temporary Items
 
 #temp files
 *.py~
+*.pyc
+*.bag
 *.c~
 *.cpp~
 
@@ -58,3 +60,8 @@ Temporary Items
 *.elf
 *.srec
 *.atsuo
+
+#Rosbags because they are too big
+*.bag
+.vscode/c_cpp_properties.json
+.vscode/settings.json

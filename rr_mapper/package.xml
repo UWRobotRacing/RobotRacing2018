@@ -13,7 +13,6 @@
   <build_depend> sensor_msgs  </build_depend> 
   <build_depend> nav_msgs </build_depend> 
   <build_depend> tf </build_depend> 
-  <build_depend> rr_libraries </build_depend>
   <build_depend> roslint </build_depend>
 
   <run_depend> std_msgs </run_depend> 
@@ -22,7 +21,6 @@
   <run_depend> sensor_msgs  </run_depend> 
   <run_depend> nav_msgs  </run_depend> 
   <run_depend> tf </run_depend>
-  <run_depend> rr_libraries </run_depend> 
 
   <export>
 

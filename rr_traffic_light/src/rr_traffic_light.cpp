@@ -1,8 +1,10 @@
-// Copyright [2016] University of Waterloo Robotics Team
-// Robot Racing Traffic_Light Node Class Header File
-// Author: Jamie Kim, Jason Leung
-// Date: 2016 05 17
-
+/**
+ * @file rr_traffic_light
+ * @author Toni Ogunmade(oluwatoni)
+ * @author Jamie Kim
+ * @author Jason Leung
+ * @competition IARRC 2018
+ */
 
 // OPENCV includes
 #include <opencv2/highgui/highgui.hpp>
@@ -23,6 +25,10 @@
 
 using namespace cv;
 
+/**
+ * @brief Construct a new Traffic Light Processor:: Traffic Light Processor object
+ * @param nh_ the nodehandle object
+ */
 TrafficLightProcessor::TrafficLightProcessor(ros::NodeHandle nh_): it_( nh_ )
 { 
   // Detection Params for Red
@@ -33,11 +39,11 @@ TrafficLightProcessor::TrafficLightProcessor(ros::NodeHandle nh_): it_( nh_ )
   images.reserve(checkback);
 
   // Output image stream, binarized
-  nh_.param<std::string>("Output_Image_topic", binary_out_im, "/output_video");
+  nh_.param<std::string>("Output_Image_topic", binary_out_im_, "/output_video");
 
 
   // Publishers
-  image_pub_ = it_.advertise(binary_out_im, 1);
+  image_pub_ = it_.advertise(binary_out_im_, 1);
   tl_pub_name_ = "/enable";
   tl_state_pub = nh_.advertise<std_msgs::Int8>(tl_pub_name_, 1);
   red_pub =  nh_.advertise<std_msgs::Float32>("red_test", 1);
@@ -59,6 +65,10 @@ TrafficLightProcessor::TrafficLightProcessor(ros::NodeHandle nh_): it_( nh_ )
   traffic_light_detected = false;
 }
 
+/**
+ * @brief serves as the callback for each image received from the traffic light
+ * @param msg image message
+ */
 void TrafficLightProcessor::imageCallback(const sensor_msgs::Image::ConstPtr& msg)
 {
 	if(tl_state.data != GREEN)
@@ -70,8 +80,8 @@ void TrafficLightProcessor::imageCallback(const sensor_msgs::Image::ConstPtr& ms
       printf("%d \n", framenum);
       curr_vec_index = framenum % checkback;
       prev_vec_index = (framenum + 1) % checkback;
-      cv_input_bridge = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
-      cv_input_bridge->image.copyTo(images.at(curr_vec_index));
+      cv_input_bridge_ = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
+      cv_input_bridge_->image.copyTo(images.at(curr_vec_index));
 
       if (framenum < checkback)
       {
@@ -90,12 +100,25 @@ void TrafficLightProcessor::imageCallback(const sensor_msgs::Image::ConstPtr& ms
 return;
 }
 
-//looks for a red light in an image an uses that to describe a traffic light
+/**
+ * @brief returns false 
+ * 
+ * @return true 
+ * @return false 
+ */
 bool TrafficLightProcessor::FindTL()
 {
   return false;
 }
 
+/**
+ * @brief finds the state of the traffic light
+ * 
+ * it blurs the image and then converts it to the HSV colorspace and 
+ * thresholds for drop in the green pixels in the image
+ * 
+ * @return true if the traffic light is green false if otherwise 
+ */
 int TrafficLightProcessor::FindTLState()
 {
   int isGreen = 0;
@@ -122,7 +145,7 @@ int TrafficLightProcessor::FindTLState()
     //sensor_msgs::ImagePtr msg = cv_bridge::CvImage(std_msgs::Header(), "mono8", red_light).toImageMsg();
     //image_pub_.publish(msg);
 
-  //  rPixel.at(curr_vec_index) = (cv::mean(red)[0]);
+    // rPixel.at(curr_vec_index) = (cv::mean(red)[0]);
     rPixel.at(curr_vec_index) = (cv::mean(red_light)[0]);
 
     printf("red new: %f old: %f\n", rPixel.at(curr_vec_index), rPixel.at(prev_vec_index));
@@ -168,6 +191,10 @@ int TrafficLightProcessor::FindTLState()
 
 }
 
+/**
+ * @brief return the state of the traffic light
+ * @return int traffic light state
+ */
 int TrafficLightProcessor::GetTLState()
 {
   return tl_state.data;
