@@ -3,6 +3,7 @@
 # @author Jungwook Lee
 # @author Toni Ogunmade(oluwatoni)
 # @competition IARRC 2018
+
 #Map Size
 TrajRoll/MAP_WIDTH:            600
 TrajRoll/MAP_HEIGHT:           400
@@ -15,6 +16,7 @@ TrajRoll/TRAJECTORY_STEPS:     100
 TrajRoll/dt:                   0.025
 TrajRoll/OBS_THRESHOLD:        0
 TrajRoll/MIN_STOPPING_DIST:      0.2
+TrajRoll/STOPPING_FACTOR:      0.15
 
 #Desired Path Setup
 TrajRoll/ANGLE_WEIGHT:         0     # More angle weight, more cost
@@ -25,7 +27,7 @@ TrajRoll/K_heading:            1
 #Desired Velocity Setup
 TrajRoll/UX_DESIRED:           0.1
 TrajRoll/MIN_ACCELERATION_ANGLE:  0.087
-TrajRoll/STRAIGHT_SPEED:       0.1
+TrajRoll/STRAIGHT_SPEED:       2.25
 
 #Vehicle Parameters
 TrajRoll/MAX_STEERING_ANGLE:   0.7

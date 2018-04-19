@@ -1,8 +1,8 @@
 <launch>
   <!-- Controller wt/ Arduino -->
   <node pkg="rosserial_python" type="serial_node.py" name="serial_node" output="screen" respawn="true">
-    <param name="~port" value="/dev/ttyACM1" />
-    <param name="~baud" value="115200" />
+    <param name="~port" value="/dev/ttyACM2" />
+    <param name="~baud" value="57600" />
   </node>
     
   <!-- Traffic Light Detection -->

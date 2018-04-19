@@ -17,6 +17,10 @@ Encoder::Encoder(int encoderPin, int multiplier, int freq) { //constructor
 
 bool Encoder::updateSpeed(float timeDiff, float &currentSpeed) { //updates speed if necessary, returns whether or not speed was updated to know if previous time should be updated
 	if (timeDiff >= 1.0/(float)frequency) { //if time difference is greater than period, update to new speed
+		
+		// Serial.print("currentCount: ");
+		// Serial.print(currentCount);
+
 		//reads current position (for currentCount)
 		digitalWrite(pin,HIGH); 
 		digitalWrite(pin,LOW);
@@ -25,6 +29,12 @@ bool Encoder::updateSpeed(float timeDiff, float &currentSpeed) { //updates speed
 		byte response2 = SPI.transfer (0);
 		digitalWrite(pin,HIGH);
 		currentCount = ((response1 << 8)|response2) ;
+
+		// Serial.print("  response1: ");
+		// Serial.print(response1);
+		// Serial.print("  response2: ");
+		// Serial.print(response2);
+
 		//resets encoder position reading
 		digitalWrite(pin,HIGH);
 		digitalWrite(pin,LOW);
