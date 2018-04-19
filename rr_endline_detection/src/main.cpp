@@ -20,7 +20,7 @@ enum states {
 };
 
 
-Class EndlineCounter {
+class EndlineCounter {
 	private :
 		ros::NodeHandle nh;
 		
@@ -36,45 +36,43 @@ Class EndlineCounter {
 	public :
 		int state;
 		
-		EndlineCounter (ros::NodeHandle nh) : it(nh) 
-		{
-			sub = it.subscribe("tl_camera/image",1, &EndlineCounter::img_callback);
-			nh.advertise<std_msgs::Bool>("endline",1);
-			state = BEGINNING;
-		}
-		
+		// EndlineCounter (ros::NodeHandle nh) : it(nh) 
+		// {
+		// 	sub = it.subscribe("tl_camera/image",1, &EndlineCounter::img_callback);
+		// 	nh.advertise<std_msgs::Bool>("endline",1);
+		// 	state = BEGINNING;
+		// }
 		int get_state() {
 			return state;
 		}
 		
-		
-}
+};
 
-EndlineCounter::img_callback(const sensor_msgs::ImagePtr& msg) {
-	pub = nh.advertise<std_msgs::Bool>("endline", 1);
-	imgptr = cv_bridge::toCvCopy(msg, "bgr8")->image); 
+// EndlineCounter::img_callback(const sensor_msgs::ImagePtr& msg) {
+// 	pub = nh.advertise<std_msgs::Bool>("endline", 1);
+// 	imgptr = cv_bridge::toCvCopy(msg, "bgr8")->image); 
 	
-	//process image
+// 	//process image
 	
 	
-	//publish 
-	if(state & ENDLINE_PAST) {
-		pub.publish(true);
-	} else {
-		pub.publish(false);
-	}
-}
+// 	//publish 
+// 	if(state & ENDLINE_PAST) {
+// 		pub.publish(true);
+// 	} else {
+// 		pub.publish(false);
+// 	}
+// }
 
-void EndlineCounter::find_el_state() {
+// void EndlineCounter::find_el_state() {
 	
-}
+// }
 
 
 int main(int argc, char** argv)
 {
 	
-	ros::init(argc,argv, "endline_counter");
-	std::cout << "Initializing endline_counter" << endl;
+	ros::init(argc, argv, "endline_detection");
+	std::cout << "Initializing endline_detection\n\r";
 	
 	//nodehandler.param ?
 	
@@ -83,8 +81,7 @@ int main(int argc, char** argv)
 	{
 	
 		
-		ros::spinOnce();
 	}
 
     return 0;
-{
+}
