@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package>
-  <name>lane_detection</name>
+  <name>rr_lane_detection</name>
   <version>0.0.0</version>
-  <description>The robot_racing_2015 package</description>
+  <description>The robot_racing_2018 package</description>
 
   <maintainer email="msmart@todo.todo">msmart</maintainer>
   <license>TODO</license>
