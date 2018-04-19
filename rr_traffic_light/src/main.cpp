@@ -1,8 +1,9 @@
-// Copyright [2016] University of Waterloo Robotics Team
-// Robot Racing Traffic Light Main
-// Author: Ji Min Kim, Oluwatoni Ogunmade
-// Date: 2016 05 17
-
+/**
+ * @file main.cpp
+ * @author Toni Ogunmade(oluwatoni)
+ * @author Ji Min Kim
+ * @competition IARRC 2018
+ */
 
 // ROS includes
 #include <ros/ros.h>
@@ -20,6 +21,10 @@
 
 #define CAMERA_FRAMERATE 15
 
+/**
+ * @brief initializes and starts the traffic light detection node 
+ * @return int 
+ */
 int main(int argc, char **argv)
 {
   // Initiate trafficLight Node
@@ -47,4 +52,3 @@ int main(int argc, char **argv)
   }
   return 0;
 }
-

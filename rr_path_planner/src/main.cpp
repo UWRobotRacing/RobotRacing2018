@@ -38,7 +38,7 @@ void enable_cb(const std_msgs::Bool& enable_msg)
  */
 int main(int argc, char **argv)
 {
-  ros::Init(argc, argv, "trajectory_generation");
+  ros::init(argc, argv, "trajectory_generation");
   ros::NodeHandle n;
   ROS_INFO("trajectories Generation Initalized");
 

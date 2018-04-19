@@ -1,3 +1,8 @@
+
+# @file rr_mapper.yaml
+# @author Toni Ogunmade(oluwatoni)
+# @competition IARRC 2018
+
 # Morphological Transform Params
 /rr_traffic_light/morphology_func: 3
   # 1 = ?

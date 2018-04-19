@@ -1,3 +1,7 @@
+<!--@file rr_traffic_light.launch
+ -  @author Toni Ogunmade(oluwatoni)
+ -  @competition IARRC 2018
+ -->
 <launch>
 	
 	<!-- Traffic Light Camera --> 

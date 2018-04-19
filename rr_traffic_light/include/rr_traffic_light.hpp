@@ -1,7 +1,11 @@
-// Copyright [2017] University of Waterloo Robotics Team
-// Robot Racing Traffic_Light Node Class Header File
-// Author: Jamie Kim, Jason Leung, Oluwatoni Ogunmade
-// Date: 2016 03 26
+/**
+ * @file rr_traffic_light.hpp
+ * @brief Traffic Light Header File
+ * @author Jamie Kim
+ * @author Jason Leung
+ * @author Toni Ogunmade(oluwatoni)
+ * @competition IARRC 2018
+ */
 
 #ifndef RR_TRAFFIC_LIGHT
 #define RR_TRAFFIC_LIGHT
