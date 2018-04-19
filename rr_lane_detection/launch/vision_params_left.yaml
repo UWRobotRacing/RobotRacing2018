@@ -10,7 +10,7 @@
 
 %YAML:1.0
 #Size of Bird's Eye View grid
-bev_width: 240
+bev_width: 270
 bev_height: 314
 bev_resolution: 0.01
 grid_offset_y: 0
@@ -32,8 +32,8 @@ world_coords: !!opencv-matrix
    dt: f
    data: [ 0., 170., 240., 0., 186., 314., 240., 291.]
 
-multibounds_: !!opencv-matrix
-   rows: 1
+multibounds: !!opencv-matrix
+   rows: 3
    cols: 6
    dt: d
-   data: [150, 128, 128, 90, 255, 255]
+   data: [0, 100, 186, 120, 255, 255,0,0,250,255,25,255, 25, 5, 186, 130, 50, 255]

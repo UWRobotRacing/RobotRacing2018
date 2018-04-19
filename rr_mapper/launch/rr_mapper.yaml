@@ -4,7 +4,7 @@
 # @author Raymond Kuo
 # @author Toni Ogunmade(oluwatoni)
 # @competition IARRC 2018
- 
+
 #Names#
 LaserMapper/Occupancy_Grid_Name:            "/map"
 LaserMapper/Laser_Scan_Name:                "/scan"
@@ -34,11 +34,11 @@ LaserMapper/samplerate:                     1
 LaserMapper/scan_processing_subsample:      0
 LaserMapper/mechanical_offset:              0
 
-LaserMapper/lane_detection_left_msg/offset_height:     75
-LaserMapper/lane_detection_left_msg/offset_width:      73
+LaserMapper/lane_detection_left_msg/offset_height:     0
+LaserMapper/lane_detection_left_msg/offset_width:      35
 
-LaserMapper/lane_detection_right_msg/offset_height:    63
-LaserMapper/lane_detection_right_msg/offset_width:     295
+LaserMapper/lane_detection_right_msg/offset_height:    0
+LaserMapper/lane_detection_right_msg/offset_width:     300
 
 #Debugging#
 LaserMapper/DEBUG:                          false

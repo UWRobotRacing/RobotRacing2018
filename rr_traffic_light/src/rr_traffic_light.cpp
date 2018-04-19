@@ -188,7 +188,6 @@ int TrafficLightProcessor::FindTLState()
     ROS_INFO("Traffic Light Green %d %d ", red_drop, green_rise);
   }
   return isGreen;
-
 }
 
 /**

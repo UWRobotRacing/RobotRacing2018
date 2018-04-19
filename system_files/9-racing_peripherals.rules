@@ -1,0 +1,5 @@
+ATTRS{idVendor}=="15d1", ATTRS{idProduct}=="0000", SYMLINK+="hokuyo", MODE="0666"
+ATTRS{idVendor}=="046d", ATTRS{idProduct}=="0809", ATTRS{serial}=="1033F0AE", SYMLINK+="cam_left", MODE="0666"
+ATTRS{idVendor}=="046d", ATTRS{idProduct}=="0990", ATTRS{serial}=="7D22BB0E", SYMLINK+="cam_right", MODE="0666"
+ATTRS{idVendor}=="046d", ATTRS{idProduct}=="0809", ATTRS{serial}=="E0E5F0A9", SYMLINK+="cam_center", MODE="0666"
+ATTRS{serial}=="75439313737351210172", SYMLINK+="arduino", MODE="0666"

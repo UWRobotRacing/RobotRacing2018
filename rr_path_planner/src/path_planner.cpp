@@ -32,9 +32,9 @@ PathPlanner::PathPlanner() {
 
   //VISUALIZATION Pub
   if(VISUALIZATION_) {
-    all_path_pub = node.advertise<visualization_msgs::Marker>("/Visualization/all_paths", 1, true);
-    selected_path_pub = node.advertise<visualization_msgs::Marker>("/Visualization/selected_path", 1, true);
-    rayTrace_pub = node.advertise<visualization_msgs::Marker>("/Visualization/rayTrace", 1, true);
+    all_path_pub_ = node.advertise<visualization_msgs::Marker>("/Visualization/all_paths", 1, true);
+    selected_path_pub_ = node.advertise<visualization_msgs::Marker>("/Visualization/selected_path", 1, true);
+    rayTrace_pub_ = node.advertise<visualization_msgs::Marker>("/Visualization/rayTrace", 1, true);
     //X_axis_pub = node.advertise<visualization_msgs::Marker>("/Visualization/X_axis", 1, true);
     //Y_axis_pub = node.advertise<visualization_msgs::Marker>("/Visualization/Y_axis", 1, true);
   }
@@ -56,10 +56,10 @@ void PathPlanner::Init() {
   enable.data=0;
   GetParams();
   // debug parameters
-  all_path_marker_id=0; //id for the selected path marker
-  selected_path_marker_id=1;
-  trajectory_marker_rayTrace_id=4;
-  trajectory_marker_rayTrace.resize(NUM_PATHS_);
+  all_path_marker_id_=0; //id for the selected path marker
+  selected_path_marker_id_=1;
+  trajectory_marker_rayTrace_id_=4;
+  trajectory_marker_rayTrace_.resize(NUM_PATHS_);
   /*X_axis_marker_id=2;
   Y_axis_marker_id=3;
   geometry_msgs::Point p1,p2;
@@ -70,7 +70,7 @@ void PathPlanner::Init() {
     Y_axis_marker_points.points.push_back(p2);
   }
   */
-  trajectory_marker_vector.resize(NUM_PATHS_);
+  trajectory_marker_vector_.resize(NUM_PATHS_);
 
   //resizing the path variables
   angles_and_weights.resize(NUM_PATHS_, std::vector<double>(2, 0.0));
@@ -114,6 +114,7 @@ void PathPlanner::GetParams() {
   node.param<double>("TrajRoll/dt", dt_, 0.05);  //**should be calculated as per the frequency rate given in main.cpp
   node.param<int>("TrajRoll/OBS_THRESHOLD", OBS_THRESHOLD_, 0);
   node.param<double>("TrajRoll/MIN_STOPPING_DIST", MIN_STOPPING_DIST_, 0.2);
+  node.param<double>("TrajRoll/STOPPING_FACTOR", STOPPING_FACTOR_, 0.15);
 
   node.param<double>("TrajRoll/ANGLE_WEIGHT", ANGLE_WEIGHT_, 1);
   node.param<double>("TrajRoll/DISTANCE_WEIGHT", DISTANCE_WEIGHT_, 1.9);
@@ -201,17 +202,17 @@ void PathPlanner::GenerateIdealPaths() {
         geometry_msgs::Point p;
         p.x = x;
         p.y = y;
-        trajectory_marker_vector[i].points.push_back(p);
-        trajectory_points.points.push_back(p);
+        trajectory_marker_vector_[i].points.push_back(p);
+        trajectory_points_.points.push_back(p);
         for(std::vector<geometry_msgs::Point>::iterator it = new_point_list.begin();it<new_point_list.end();it++) {
-          trajectory_marker_rayTrace[i].points.push_back(*it);
+          trajectory_marker_rayTrace_[i].points.push_back(*it);
         }
       }
     }
   }
-  if(!all_path_pub) {ROS_WARN("Invalid publisher");}
+  if(!all_path_pub_) {ROS_WARN("Invalid publisher");}
   if(VISUALIZATION_) {
-    DrawPath(all_path_pub, trajectory_points, all_path_marker_id, -1, 50, 0, 0, 0.01, 1.0);
+    DrawPath(all_path_pub_, trajectory_points_, all_path_marker_id_, -1, 50, 0, 0, 0.01, 1.0);
     //DrawPath(X_axis_pub, X_axis_marker_points, X_axis_marker_id, -1, 100, 0, 0, 0.05, 1.0);
     //DrawPath(Y_axis_pub, Y_axis_marker_points, Y_axis_marker_id, -1, 0, 0, 100, 0.05, 1.0);
   }
@@ -310,8 +311,8 @@ void PathPlanner::GenerateRealPaths() {
   steer_pub.publish(steerMsg);
   //Publish for VISUALIZATION_: selected_path based on index_of_longest_path
   if(VISUALIZATION_) {
-    DrawPath(selected_path_pub, trajectory_marker_vector[selected_path_index], selected_path_marker_id, index_of_longest_path, 0, 0, 50, 0.05, 1);
-    DrawPath(rayTrace_pub, trajectory_marker_rayTrace[selected_path_index], trajectory_marker_rayTrace_id, -1, 0, 50, 50, 0.01, 0.5);
+    DrawPath(selected_path_pub_, trajectory_marker_vector_[selected_path_index], selected_path_marker_id_, index_of_longest_path, 0, 0, 50, 0.05, 1);
+    DrawPath(rayTrace_pub_, trajectory_marker_rayTrace_[selected_path_index], trajectory_marker_rayTrace_id_, -1, 0, 50, 50, 0.01, 0.5);
   }
 }
 
@@ -491,11 +492,12 @@ std::vector<geometry_msgs::Point> PathPlanner::rayTrace(double x0, double y0, do
  */
 std_msgs::Float32 PathPlanner::Velocity(double dist, double steer) {
   std_msgs::Float32 vel;
-  if(dist <= MIN_STOPPING_DIST_) {
+  if((dist <= StopDistFromVel(last_velMsg.data)) || (dist <=MIN_STOPPING_DIST_)) {
     vel.data=0.0;
   }
   else {
-    vel.data = std::min(0.75+(dist/(3+steer)),STRAIGHT_SPEED_);
+     //turning radius break point at
+    vel.data = std::min(STRAIGHT_SPEED_/(1+abs(steer)),STRAIGHT_SPEED_);
     ROS_INFO("PathPlanner: Velocity(: vel=%f",vel.data);
   }
   return vel;
@@ -507,10 +509,9 @@ std_msgs::Float32 PathPlanner::Velocity(double dist, double steer) {
  * @param msg the enable message
  */
 void PathPlanner::EnableCallBack(const std_msgs::Int8::ConstPtr& msg) {
-  enable=*msg;
+  enable = *msg;
 }
 
-// Convert x,y in car frame to occupancy grid index
 /**
  * @brief converts from the car frame to the occupancy grid frame
  * 
@@ -532,4 +533,15 @@ int PathPlanner::xyToMapIndex(double x, double y) {
   int Map_index = (map_x-1)+(map_y-1)*map_W_;   //**map index starts from 0,0 from top left
   //if(DEBUG_ON_) {ROS_INFO("xyToMapIndex() : Finished :6");}
   return Map_index;
+  }
+
+/**
+ * @brief returns the distance needed to stop when moving at a certain velocity 
+ * 
+ * @param vel1 the current velocity
+ * @return double the distance required to come to a complete stop
+ */
+double PathPlanner::StopDistFromVel(double vel1)
+{
+   return (vel1 * vel1 * STOPPING_FACTOR_);
 }
