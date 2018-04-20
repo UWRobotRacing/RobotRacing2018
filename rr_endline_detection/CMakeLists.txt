@@ -7,29 +7,21 @@ find_package(catkin REQUIRED COMPONENTS
   cv_bridge
   image_transport
 )
+find_package(OpenCV)
 
-## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   std_msgs
-# )
+catkin_package()
 
-catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES rr_endline_detection
-#  CATKIN_DEPENDS roscpp std_msgs
-#  DEPENDS system_lib
-)
-
+include_directories(${OpenCV_INCLUDE_DIRS})
 include_directories(include
   ${catkin_INCLUDE_DIRS}
 )
 
 add_executable(endline_detection 
-src/main.cpp
+  src/main.cpp
+  include/endline_detection.hpp
+  src/endline_detection.cpp
 )
 
-## Specify libraries to link a library or executable target against
 target_link_libraries(endline_detection
   ${catkin_LIBRARIES}
 )
