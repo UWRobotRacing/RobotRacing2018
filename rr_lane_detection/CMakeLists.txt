@@ -1,9 +1,17 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(lane_detection)
+project(rr_lane_detection)
 
-set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_BUILD_TYPE Release)
 
-find_package(catkin REQUIRED COMPONENTS roscpp std_msgs sensor_msgs geometry_msgs image_transport cv_bridge)
+find_package(catkin REQUIRED COMPONENTS
+  roscpp
+  std_msgs
+  sensor_msgs
+  geometry_msgs
+  image_transport
+  cv_bridge
+)
+
 find_package(OpenCV)
 
 catkin_package()

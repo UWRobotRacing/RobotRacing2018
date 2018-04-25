@@ -4,8 +4,7 @@
 # @author Toni Ogunmade(oluwatoni)
 # @competition IARRC 2018
 
-#Race Mode
-TrajRoll/DRAG_MODE:           true
+#TrajRoll/DRAG_MODE:           true
 # In Nano Seconds
 TrajRoll/DRAG_DURATION:       90.0
 TrajRoll/DRAG_DURATION_NANO:  440000000
@@ -21,7 +20,8 @@ TrajRoll/NUM_PATHS:            101
 TrajRoll/TRAJECTORY_STEPS:     100
 TrajRoll/dt:                   0.025
 TrajRoll/OBS_THRESHOLD:        0
-TrajRoll/MIN_STOPPING_DIST:      0.2
+TrajRoll/MIN_STOPPING_DIST:    0.2
+TrajRoll/STOPPING_FACTOR:      0.15
 
 #Desired Path Setup
 TrajRoll/ANGLE_WEIGHT:         0     # More angle weight, more cost
@@ -32,11 +32,11 @@ TrajRoll/K_heading:            1
 #Desired Velocity Setup
 TrajRoll/UX_DESIRED:           0.7
 TrajRoll/MIN_ACCELERATION_ANGLE:  0.20
-TrajRoll/STRAIGHT_SPEED:       5.3
+TrajRoll/STRAIGHT_SPEED:       3.0
 
 #Vehicle Parameters
-TrajRoll/MAX_STEERING_ANGLE:   0.035
-TrajRoll/CAR_WIDTH:            0.21
+TrajRoll/MAX_STEERING_ANGLE:   0.2
+TrajRoll/CAR_WIDTH:            0.2
 TrajRoll/DIST_COST_FACTOR:     10.0
 TrajRoll/MIN_OFFSET_DIST:      0.05
 

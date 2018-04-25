@@ -42,15 +42,19 @@ private:
     bool IsCellOccupied(int index);
     int CheckLength(int angle_index);
     std_msgs::Float32 Velocity(double dist, double steer);
+    double StopDistFromVel(double vel1);
 
     //ROS nodes, pub, sub, msgs & variables
     ros::NodeHandle node;
     ros::Subscriber map_sub;
+
     ros::Publisher vel_pub;
     ros::Publisher steer_pub;
     nav_msgs::OccupancyGrid::ConstPtr map_;  //map in 2d grid
     std_msgs::Float32 velMsg;   //velocity msg
     std_msgs::Float32 steerMsg; // steer msg
+    std_msgs::Float32 last_velMsg;
+
     ros::Subscriber enable_sub;
     std_msgs::Int8 enable;
 
@@ -89,8 +93,7 @@ private:
     double ANGLE_VEL_DAMP_;
     double MIN_ACCELERATION_ANGLE_;
     double STRAIGHT_SPEED_;
-
-
+    
     // Drag mode
     bool DRAG_MODE_;
     int DRAG_DURATION_;
@@ -102,18 +105,19 @@ private:
     // Offset box params, obs in the box is ignored
     double min_offset_dist_;
     double MIN_STOPPING_DIST_;
+    double STOPPING_FACTOR_;
     double DIST_COST_FACTOR_;
 
     //Debug variables
     bool VISUALIZATION_;
     bool DEBUG_ON_;
     void DrawPath(ros::Publisher& pub, visualization_msgs::Marker& points,int id, int index, int R, int G, int B, float scale, float alpha);
-    int all_path_marker_id;  //used as an id for drawing path using visualization_msgs
-    int selected_path_marker_id;
-    ros::Publisher all_path_pub;
-    ros::Publisher selected_path_pub;
-    std::vector <visualization_msgs::Marker> trajectory_marker_vector;  //used for visualizing selected_path
-    visualization_msgs::Marker trajectory_points;
+    int all_path_marker_id_;  //used as an id for drawing path using visualization_msgs
+    int selected_path_marker_id_;
+    ros::Publisher all_path_pub_;
+    ros::Publisher selected_path_pub_;
+    std::vector <visualization_msgs::Marker> trajectory_marker_vector_;  //used for visualizing selected_path
+    visualization_msgs::Marker trajectory_points_;
     //drawing axis
     /*visualization_msgs::Marker X_axis_marker_points;
     visualization_msgs::Marker Y_axis_marker_points;
@@ -122,9 +126,9 @@ private:
     int X_axis_marker_id;
     int Y_axis_marker_id;*/
     //drawing rayTrace
-    std::vector <visualization_msgs::Marker> trajectory_marker_rayTrace;
-    ros::Publisher rayTrace_pub;
-    int trajectory_marker_rayTrace_id;
+    std::vector <visualization_msgs::Marker> trajectory_marker_rayTrace_;
+    ros::Publisher rayTrace_pub_;
+    int trajectory_marker_rayTrace_id_;
 };
 
 #endif

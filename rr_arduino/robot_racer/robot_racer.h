@@ -5,7 +5,7 @@
 #include "Arduino.h"
 
 //! #define BRAKE
-//! #define TEST_OUTPUT
+#define TEST_OUTPUT 1
 
 //! servo defines
 #define SERVO_THROTTLE_PIN    10
@@ -13,14 +13,14 @@
 #define SERVO_BRAKE_PIN       12
 #define MANUAL_MAX            1575
 #define MANUAL_REV_MAX        1375
-#define THROTTLE_MAX          1545  //!< 1675 is 10 m/s, max. is 2000
+#define THROTTLE_MAX          1675  //!< 1675 is 10 m/s, max. is 2000
 #define THROTTLE_REV_MAX      1300  //!< Under 1300 is too fast, min. is 1000
 #define MAX_RC_VAL            1738
 #define MIN_RC_VAL            304
 #define REST_RC_VAL           874
-#define MAX_RC_STEER_VAL      1732
+#define MAX_RC_STEER_VAL      1726
 #define MIN_RC_STEER_VAL      306
-#define REST_STEER_VAL        990
+#define REST_STEER_VAL        982
 #define MAX_STEERING          2000
 #define MIN_STEERING          1000
 #define NEUTRAL               1500
@@ -30,6 +30,7 @@
 #define THROTTLE_REDUCTION    25
 #define BRAKE_DELAY           100  //!< Reducing this quickens the vehicle braking
 #define RC_CHANNELS           8
+#define DELAY                 250 // Time in milliseconds for estop to trigger when r/c disconnects
 
 //! States for eStop, RC, and Auto
 enum CarState
@@ -57,6 +58,7 @@ class Car
     float forward_throttle_multiplier_;
     float left_steering_multiplier_;
     float right_steering_multiplier_;
+    long previous_;
     
     Servo ThrottleServo_, SteerServo_;
 #ifdef BRAKE
@@ -74,5 +76,7 @@ class Car
     void RC_read();
     void RCMode();
     void WriteToServos();
+    long GetPreviousTime();
+    void SetPreviousTime(long time);
 };
 #endif
