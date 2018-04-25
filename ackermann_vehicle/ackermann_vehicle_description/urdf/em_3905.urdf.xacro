@@ -43,10 +43,10 @@ limitations under the License.
 
   <!-- chassis_length is measured along the x axis, chassis_width
        along the y axis, and chassis_height along the z axis. -->
-  <xacro:property name="chassis_length" value="0.445"/>
-  <xacro:property name="chassis_width" value="0.178"/>
+  <xacro:property name="chassis_length" value="0.258"/>
+  <xacro:property name="chassis_width" value="0.168"/>
   <xacro:property name="chassis_height" value="0.01"/>
-  <xacro:property name="chassis_mass" value="4"/>
+  <xacro:property name="chassis_mass" value="2.788"/>
 
   <!-- battery_dist is the distance between the inner edges of the
        batteries. battery_comp_depth is the battery compartment depth.
@@ -66,9 +66,9 @@ limitations under the License.
        inset from the outer edge of the tire. It is set so that each wheel
        is a "zero offset" wheel. hex_hub_depth = tire_width / 2 -
        axle_length. -->
-  <xacro:property name="hub_dia" value="0.0826"/>
-  <xacro:property name="tire_dia" value="0.107"/>
-  <xacro:property name="tire_width" value="0.038"/>
+  <xacro:property name="hub_dia" value="0.09652"/>
+  <xacro:property name="tire_dia" value="0.14605"/>
+  <xacro:property name="tire_width" value="0.0889"/>
   <xacro:property name="hex_hub_depth" value="0.01445"/>
   <xacro:property name="wheel_mass" value="0.29"/>
 
