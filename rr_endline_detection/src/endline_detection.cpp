@@ -4,20 +4,18 @@
 EndlineCounter::EndlineCounter (ros::NodeHandle nh) : it(nh) 
 {
 	pub = nh.advertise<std_msgs::Bool>("endline",1);
-	this->state = BEGINNING;
+	state = BEGINNING;
 }
 
-// void EndlineCounter::img_callback(const sensor_msgs::ImagePtr& msg) {
-	
-// 	// process image
-	
-	
-// 	// publish 
-// 	// if(this->state & PAST_END) {
-// 	// 	this->pub.publish(true);
-// 	// } else {
-// 	// 	this->pub.publish(false);
-// 	// }
-// }
+void EndlineCounter::img_callback(const sensor_msgs::ImageConstPtr& msg)
+{
+  ROS_INFO("hello world!");
+	//publish 
+	// if(state & PAST_END) {
+	// 	pub.publish(true);
+	// } else {
+	// 	pub.publish(false);
+	// }
+}
 
 void EndlineCounter::find_el_state(){}

@@ -15,11 +15,9 @@ enum states {
 	PAST_END = 0x08
 };
 
-
 class EndlineCounter {
 	private :
 		ros::NodeHandle nh;
-		
 		image_transport::ImageTransport it;
 		
 		cv_bridge::CvImagePtr imgptr;
@@ -31,9 +29,9 @@ class EndlineCounter {
 		int state;
 		int get_state();
 
-        EndlineCounter(ros::NodeHandle nodeh);
-        void img_callback(const sensor_msgs::ImagePtr&);
-        void find_el_state();
+		EndlineCounter(ros::NodeHandle nodeh);
+		void img_callback(const sensor_msgs::ImageConstPtr&);
+		void find_el_state();
 };
 
 #endif /*ENDLINE_DETECTION_HPP*/
