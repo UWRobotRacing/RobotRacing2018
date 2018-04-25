@@ -4,6 +4,8 @@
 ### Description:
 This repository contains the current competition code (2018). This code is used for the IARRC 2018. This code currently handles LIDAR mapping, trajectory rollout, PID speed control, lane detection and traffic light detection.
 
+A list of what we're currently working on is in the issues section of this repo.
+
 ### Coding Standards:
 For C++ code and Python Scripts we follow the Google coding standards linked below
 * https://google.github.io/styleguide/cppguide.html
@@ -44,6 +46,7 @@ This code base should be integrated with the overall UWRobotics code such that m
 * Jack Xu
 * Angela Gu
 * Brian Tran
+* Adrian Malaran
 
 ### Past Contributers (2014-2017):
 * Matthew Post
