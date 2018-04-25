@@ -42,24 +42,23 @@ Please fill this header out above every source code file(including launch files 
 This code base should be integrated with the overall UWRobotics code such that modularity can be achieved?
 
 ### Contributers for the current code:
-* Toni Ogunmade
+* Toni Ogunmade(Software Lead)
 * Jack Xu
 * Angela Gu
 * Brian Tran
 * Adrian Malaran
 
 ### Past Contributers (2014-2017):
-* Matthew Post
+* Matthew Post(Software Lead)
 * Praveen Dorairaj
 * Ivy Xing
 * Aditya Matam
 * Ee Ern Low
 * Sirui Song
 * Michael Smart
-* Jungwook Lee
-* Raymond Kuo
-* Matthew Post
-* Jakub Dworakowski
+* Jungwook Lee(Software Lead)
+* Raymond Kuo(Software Lead)
+* Jakub Dworakowski(Software Lead)
 * Greg Varty
 * Archie Lee
 * Shalin Upadhyay
