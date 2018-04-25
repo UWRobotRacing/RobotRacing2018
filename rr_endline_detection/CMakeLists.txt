@@ -7,7 +7,7 @@ find_package(catkin REQUIRED COMPONENTS
   cv_bridge
   image_transport
 )
-find_package(OpenCV)
+find_package(OpenCV REQUIRED)
 
 catkin_package()
 
@@ -24,4 +24,5 @@ add_executable(endline_detection
 
 target_link_libraries(endline_detection
   ${catkin_LIBRARIES}
+  ${OpenCV_LIBS}
 )
