@@ -6,7 +6,7 @@ ROS packages for simulating a vehicle with Ackermann steering
 To start a gazebo simulation, run:
 
 ```
-$ roslaunch ackermann_vehicle_gazebo ackermann_vehicle.launch
+$ roslaunch rr_vehicle_gazebo rr_vehicle.launch
 ```
 
 To move the vehicle, publish to `/ackermann_vehicle/ackermann_cmd`

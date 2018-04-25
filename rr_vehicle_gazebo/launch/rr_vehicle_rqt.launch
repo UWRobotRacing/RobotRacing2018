@@ -1,5 +1,5 @@
 <launch>
     <!-- Load RQT with a pre-setup GUI for rover controls from a perspective file -->
     <node name="rrbot_rqt" pkg="rqt_gui" type="rqt_gui" respawn="false"
-            output="screen" args="--perspective-file $(find ackermann_vehicle_gazebo)/launch/ackermann_vehicle_rqt.perspective"/>
+            output="screen" args="--perspective-file $(find rr_vehicle_gazebo)/launch/rr_vehicle_rqt.perspective"/>
 </launch>

@@ -24,9 +24,9 @@ limitations under the License.
 -->
 
 <launch>
-  <arg name="namespace" default="ackermann_vehicle"/>
+  <arg name="namespace" default="rr_vehicle"/>
 
-  <include file="$(find ackermann_vehicle_description)/launch/ackermann_vehicle.launch">
+  <include file="$(find rr_vehicle_description)/launch/ackermann_vehicle.launch">
     <arg name="namespace" value="$(arg namespace)"/>
   </include>
 
@@ -37,7 +37,7 @@ limitations under the License.
     <param name="use_gui" value="true"/>
   </node>
 
-  <include file="$(find ackermann_vehicle_description)/launch/rviz.launch">
+  <include file="$(find rr_vehicle_description)/launch/rviz.launch">
     <arg name="namespace" value="$(arg namespace)"/>
   </include>
 </launch>

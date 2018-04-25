@@ -52,19 +52,6 @@ limitations under the License.
   <xacro:property name="chassis_height" value="0.01"/>
   <xacro:property name="chassis_mass" value="4"/>
 
-  <!-- battery_dist is the distance between the inner edges of the
-       batteries. battery_comp_depth is the battery compartment depth.
-       battery_length is measured along the x axis, battery_width
-       along the y axis, and battery_height along the z axis. -->
-  <xacro:property name="battery_x_offset" value="0.055"/>
-  <xacro:property name="battery_dist" value="0.065"/>
-  <xacro:property name="battery_comp_depth" value="0.02"/>
-  <xacro:property name="battery_comp_angle" value="0.34906585"/>
-  <xacro:property name="battery_length" value="0.16"/>
-  <xacro:property name="battery_width" value="0.047"/>
-  <xacro:property name="battery_height" value="0.024"/>
-  <xacro:property name="battery_mass" value="0.5025"/>
-
   <!-- hub_dia and tire_dia are the diameters of the hub and tire,
        respectively. hex_hub_depth is the distance that the hex hub is
        inset from the outer edge of the tire. It is set so that each wheel
@@ -72,8 +59,8 @@ limitations under the License.
        axle_length. -->
   <xacro:property name="hub_dia" value="0.0826"/>
   <xacro:property name="tire_dia" value="0.107"/>
-  <xacro:property name="tire_width" value="0.0889"/>
-  <xacro:property name="hex_hub_depth" value="0.01445"/>
+  <xacro:property name="tire_width" value="0.0381"/>
+  <xacro:property name="hex_hub_depth" value="0.0091"/>
   <xacro:property name="wheel_mass" value="0.29"/>
 
   <!-- hex_hub_dist is the distance between left and right hex hubs when
@@ -82,7 +69,7 @@ limitations under the License.
        vertical wheel travel. -->
   <xacro:property name="wheelbase" value="0.335"/>
   <xacro:property name="hex_hub_dist" value="0.365"/>
-  <xacro:property name="axle_length" value="0.03"/>
+  <xacro:property name="axle_length" value="0.01"/>
   <xacro:property name="wheel_travel" value="0.084"/>
   <xacro:property name="shock_z_offset" value="0.0655"/>
 
@@ -119,9 +106,6 @@ limitations under the License.
   <!-- ctrl_period is gazebo_ros_control's control period. Unit: hertz. -->
   <xacro:property name="ctrl_period" value="0.01"/>
 
-  <material name="battery_mat">
-    <color rgba="0 0 1 1"/>
-  </material>
   <material name="chassis_mat">
     <color rgba="0.5 0.5 0.5 1"/>
   </material>
@@ -169,55 +153,6 @@ limitations under the License.
                izz="${mass * (inner_rad * inner_rad +
                     outer_rad * outer_rad) / 2}"/>
     </inertial>
-  </xacro:macro>
-
-  <!-- Battery -->
-  <xacro:macro name="battery" params="prefix reflect">
-    <joint name="chassis_to_${prefix}_battery" type="fixed">
-      <parent link="chassis"/>
-      <child link="${prefix}_battery_offset"/>
-      <origin xyz="${battery_x_offset - battery_length / 2}
-                   ${reflect * battery_dist / 2}
-                   0"
-              rpy="${reflect * battery_comp_angle} 0 0"/>
-    </joint>
-
-    <link name="${prefix}_battery_offset">
-      <xacro:null_inertial/>
-    </link>
-
-    <joint name="offset_to_${prefix}_battery" type="fixed">
-      <parent link="${prefix}_battery_offset"/>
-      <child link="${prefix}_battery"/>
-      <origin xyz="0
-                   ${reflect * battery_width / 2}
-                   ${(battery_height / 2) - battery_comp_depth}"/>
-    </joint>
-
-    <link name="${prefix}_battery">
-      <visual>
-        <geometry>
-          <box size="${battery_length} ${battery_width} ${battery_height}"/>
-        </geometry>
-        <material name="battery_mat"/>
-      </visual>
-
-      <collision>
-        <geometry>
-          <box size="${battery_length} ${battery_width} ${battery_height}"/>
-        </geometry>
-      </collision>
-
-      <xacro:solid_cuboid_inertial
-         width="${battery_length}" depth="${battery_width}"
-         height="${battery_height}" mass="${battery_mass}">
-        <origin/>
-      </xacro:solid_cuboid_inertial>
-    </link>
-
-    <gazebo reference="${prefix}_battery">
-      <material>Gazebo/Blue</material>
-    </gazebo>
   </xacro:macro>
 
   <!-- Shock absorber -->
@@ -383,91 +318,6 @@ limitations under the License.
     <origin xyz="${chassis_length /2 + 0.12} 0.0 0.0" rpy="0.0 0.0 0.0"/>
    </joint>
 
-
-  <link name="eye_link">
-	    <visual>
-	        <geometry>
-	            <box size="0.05 0.1 0.03"/>
-	        </geometry>
-	    </visual>
-	    <collision>
-	        <!-- origin is relative -->
-	        <geometry>
-	            <box size="0.05 0.1 0.03"/>
-	        </geometry>
-	    </collision>
-	</link>
-	  <gazebo reference="eye_link">
-    <material>Gazebo/Red</material>
-  </gazebo>
-	
-	
-	<link name="left_eye">
-	    <visual>
-	        <geometry>
-	            <sphere radius="0.01"/>
-	        </geometry>
-	    </visual>
-	</link>
-	<gazebo reference="left_eye">
-    	<material>Gazebo/Green</material>
-  	</gazebo>
-	<link name="right_eye">
-	    <visual>
-	        <geometry>
-	            <sphere radius="0.01"/>
-	        </geometry>
-	    </visual>
-	</link>
-	<gazebo reference="right_eye">
-    	<material>Gazebo/Green</material>
-  	</gazebo>
-	
-   <joint name="left_eye_to_head" type="fixed">
-    <parent link="eye_link"/>
-    <child link="left_eye"/>
-    <origin xyz="0.03 0.03 0.0" rpy="0.0 0.0 0.0"/>
-   </joint>
-   
-   <joint name="right_eye_to_head" type="fixed">
-    <parent link="eye_link"/>
-    <child link="right_eye"/>
-    <origin xyz="0.03 -0.03 0.0" rpy="0.0 0.0 0.0"/>
-   </joint>
-	
-   <joint name="base_link_to_eye" type="fixed">
-    <parent link="base_link"/>
-    <child link="eye_link"/>
-    <origin xyz="${chassis_length /2 + 0.03} 0.0 0.1" rpy="0.0 0.0 0.0"/>
-   </joint>
-    
-    <joint name="imu_joint" type="fixed">
-		<axis xyz="1 0 0"/>
-		<origin xyz="0 0 0.19"/>
-		<parent link="base_link"/>
-		<child link="imu_link"/>
-	</joint>
-
-	<link name="imu_link">
-	  <inertial>
-	    <mass value="0.001"/>
-	    <origin rpy="0 0 0" xyz="0 0 0"/>
-	    <inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.000001" iyz="0" izz="0.0001"/>
-	  </inertial>
-	  <visual>
-	    <origin rpy="0 0 0" xyz="0 0 0"/>
-	    <geometry>
-	      <box size="0.001 0.001 0.001"/>
-	    </geometry>
-	  </visual>
-	  <collision>
-	    <origin rpy="0 0 0" xyz="0 0 0"/>
-	    <geometry>
-	      <box size=".001 .001 .001"/>
-	    </geometry>
-	  </collision>
-	</link>  
-    
   <!-- Chassis -->
   <link name="chassis">
     <visual>
@@ -500,10 +350,6 @@ limitations under the License.
     <child link="chassis"/>
   </joint>
 
-  <!-- Batteries -->
-  <xacro:battery prefix="left" reflect="1"/>
-  <xacro:battery prefix="right" reflect="-1"/>
-
   <!-- Wheels -->
   <xacro:front_wheel lr_prefix="left" fr_prefix="front"
                      lr_reflect="1" fr_reflect="1"/>
@@ -523,96 +369,5 @@ limitations under the License.
       -->
     </plugin>
   </gazebo>
-  
-  <!-- Camera left eye-->
-  <gazebo reference="left_eye">
-      <sensor type="camera" name="left_camera">
-          <update_rate>30.0</update_rate>
-          <camera name="head">
-              <horizontal_fov>1.3962634</horizontal_fov>
-              <image>
-                  <width>320</width>
-                  <height>240</height>
-                  <format>R8G8B8</format>
-              </image>
-              <clip>
-                  <near>0.02</near>
-                  <far>300</far>
-              </clip>
-              <noise>
-                  <type>gaussian</type>
-                  <!-- Noise is sampled independently per pixel on each frame.
-                        That pixel's noise value is added to each of its color
-                        channels, which at that point lie in the range [0,1]. -->
-                  <mean>0.0</mean>
-                  <stddev>0.007</stddev>
-              </noise>
-          </camera>
-          <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
-              <alwaysOn>true</alwaysOn>
-              <updateRate>0.0</updateRate>
-              <cameraName>sensors/left_camera</cameraName>
-              <imageTopicName>image_raw</imageTopicName>
-              <cameraInfoTopicName>camera_info</cameraInfoTopicName>
-              <frameName>camera_link</frameName>
-              <hackBaseline>0.07</hackBaseline>
-              <distortionK1>0.0</distortionK1>
-              <distortionK2>0.0</distortionK2>
-              <distortionK3>0.0</distortionK3>
-              <distortionT1>0.0</distortionT1>
-              <distortionT2>0.0</distortionT2>
-          </plugin>
-      </sensor>
-  </gazebo>
-  
-  <!-- Camera right eye-->
-  <gazebo reference="right_eye">
-      <sensor type="camera" name="right_camera">
-          <update_rate>30.0</update_rate>
-          <camera name="head">
-              <horizontal_fov>1.3962634</horizontal_fov>
-              <image>
-                  <width>320</width>
-                  <height>240</height>
-                  <format>R8G8B8</format>
-              </image>
-              <clip>
-                  <near>0.02</near>
-                  <far>300</far>
-              </clip>
-              <noise>
-                  <type>gaussian</type>
-                  <mean>0.0</mean>
-                  <stddev>0.007</stddev>
-              </noise>
-          </camera>
-          <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
-              <alwaysOn>true</alwaysOn>
-              <updateRate>0.0</updateRate>
-              <cameraName>sensors/right_camera</cameraName>
-              <imageTopicName>image_raw</imageTopicName>
-              <cameraInfoTopicName>camera_info</cameraInfoTopicName>
-              <frameName>camera_link</frameName>
-              <hackBaseline>0.07</hackBaseline>
-              <distortionK1>0.0</distortionK1>
-              <distortionK2>0.0</distortionK2>
-              <distortionK3>0.0</distortionK3>
-              <distortionT1>0.0</distortionT1>
-              <distortionT2>0.0</distortionT2>
-          </plugin>
-      </sensor>
-  </gazebo>
-
-<!-- imu sensor-->  
-<gazebo>    
-  <plugin name="imu_plugin" filename="libgazebo_ros_imu.so">
-      <alwaysOn>true</alwaysOn>       
-      <bodyName>imu_link</bodyName>
-      <topicName>imu_data</topicName>
-      <serviceName>imu_service</serviceName>
-      <gaussianNoise>0.0</gaussianNoise>
-      <updateRate>30.0</updateRate> 
-  </plugin>
-</gazebo>
 
 </robot>

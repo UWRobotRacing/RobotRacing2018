@@ -21,12 +21,12 @@ limitations under the License.
 -->
 
 <launch>
-  <arg name="namespace" default="ackermann_vehicle"/>
+  <arg name="namespace" default="rr_vehicle"/>
 
   <group ns="$(arg namespace)">
     <!-- robot_description is used by nodes that publish to joint_states. -->
     <param name="robot_description"
-           command="$(find xacro)/xacro --inorder $(find ackermann_vehicle_description)/urdf/augmented_rc_car.urdf.xacro"/>
+           command="$(find xacro)/xacro --inorder $(find rr_vehicle_description)/urdf/augmented_rc_car.urdf.xacro"/>
 
     <!-- Read joint positions from joint_states, then publish the vehicle's
          state to tf. -->
