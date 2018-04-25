@@ -2,7 +2,7 @@
 ## Robot Racing
                                                             
 ### Description:
-This repository contains the current competition code (2018). This code is used for the IARRC 2018. This code currently handles LIDAR mapping, trajectory rollout, PID speed control, lane detection and traffic light detection.
+This repository contains the current competition code (2018). This code will be used for the IARRC 2018. This code currently handles LIDAR mapping, trajectory rollout, PID speed control, lane detection and traffic light detection.
 
 A list of what we're currently working on is in the issues section of this repo.
 
