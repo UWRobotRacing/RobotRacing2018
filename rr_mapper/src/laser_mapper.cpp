@@ -26,19 +26,14 @@
  */
 LaserMapper::LaserMapper()
 {
-  // Initialize variables
-  ready2Maplane_detectionLeft_ = false;
-  ready2Maplane_detectionRight_ = false;
-  ready2Map_ = true;
-
   // Load Parameters
   GetParam();
 
-  // Setup Publisher and Subscriber
+  // PUBLISHERS
   map_pub_ = nh_.advertise<nav_msgs::OccupancyGrid>(occupancy_grid_name_, 1);
-  scan_sub_ = nh_.subscribe<sensor_msgs::LaserScan>
-                      (laser_scan_name_, 1, &LaserMapper::CallBack, this);
-
+  
+  // SUBSCRIBERS
+  scan_sub_ = nh_.subscribe(laser_scan_name_, 1, &LaserMapper::CallBack, this);
   lane_detection_left_sub_ = nh_.subscribe("/output_point_list_left", 1, &LaserMapper::DetectLeftLane, this);
   lane_detection_right_sub_ = nh_.subscribe("/output_point_list_right", 1, &LaserMapper::DetectRightLane, this);
 
@@ -54,11 +49,11 @@ void LaserMapper::GetParam()
   nh_.param<std::string>("LaserMapper/Occupancy_Grid_Name", occupancy_grid_name_, "/map");
   nh_.param<std::string>("LaserMapper/Laser_Scan_Name", laser_scan_name_, "/scan");
 
-  nh_.param<double>("LaserMapper/NO_OBS", NO_OBS_, 0);
-  nh_.param<double>("LaserMapper/OBS", OBS_, 200);
-  nh_.param<double>("LaserMapper/UNKNOWN", UNKNOWN_, -1);
-  nh_.param<double>("LaserMapper/OBS_SCALE", OBS_SCALE_, 1);
-  nh_.param<int>("LaserMapper/INFLATE_OBS", inflate_obstacle_, 2);
+  // nh_.param<double>("LaserMapper/NO_OBS", NO_OBS_, 0);
+  // nh_.param<double>("LaserMapper/OBS", OBS_, 200);
+  // nh_.param<double>("LaserMapper/UNKNOWN", UNKNOWN_, -1);
+  // nh_.param<double>("LaserMapper/OBS_SCALE", OBS_SCALE_, 1);
+  // nh_.param<int>("LaserMapper/INFLATE_OBS", inflate_obstacle_, 2);
 
   nh_.param<double>("LaserMapper/map_res", map_res_, 0.01);
   nh_.param<int>("LaserMapper/map_W", map_W_, 800);
@@ -115,7 +110,7 @@ void LaserMapper::DetectRightLane(const nav_msgs::OccupancyGrid::ConstPtr& msg)
 void LaserMapper::InitMap()
 {
   belief_map_.resize(map_W_*map_H_, UNKNOWN_);
-  ROS_INFO("Map Initialization Done. Size(%d,%d).", map_H_,map_W_);
+  ROS_INFO("Map Initialization Done. Size(%d, %d).", map_H_,map_W_);
 }
 
 /** @brief empties the underlying vector of the map
@@ -132,7 +127,7 @@ void LaserMapper::DeleteMap()
  *  @param value the new value for the cell on the map
  *  @return NONE
  */ 
-void LaserMapper::UpdateLaserMap(int x, int y, double value)
+void LaserMapper::UpdateLaserMap(const int& x, const int& y, const double& value)
 {
   // In occupancy grid scale, not world scale
   // Change it to update using vectors, and then put it into a 1D array.
@@ -299,9 +294,9 @@ void LaserMapper::ProcessMap()
     for (double i = min_angle_; i < max_angle_; i+= increment)
     {
       // Check for NaN ranges
-      if (isnan (laser_msg_.ranges[n]) == false)
+      if (std::isnan (laser_msg_.ranges[n]) == false)
       {
-        RayTracing(i, laser_msg_.ranges[n], inflate_obstacle_);
+        RayTracing(i, laser_msg_.ranges[n], 0);
         // ROS_INFO ("1");
       }
       n+= samplerate_;

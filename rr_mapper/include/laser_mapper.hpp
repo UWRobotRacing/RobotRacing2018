@@ -39,7 +39,7 @@ class LaserMapper
     void GetParam();
     void InitMap();
     void DeleteMap();
-    void UpdateLaserMap(int x, int y, double value);
+    void UpdateLaserMap(const int& x, const int& y, const double& value);
     double CheckMap(int x, int y);
     void RayTracing(float angle, float range, int inflate_factor);
 
@@ -79,10 +79,10 @@ class LaserMapper
     double LASER_ORIENTATION_;
 
     // Map Values
-    double NO_OBS_;
-    double OBS_;
-    double UNKNOWN_;
-    double OBS_SCALE_;
+    // double NO_OBS_;
+    // double OBS_;
+    // double UNKNOWN_;
+    const double OBS_SCALE_ = 1;
 
     // lane_detection Map Values
     int offset_height_left_;
@@ -92,9 +92,15 @@ class LaserMapper
 
     // Debug Purposes
     bool DEBUG_;
-    bool ready2Map_;
-    bool ready2Maplane_detectionLeft_;
-    bool ready2Maplane_detectionRight_;
+    bool ready2Map_ = true;
+    bool ready2Maplane_detectionLeft_ = false;
+    bool ready2Maplane_detectionRight_ = false;
+
+    enum CellState {
+        NO_OBS_ = 0,
+        OBS_ = 100,
+        UNKNOWN_ = -1
+    };
 
 };
 
