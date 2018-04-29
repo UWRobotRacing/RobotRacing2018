@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--@file rr_vehicle.launch
  -  @brief Launch nodes used by both RViz and Gazebo when 
  -         visualizing a vehicle with Ackermann steering.
@@ -11,7 +12,6 @@
  -  @author Toni Ogunmade(oluwatoni)
  -  @competition IARRC 2018
 -->
-<?xml version="1.0"?>
 <launch>
   <arg name="namespace" default="rr_vehicle"/>
 

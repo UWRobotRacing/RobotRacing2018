@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--@file rr_vehicle.launch
  -  @brief Use Gazebo to simulate a vehicle with Ackermann steering.
  -         Arguments:
@@ -24,7 +25,6 @@
  -  @author Toni Ogunmade(oluwatoni)
  -  @competition IARRC 2018
 -->
-<?xml version="1.0"?>
 <launch>
   <arg name="namespace" default="rr_vehicle"/>
   <arg name="world_name" default="worlds/empty.world"/>
