@@ -4,7 +4,7 @@
 
 This file defines a model of a RC Car augmented with sensors
 It is based on the Traxxas(R) E-Maxx(R) #3905 RC (Radio Controlled)
-truck model: 
+truck model:
 
 Here below are the description given for the em_3905 model:
 
@@ -39,16 +39,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 
-<robot name="em_3905" xmlns:xacro="http://www.ros.org/wiki/xacro">
+<robot name="" xmlns:xacro="http://www.ros.org/wiki/xacro">
   <!-- Degree-to-radian conversions -->
   <xacro:property name="degrees_45" value="0.785398163"/>
   <xacro:property name="degrees_90" value="1.57079633"/>
 
   <!-- chassis_length is measured along the x axis, chassis_width
        along the y axis, and chassis_height along the z axis. -->
-  <!--xacro:property name="chassis_length" value="0.258"/-->
   <xacro:property name="chassis_length" value="0.445"/>
-  <xacro:property name="chassis_width" value="0.178"/>
+  <xacro:property name="chassis_width" value="0.165"/>
   <xacro:property name="chassis_height" value="0.01"/>
   <xacro:property name="chassis_mass" value="4"/>
 
@@ -62,23 +61,9 @@ limitations under the License.
   <xacro:property name="tire_width" value="0.0381"/>
   <xacro:property name="hex_hub_depth" value="0.0091"/>
   <xacro:property name="wheel_mass" value="0.29"/>
-
-  <!-- hex_hub_dist is the distance between left and right hex hubs when
-       the shock absorbers are fully extended. axle_length is the distance
-       from a U joint to the corresponding hex hub. wheel_travel is the
-       vertical wheel travel. -->
+  <xacro:property name="axle_length" value="0.01"/>
   <xacro:property name="wheelbase" value="0.335"/>
   <xacro:property name="hex_hub_dist" value="0.365"/>
-  <xacro:property name="axle_length" value="0.01"/>
-  <xacro:property name="wheel_travel" value="0.084"/>
-  <xacro:property name="shock_z_offset" value="0.0655"/>
-
-  <!-- shock_eff_limit is 2 * ((shock_stroke / 2) * shock_spring_constant) N.
-       shock_stroke is 0.028575 meters. shock_spring_constant, an approximation
-       of a Traxxas Ultra Shock shock absorber spring's constant, is
-       437.817 N/m. -->
-  <xacro:property name="shock_eff_limit" value="12.5106"/>
-  <xacro:property name="shock_vel_limit" value="1000"/>
 
   <!-- The specifications for a Titan(R) 550 motor could not be found, so the
        stall torque of a Mabuchi Motor(R) RS-550VC-7525 motor was used instead.
@@ -155,30 +140,17 @@ limitations under the License.
     </inertial>
   </xacro:macro>
 
-  <!-- Shock absorber -->
+  <!-- Shock absorber without any shock absorption -->
   <xacro:macro name="shock"
                params="lr_prefix fr_prefix lr_reflect fr_reflect child">
-    <joint name="${lr_prefix}_${fr_prefix}_shock" type="prismatic">
+    <joint name="${lr_prefix}_${fr_prefix}_shock" type="fixed">
       <parent link="chassis"/>
       <child link="${child}"/>
 
       <origin xyz="${fr_reflect * wheelbase / 2}
                    ${lr_reflect * ((hex_hub_dist / 2) - axle_length)}
-                   ${(wheel_travel / 2) - shock_z_offset}"/>
-      <axis xyz="0 0 -1"/>
-      <limit lower="${-wheel_travel / 2}" upper="${wheel_travel / 2}"
-             effort="${shock_eff_limit}" velocity="${shock_vel_limit}"/>
+                   0"/>
     </joint>
-    <transmission name="${lr_prefix}_${fr_prefix}_shock_trans">
-      <type>transmission_interface/SimpleTransmission</type>
-      <joint name="${lr_prefix}_${fr_prefix}_shock">
-        <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-      </joint>
-      <actuator name="${lr_prefix}_${fr_prefix}_shock_act">
-        <hardwareInterface>EffortJointInterface</hardwareInterface>
-        <mechanicalReduction>1</mechanicalReduction>
-      </actuator>
-    </transmission>
   </xacro:macro>
 
   <!-- The "wheel" macro defines an axle carrier, axle, and wheel. -->
@@ -210,7 +182,7 @@ limitations under the License.
     <link name="${lr_prefix}_${fr_prefix}_wheel">
       <visual>
         <origin xyz="0
-                     ${lr_reflect * (axle_length - (tire_width / 
+                     ${lr_reflect * (axle_length - (tire_width /
                      2 - hex_hub_depth))}
                      0"/>
         <geometry>
@@ -221,7 +193,7 @@ limitations under the License.
 
       <collision>
         <origin xyz="0
-                     ${lr_reflect * (axle_length - (tire_width / 
+                     ${lr_reflect * (axle_length - (tire_width /
                      2 - hex_hub_depth))}
                      0"/>
         <geometry>
@@ -297,26 +269,27 @@ limitations under the License.
   </gazebo>
 
   <link name="bumper_link">
-	    <visual>
-	        <geometry>
-	            <box size="0.01 0.3 0.01"/>
-	        </geometry>
-	    </visual>
-	    <collision>
-	        <!-- origin is relative -->
-	        <geometry>
-	            <box size="0.01 0.3 0.01"/>
-	        </geometry>
-	    </collision>
-	</link>
-	<gazebo reference="bumper_link">
-    	<material>Gazebo/Black</material>
-  	</gazebo>
-   <joint name="baselink_to_bumper" type="fixed">
+      <visual>
+          <geometry>
+              <box size="0.01 0.3 0.01"/>
+          </geometry>
+      </visual>
+      <collision>
+          <!-- origin is relative -->
+          <geometry>
+              <box size="0.01 0.3 0.01"/>
+          </geometry>
+      </collision>
+  </link>
+  <gazebo reference="bumper_link">
+    <material>Gazebo/Black</material>
+  </gazebo>
+
+  <joint name="baselink_to_bumper" type="fixed">
     <parent link="base_link"/>
     <child link="bumper_link"/>
     <origin xyz="${chassis_length /2 + 0.12} 0.0 0.0" rpy="0.0 0.0 0.0"/>
-   </joint>
+  </joint>
 
   <!-- Chassis -->
   <link name="chassis">

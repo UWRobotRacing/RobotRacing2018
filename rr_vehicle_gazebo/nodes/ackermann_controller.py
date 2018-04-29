@@ -22,9 +22,6 @@ Published Topics:
         Command for the left rear axle controller.
     <right rear axle controller name>/command (std_msgs/Float64)
         Command for the right rear axle controller.
-    <shock absorber controller name>/command (std_msgs/Float64)
-        One of these topics exists for each shock absorber. They are latched
-        topics.
 
 Services Called:
     controller_manager/list_controllers (controller_manager_msgs/
@@ -65,16 +62,6 @@ Parameters:
     ~left_rear_wheel/diameter
     ~right_rear_wheel/diameter
         Wheel diameters. Each diameter must be greater than zero. Unit: meter.
-
-    ~shock_absorbers (sequence of mappings, default: empty)
-        Zero or more shock absorbers.
-
-        Key-Value Pairs:
-
-        controller_name (string)
-            Controller name.
-        equilibrium_position (float, default: 0.0)
-            Equilibrium position. Unit: meter.
 
     ~cmd_timeout (float, default: 0.5)
         If ~cmd_timeout is greater than zero and this node does not receive a
@@ -156,33 +143,6 @@ class _AckermannCtrlr(object):
         list_ctrlrs = rospy.ServiceProxy("controller_manager/list_controllers",
                                          ListControllers)
         list_ctrlrs.wait_for_service()
-
-        # Shock absorbers
-        shock_param_list = rospy.get_param("~shock_absorbers", [])
-        self._shock_pubs = []
-        try:
-            for shock_params in shock_param_list:
-                try:
-                    ctrlr_name = shock_params["controller_name"]
-                    try:
-                        eq_pos = shock_params["equilibrium_position"]
-                    except:
-                        eq_pos = self._DEF_EQ_POS
-                    eq_pos = float(eq_pos)
-                except:
-                    rospy.logwarn("An invalid parameter was specified for a "
-                                  "shock absorber. The shock absorber will "
-                                  "not be used.")
-                    continue
-
-                pub = rospy.Publisher(ctrlr_name + "/command", Float64,
-                                      queue_size=1, latch=True)
-                _wait_for_ctrlr(list_ctrlrs, ctrlr_name)
-                pub.publish(eq_pos)
-                self._shock_pubs.append(pub)
-        except:
-            rospy.logwarn("The specified list of shock absorbers is invalid. "
-                          "No shock absorbers will be used.")
 
         # Command timeout
         try:
