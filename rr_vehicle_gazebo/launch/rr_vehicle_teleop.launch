@@ -84,8 +84,10 @@
     </node>
     
     <!-- Handle the joystick input -->
+    <node name="connect_controller" pkg="rr_vehicle_gazebo"
+          type="connect_controller.sh" output="screen"/>
     <node pkg="joy" name="joy_node" type="joy_node"/>
     <node name="vehicle_joystick" pkg="rr_vehicle_gazebo"
-          type="vehicle_joystick.py"/>
+          type="vehicle_joystick.py" output="screen"/>
   </group>
 </launch>

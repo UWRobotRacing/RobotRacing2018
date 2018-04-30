@@ -203,10 +203,10 @@ class _RRController(object):
             _create_axle_cmd_pub(list_ctrlrs, right_rear_axle_ctrlr_name)
 
         self._steering_cmd_sub = \
-            rospy.Subscriber("/PathPlanner/steer_cmd", Float32,
+            rospy.Subscriber("/rr_vehicle/steering_cmd", Float32,
                              self.steering_cb, queue_size=1)
         self._velocity_cmd_sub = \
-            rospy.Subscriber("/PathPlanner/vel_level", Float32,
+            rospy.Subscriber("/rr_vehicle/velocity_cmd", Float32,
                              self.velocity_cb, queue_size=1)
 
     ## Control the vehicle
@@ -271,7 +271,7 @@ class _RRController(object):
     def velocity_cb(self, velocity):
         self._last_cmd_time = rospy.get_time()
         with self._rr_cmd_lock:
-            self._steer_ang = velocity.data
+            self._speed = velocity.data
 
     # Get front wheel parameters. Return a tuple containing the steering
     # link name, steering controller name, axle controller name (or None),

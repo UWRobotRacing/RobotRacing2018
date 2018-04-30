@@ -5,6 +5,7 @@ catkin_package()
 
 install(PROGRAMS
   scripts/ackermann_controller.py
+  scripts/connect_controller.py
   scripts/vehicle_joystick.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )

@@ -21,7 +21,6 @@ import threading
 from math import pi
 
 import rospy
-import tf
 
 from std_msgs.msg import Float64, Float32
 from controller_manager_msgs.srv import ListControllers
@@ -29,26 +28,24 @@ from controller_manager_msgs.srv import ListControllers
 import time
 import rospy
 from sensor_msgs.msg import Joy
-from std_msgs.msg import Int32
 
 class PS3Controller:
     def __init__(self):
         "PS3 controller node constructor"
         # tele-operation controls
         self._steer = 0                  # steering axis
-        self._drive = 13                  # shift to Drive
-        self._reverse = 12                # shift to Reverse
+        self._drive = 9                  # shift to Drive
+        self._reverse = 8                # shift to Reverse
         self._disable = False
         self._run_suspend_button_state = 0
         self._max_velocity = 8 #m/s
         self._max_steering_angle = 0.524 #rad
-        self._steering_publisher = rospy.Publisher('rr_vehicle/steering_cmd', Float32,queue_size = 1)
-        self._velocity_publisher = rospy.Publisher('rr_vehicle/velocity_cmd', Float32,queue_size = 1)
+        self._steering_publisher = rospy.Publisher('steering_cmd', Float32,queue_size = 1)
+        self._velocity_publisher = rospy.Publisher('velocity_cmd', Float32,queue_size = 1)
         self._joy = rospy.Subscriber('joy', Joy, self.joy_callback)
         
     def joy_callback(self, joy):
         "invoked every time a joystick message arrives" 
-
         if not(self._disable):
             # create the throttle and steering command
             self._steering_publisher.publish(joy.axes[self._steer])

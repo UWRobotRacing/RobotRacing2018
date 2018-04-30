@@ -193,6 +193,11 @@
 
     <gazebo reference="${lr_prefix}_${fr_prefix}_wheel">
       <material>Gazebo/Black</material>
+      <kp>100000.0</kp>
+      <kd>1</kd>
+      <mu1>1.35</mu1>
+      <mu2>1.35</mu2>
+      <fdir1>1 0 0</fdir1>
     </gazebo>
   </xacro:macro>
 
