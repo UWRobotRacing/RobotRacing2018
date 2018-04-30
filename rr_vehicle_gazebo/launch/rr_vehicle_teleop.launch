@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!--@file rr_vehicle.launch
+<!--@file rr_vehicle_teleop.launch
  -  @brief Use Gazebo to simulate a vehicle with Ackermann steering.
  -         Arguments:
  -             namespace (string, default: ackermann_vehicle)
@@ -82,5 +82,10 @@
       <param name="cmd_timeout" value="$(arg cmd_timeout)"/>
       <rosparam file="$(find rr_vehicle_gazebo)/config/em_3905_ackermann_ctrlr_params.yaml" command="load"/>
     </node>
+    
+    <!-- Handle the joystick input -->
+    <node pkg="joy" name="joy_node" type="joy_node"/>
+    <node name="vehicle_joystick" pkg="rr_vehicle_gazebo"
+          type="vehicle_joystick.py"/>
   </group>
 </launch>
