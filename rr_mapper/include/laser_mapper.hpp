@@ -21,6 +21,7 @@
 #include <nav_msgs/OccupancyGrid.h>
 #include <sensor_msgs/LaserScan.h>
 #include <tf/transform_datatypes.h>
+#include <tf/transform_listener.h>
 
 /*
  *  Callback Class for laser to Occumpancy Grid Format/OpenCV Format
@@ -30,18 +31,25 @@ class LaserMapper
 {
   public:
     LaserMapper();
+    ~LaserMapper();
+
+    // Publishers
     void ProcessMap();
-  private:
+
+  private:    
+    // Subscribers
+    void LidarCallBack(const sensor_msgs::LaserScan::ConstPtr& msg);
+    void DetectLeftLaneCallback(const nav_msgs::OccupancyGrid::ConstPtr& msg);
+    void DetectRightLaneCallback(const nav_msgs::OccupancyGrid::ConstPtr& msg);
+
     // Methods
-    void CallBack(const sensor_msgs::LaserScan::ConstPtr& msg);
-    void DetectLeftLane(const nav_msgs::OccupancyGrid::ConstPtr& msg);
-    void DetectRightLane(const nav_msgs::OccupancyGrid::ConstPtr& msg);
     void GetParam();
     void InitMap();
     void DeleteMap();
     void UpdateLaserMap(const int& x, const int& y, const double& value);
     double CheckMap(int x, int y);
     void RayTracing(float angle, float range, int inflate_factor);
+    void StitchMap(std::string ref_name);
 
     // ROS Variables
     ros::NodeHandle nh_;
@@ -49,10 +57,10 @@ class LaserMapper
     ros::Subscriber scan_sub_;
     ros::Subscriber lane_detection_left_sub_;
     ros::Subscriber lane_detection_right_sub_;
+    // tf::TransformListener position_listener_;
 
     // Map Variables
     std::vector<double> belief_map_;
-    nav_msgs::OccupancyGrid occu_msg_;
     nav_msgs::OccupancyGrid lane_detection_left_msg_;
     nav_msgs::OccupancyGrid lane_detection_right_msg_;
     sensor_msgs::LaserScan laser_msg_;

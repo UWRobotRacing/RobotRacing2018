@@ -12,13 +12,14 @@
 #include <algorithm>
 #include <string>
 
-// OpenCV libraries
+// ROS
 #include <ros/ros.h>
 #include <std_msgs/Bool.h>
 #include <geometry_msgs/Pose2D.h>
 #include <nav_msgs/OccupancyGrid.h>
 #include <sensor_msgs/LaserScan.h>
 #include <tf/transform_datatypes.h>
+#include <tf/transform_listener.h>
 
 /**
  * @brief initiliazes the LaserMapper class
@@ -33,12 +34,20 @@ LaserMapper::LaserMapper()
   map_pub_ = nh_.advertise<nav_msgs::OccupancyGrid>(occupancy_grid_name_, 1);
   
   // SUBSCRIBERS
-  scan_sub_ = nh_.subscribe(laser_scan_name_, 1, &LaserMapper::CallBack, this);
-  lane_detection_left_sub_ = nh_.subscribe("/output_point_list_left", 1, &LaserMapper::DetectLeftLane, this);
-  lane_detection_right_sub_ = nh_.subscribe("/output_point_list_right", 1, &LaserMapper::DetectRightLane, this);
+  scan_sub_ = nh_.subscribe(laser_scan_name_, 1, &LaserMapper::LidarCallBack, this);
+  lane_detection_left_sub_ = nh_.subscribe("/output_point_list_left", 1, &LaserMapper::DetectLeftLaneCallback, this);
+  lane_detection_right_sub_ = nh_.subscribe("/output_point_list_right", 1, &LaserMapper::DetectRightLaneCallback, this);
 
   // Initialize an occupancy grid
   InitMap();
+}
+
+/**
+ * @brief destructs the LaserMapper class
+ * @return NONE
+ */
+LaserMapper::~LaserMapper() {
+  DeleteMap();
 }
 
 /** @brief get the rosparams
@@ -80,7 +89,7 @@ void LaserMapper::GetParam()
  *  @param msg the occupancy grid message
  *  @return NONE
  */
-void LaserMapper::DetectLeftLane(const nav_msgs::OccupancyGrid::ConstPtr& msg)
+void LaserMapper::DetectLeftLaneCallback(const nav_msgs::OccupancyGrid::ConstPtr& msg)
 {
   lane_detection_left_msg_ = *msg;
 
@@ -94,7 +103,7 @@ void LaserMapper::DetectLeftLane(const nav_msgs::OccupancyGrid::ConstPtr& msg)
  *  @param msg the occupancy grid message
  *  @return NONE
  */
-void LaserMapper::DetectRightLane(const nav_msgs::OccupancyGrid::ConstPtr& msg)
+void LaserMapper::DetectRightLaneCallback(const nav_msgs::OccupancyGrid::ConstPtr& msg)
 {
   lane_detection_right_msg_ = *msg;
 
@@ -234,7 +243,7 @@ void LaserMapper::RayTracing(float angle, float range, int inflate_factor)
  *  @param msg the laser scan data
  *  @return NONE
  */
-void LaserMapper::CallBack(const sensor_msgs::LaserScan::ConstPtr& msg)
+void LaserMapper::LidarCallBack(const sensor_msgs::LaserScan::ConstPtr& msg)
 {
   static int scan_subsample_counter = 0;
   ++scan_subsample_counter;
@@ -256,7 +265,7 @@ void LaserMapper::CallBack(const sensor_msgs::LaserScan::ConstPtr& msg)
     return;
   }
 
-  laser_msg_ = *msg;
+  laser_msg_ = *msg;  
 
   // ROS_INFO ("Mapper: Copied laser data");
 
@@ -281,6 +290,8 @@ void LaserMapper::ProcessMap()
   if (!ready2Map_)
     return;
 
+  nav_msgs::OccupancyGrid grid_msg_;
+
   int n = floor(abs(min_angle_-laser_msg_.angle_min)/laser_msg_.angle_increment)+mech_offset_;    
   // for (double i = laser_msg.angle_min; i < laser_msg.angle_max; i+= increment)
   double increment = (samplerate_)*laser_msg_.angle_increment;
@@ -304,22 +315,22 @@ void LaserMapper::ProcessMap()
     prev_header_ = laser_msg_.header;
   }
 
-  occu_msg_.header.frame_id = "/map";
-  occu_msg_.info.resolution = map_res_;
-  occu_msg_.info.width = map_W_;
-  occu_msg_.info.height = map_H_;
-  occu_msg_.info.origin.position.x = map_W_/2*map_res_;//-map_W_/2*map_res_; //map_W_/2*map_res_
-  occu_msg_.info.origin.position.y = map_H_/2*map_res_;//-map_H_/2*map_res_; //map_H_*map_res_
-  occu_msg_.info.origin.orientation =
+  grid_msg_.header.frame_id = "/map";
+  grid_msg_.info.resolution = map_res_;
+  grid_msg_.info.width = map_W_;
+  grid_msg_.info.height = map_H_;
+  grid_msg_.info.origin.position.x = map_W_/2*map_res_;//-map_W_/2*map_res_; //map_W_/2*map_res_
+  grid_msg_.info.origin.position.y = map_H_/2*map_res_;//-map_H_/2*map_res_; //map_H_*map_res_
+  grid_msg_.info.origin.orientation =
              tf::createQuaternionMsgFromRollPitchYaw(M_PI, -1*M_PI, 0);
-  occu_msg_.data.resize(map_W_*map_H_);
+  grid_msg_.data.resize(map_W_*map_H_);
 
   for (int i = 0; i < map_W_*map_H_; i++)
   {
     double weight = std::min(100.0, OBS_SCALE_*belief_map_[i]);
     weight = std::max(0.0, weight);
 
-    occu_msg_.data[i] =
+    grid_msg_.data[i] =
     std::max(static_cast<int>(weight), static_cast<int>(belief_map_[i]));
   }
 
@@ -327,11 +338,32 @@ void LaserMapper::ProcessMap()
   if (ready2Map_ && ready2Maplane_detectionLeft_ && ready2Maplane_detectionRight_)
   {
     // ROS_INFO("Joining maps");
-    JoinOccupancyGrid(occu_msg_, lane_detection_left_msg_, offset_height_left_, offset_width_left_);
-    JoinOccupancyGrid(occu_msg_, lane_detection_right_msg_, offset_height_right_, offset_width_right_);
+    JoinOccupancyGrid(grid_msg_, lane_detection_left_msg_, offset_height_left_, offset_width_left_);
+    JoinOccupancyGrid(grid_msg_, lane_detection_right_msg_, offset_height_right_, offset_width_right_);
   }
 
-  map_pub_.publish(occu_msg_);
+  map_pub_.publish(grid_msg_);
   DeleteMap();
   InitMap();
+}
+
+void LaserMapper::StitchMap(std::string ref_name) {
+  ROS_INFO("Im a test!");
+
+  //Listens for tf and uses lookup transform 
+  /*
+  tf::StampedTransform transform;
+  try{
+     listener_.lookupTransform("/turtle2", "/turtle1",  
+                              ros::Time(0), transform);
+   }
+   catch (tf::TransformException ex){
+     ROS_ERROR("%s",ex.what());
+     ros::Duration(1.0).sleep();
+   }
+   ...
+   transform.getOrigin().y();
+   transform.getOrigin().x();
+  */
+  //Should also do the distance calculation
 }
