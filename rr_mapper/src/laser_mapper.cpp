@@ -1,11 +1,10 @@
-/** @file lane_detection.cpp
+/** @file laser_mapper.cpp
  *  @author Jungwook Lee
  *  @author Toni Ogunmade(oluwatoni)
  *  @competition IARRC 2018
  */
 
-#include "laser_mapper.hpp"
-#include <occupancy_grid_utils.hpp>
+// CPP
 #include <stdio.h>
 #include <math.h>
 #include <vector>
@@ -20,6 +19,10 @@
 #include <sensor_msgs/LaserScan.h>
 #include <tf/transform_datatypes.h>
 #include <tf/transform_listener.h>
+
+// Local
+#include "laser_mapper.hpp"
+#include <occupancy_grid_utils.hpp>
 
 /**
  * @brief initiliazes the LaserMapper class
