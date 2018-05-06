@@ -17,8 +17,6 @@
 #include <geometry_msgs/Pose2D.h>
 #include <nav_msgs/OccupancyGrid.h>
 #include <sensor_msgs/LaserScan.h>
-#include <tf/transform_datatypes.h>
-#include <tf/transform_listener.h>
 
 // Local
 #include "laser_mapper.hpp"
