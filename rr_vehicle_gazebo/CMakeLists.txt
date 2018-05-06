@@ -1,7 +1,22 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(rr_vehicle_gazebo)
-find_package(catkin REQUIRED)
+set(CMAKE_BUILD_TYPE Release)
+find_package(catkin REQUIRED COMPONENTS
+  roscpp
+  rospy
+  std_msgs
+  sensor_msgs
+  nav_msgs
+  roslint
+  tf
+)
 catkin_package()
+
+include_directories(include ${catkin_INCLUDE_DIRS})
+add_executable(simulated_odom src/simulated_odom.cpp 
+               src/simulated_odom_node.cpp include/simulated_odom.hpp)
+target_link_libraries(simulated_odom ${catkin_LIBRARIES})
+roslint_cpp(src/simulated_odom.cpp src/simulated_odom_node.cpp include/simulated_odom.h)
 
 install(PROGRAMS
   scripts/ackermann_controller.py

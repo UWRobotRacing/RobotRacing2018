@@ -55,22 +55,6 @@
                 -x $(arg x) -y $(arg y) -z $(arg z)
                 -R $(arg roll) -P $(arg pitch) -Y $(arg yaw)"/>
 
-    <!-- Spawn the target. -->
-    <!-- Or run the command:
-    rosrun gazebo_ros spawn_model -gazebo_namespace /ackermann_vehicle/gazebo/ -database coke_can -sdf -model target
-    
-    or include:
-    
-    <node name="spawn_target" pkg="gazebo_ros" type="spawn_model"
-          args="-database coke_can -sdf -model target
-                -gazebo_namespace /$(arg namespace)/gazebo
-                -x 1 -y 1 -z 1
-                -R 0 -P 0 -Y 0"/>
-    
-    and for moving, publish the rostopic, e.g:
-    rostopic pub -r 20 /ackermann_vehicle/gazebo/set_model_state gazebo_msgs/ModelState '{model_name: target, pose: { position: { x: 1, y: 0, z: 2 }, orientation: {x: 0, y: 0.491983115673, z: 0, w: 0.870604813099 } }, twist: { linear: { x: 0, y: 0, z: 0 }, angular: { x: 0, y: 0, z: 0}  }, reference_frame: world }'
-    -->
-
     <!-- Load the joint controllers. One of these publishes the joint states
          to joint_states. -->
     <node name="controller_spawner" pkg="controller_manager" type="spawner"
@@ -82,5 +66,14 @@
       <param name="cmd_timeout" value="$(arg cmd_timeout)"/>
       <rosparam file="$(find rr_vehicle_gazebo)/config/em_3905_ackermann_ctrlr_params.yaml" command="load"/>
     </node>
+
+    <!-- Publish the vehicle odometry -->
+    <node name="simulated_odometry" pkg="rr_vehicle_gazebo"
+          type="simulated_odom" output="screen">
+      <param name="angular_velocity_sd" value="0.2"/>
+      <param name="linear_velocity_sd" value="0.2"/>
+      <rosparam file="$(find rr_vehicle_gazebo)/config/em_3905_ackermann_ctrlr_params.yaml" command="load"/>
+    </node>
+
   </group>
 </launch>

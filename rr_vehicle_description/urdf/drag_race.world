@@ -1,0 +1,48 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <world name="default">
+    <scene>
+      <sky>
+        <clouds>
+          <speed>12</speed>
+        </clouds>
+      </sky>
+      <ambient>1.0 1.0 1.0 1.0</ambient>
+      <shadows>true</shadows>
+    </scene>
+
+    <!-- A global light source -->
+    <include>
+      <uri>model://urdf/models/sun</uri>
+    </include>
+    <include>
+      <name>track</name>
+      <uri>model://urdf/models/track</uri>
+      <pose>0 0 0.0762 0 0 0.785398</pose>
+    </include>
+    <include>
+      <name>blended_plane</name>
+      <uri>model://urdf/models/blended_track</uri>
+      <pose>0 0 0 0 0 0.785398</pose>
+    </include>
+    <!-- A ground plane -->
+    <include>
+      <static>true</static>
+      <name>cone_1</name>
+      <uri>model://construction_cone</uri>
+      <pose>3.9 -10 0 0 0 0</pose>
+    </include>
+    <include>
+      <static>true</static>
+      <name>cone_2</name>
+      <uri>model://construction_cone</uri>
+      <pose>3.6 -1.7 0 0 0 0</pose>
+    </include>
+    <include>
+      <static>true</static>
+      <name>cone_3</name>
+      <uri>model://construction_cone</uri>
+      <pose>-1.3 10.9 0 0 0 0</pose>
+    </include>
+  </world>
+</sdf>

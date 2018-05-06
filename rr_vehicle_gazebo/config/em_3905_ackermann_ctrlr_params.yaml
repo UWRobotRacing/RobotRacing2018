@@ -45,3 +45,6 @@ right_rear_wheel:
   link_name: right_rear_wheel
   axle_controller_name: right_rear_axle_ctrlr
   diameter: 0.107
+
+angular_velocity_sd: 0.2
+linear_velocity_sd: 0.2

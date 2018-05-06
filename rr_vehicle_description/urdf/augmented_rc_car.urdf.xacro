@@ -476,7 +476,11 @@
   </xacro:macro>
 
   <xacro:rr_camera name="front_facing" x_offset="0.25"
-                y_offset="0.0" z_offset="0.25" pitch="0.0" yaw="0.0"/>
+                y_offset="0.0" z_offset="0.29" pitch="0.0" yaw="0.0"/>
+  <xacro:rr_camera name="left_facing" x_offset="0.25"
+                y_offset="-0.15" z_offset="0.29" pitch="0.349" yaw="-0.349"/>
+  <xacro:rr_camera name="right_facing" x_offset="0.25"
+                y_offset="0.15" z_offset="0.29" pitch="0.349" yaw="0.349"/>
 
   <gazebo>
     <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so"/>
