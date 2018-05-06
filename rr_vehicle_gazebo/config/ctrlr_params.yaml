@@ -1,0 +1,31 @@
+# ctrlr_params.yaml
+#
+# This file defines ackermann_controller parameter values used for simulating a
+# Traxxas(R) E-Maxx(R) #3905 RC (Radio Controlled) truck.
+#
+
+left_front_wheel:
+  steering_link_name: left_front_wheel
+  steering_controller_name: left_steering_ctrlr
+  axle_controller_name: left_front_axle_ctrlr
+  diameter: 0.107
+
+right_front_wheel:
+  steering_link_name: right_front_wheel
+  steering_controller_name: right_steering_ctrlr
+  axle_controller_name: right_front_axle_ctrlr
+  diameter: 0.107
+
+left_rear_wheel:
+  link_name: left_rear_wheel
+  axle_controller_name: left_rear_axle_ctrlr
+  diameter: 0.107
+
+right_rear_wheel:
+  link_name: right_rear_wheel
+  axle_controller_name: right_rear_axle_ctrlr
+  diameter: 0.107
+
+angular_velocity_sd: 0.2
+linear_velocity_sd: 0.2
+wheel_to_wheel_dist: 0.335

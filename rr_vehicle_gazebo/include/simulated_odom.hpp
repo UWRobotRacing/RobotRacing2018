@@ -11,8 +11,11 @@
 
 #include <ros/ros.h>
 #include <sensor_msgs/JointState.h>
+#include <geometry_msgs/Quaternion.h>
 #include <nav_msgs/Odometry.h>
 #include <tf/transform_broadcaster.h>
+#include <tf/transform_datatypes.h>
+#include <math.h>
 
 class SimulatedOdom{
 public:
@@ -33,6 +36,7 @@ private:
   double angular_vel_sd_;
   double linear_vel_sd_;
   double wheel_diameter_;
+  double wheel_to_wheel_dist_;
   nav_msgs::Odometry odom_;
   void jointStateCb(const sensor_msgs::JointState::ConstPtr &msg);
 };

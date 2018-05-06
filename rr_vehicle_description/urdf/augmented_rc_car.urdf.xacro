@@ -40,7 +40,9 @@
        respectively. hex_hub_depth is the distance that the hex hub is
        inset from the outer edge of the tire. It is set so that each wheel
        is a "zero offset" wheel. hex_hub_depth = tire_width / 2 -
-       axle_length. -->
+       axle_length. wheelbase is the distance between the front wheel
+       and the rear wheel hex_hub_dist is the distance between the right and
+       left hex hubs-->
   <xacro:property name="hub_dia" value="0.0826"/>
   <xacro:property name="tire_dia" value="0.107"/>
   <xacro:property name="tire_width" value="0.0381"/>
