@@ -6,6 +6,10 @@ This repository contains the current competition code (2018). This code will be 
 
 A list of what we're currently working on is in the issues section of this repo.
 
+### Competition Rules:
+Please review the competition rules before pushing any code :)
+* https://drive.google.com/file/d/1iF5CkpvjLxLN1k5ueg4_vOaK9uYlgP9x/view
+
 ### Coding Standards:
 For C++ code and Python Scripts we follow the Google coding standards linked below
 * https://google.github.io/styleguide/cppguide.html
