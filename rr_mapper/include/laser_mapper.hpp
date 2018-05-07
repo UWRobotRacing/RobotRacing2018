@@ -58,7 +58,7 @@ class LaserMapper
     ros::Subscriber scan_sub_;
     ros::Subscriber lane_detection_left_sub_;
     ros::Subscriber lane_detection_right_sub_;
-    // tf::TransformListener position_listener_;
+    tf::TransformListener position_listener_;
 
     // Map Variables
     std::vector<double> belief_map_;

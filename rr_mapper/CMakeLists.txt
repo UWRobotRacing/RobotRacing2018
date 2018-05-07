@@ -16,20 +16,9 @@ find_package(
 	roslint
 )
 
-catkin_package(
-	INCLUDE_DIRS include
-	CATKIN_DEPENDS 
-	roscpp 
-	rospy 
-	std_msgs 
-	sensor_msgs 
-	nav_msgs
-	tf
-)
-
+catkin_package()
 roslint_cpp()
 
-include_directories(include ${Boost_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS})
-include_directories(include ${roscpp_INCLUDE_DIRS}) 
+include_directories(include ${catkin_INCLUDE_DIRS})
 add_executable(rr_mapper src/main.cpp src/laser_mapper.cpp src/occupancy_grid_utils.cpp)
-target_link_libraries(rr_mapper ${roscpp_LIBRARIES}) 
+target_link_libraries(rr_mapper ${catkin_LIBRARIES}) 
