@@ -2,6 +2,7 @@
  *  @author Sirui Song
  *  @author Jungwook Lee
  *  @author Raymond Kuo
+ *  @author Andrew Jin (DongJunJin)
  *  @author Toni Ogunmade(oluwatoni)
  *  @competition IARRC 2018
  */
@@ -51,6 +52,7 @@ class LaserMapper
     double CheckMap(int x, int y);
     void RayTracing(float angle, float range, int inflate_factor);
     void StitchMap(std::string ref_name);
+    void ShiftMap();
 
     // ROS Variables
     ros::NodeHandle nh_;

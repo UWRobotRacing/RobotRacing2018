@@ -1,22 +1,12 @@
 /** @file laser_mapper.cpp
  *  @author Jungwook Lee
+ *  @author Andrew Jin (DongJunJin)
  *  @author Toni Ogunmade(oluwatoni)
  *  @competition IARRC 2018
  */
 
 // CPP
-#include <stdio.h>
-#include <math.h>
-#include <vector>
 #include <algorithm>
-#include <string>
-
-// ROS
-#include <ros/ros.h>
-#include <std_msgs/Bool.h>
-#include <geometry_msgs/Pose2D.h>
-#include <nav_msgs/OccupancyGrid.h>
-#include <sensor_msgs/LaserScan.h>
 
 // Local
 #include "laser_mapper.hpp"
@@ -94,8 +84,8 @@ void LaserMapper::DetectLeftLaneCallback(const nav_msgs::OccupancyGrid::ConstPtr
 {
   lane_detection_left_msg_ = *msg;
 
-  if (!ready2Maplane_detectionLeft_)
-    ready2Maplane_detectionLeft_ = true;
+  // if (!ready2Maplane_detectionLeft_)
+  //   ready2Maplane_detectionLeft_ = true;
   // Assumes laser is much faster than lane_detection data
   // Note: modify this function after camera integration
 }
@@ -108,8 +98,8 @@ void LaserMapper::DetectRightLaneCallback(const nav_msgs::OccupancyGrid::ConstPt
 {
   lane_detection_right_msg_ = *msg;
 
-  if (!ready2Maplane_detectionRight_)
-    ready2Maplane_detectionRight_ = true;
+  // if (!ready2Maplane_detectionRight_)
+  //   ready2Maplane_detectionRight_ = true;
   // Assumes laser is much faster than lane_detection data
   // Note: modify this function after camera integration
 }
@@ -344,13 +334,22 @@ void LaserMapper::ProcessMap()
   }
 
   map_pub_.publish(grid_msg_);
-  DeleteMap();
-  InitMap();
+
+  // DeleteMap();
+  // ShiftMap();
+  // InitMap();
 }
 
 void LaserMapper::StitchMap(std::string ref_name) {
-  ROS_INFO("Im a test!");
 
+  tf::StampedTransform transform;
+  try {
+    position_listener_.lookupTransform("/base_link", ref_name,
+                              ros::Time(0), transform);
+  } catch (tf::TransformException ex) {
+      ROS_ERROR("%s",ex.what());
+      ros::Duration(1.0).sleep();
+  }
   //Listens for tf and uses lookup transform 
   /*
   tf::StampedTransform transform;
