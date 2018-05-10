@@ -5,6 +5,7 @@ THRESHOLD_TOLERANCE = 0.8;
 MIN_SHADOW_AREA = 30;
 MASK_DILATION = 6;
 EXPANDED_MASK_DILATION = 10;
+MED_FILTER_KERNEL_SIZE = 5;
 
 % Try using Lab colour space for shadows
 shadow = imread('shadowcrop.png');
@@ -146,11 +147,27 @@ end
 
 subplot(3,2,5), imagesc(corrected_image), title('Removed Shadows'), grid on;
 
-% Fix over-illuminated edges
-corrected_image(1:150,1:150,:) = medfilt3(corrected_image(1:150,1:150,:), [9 9 3]);
-% TODO: perform median filter on each pixel
-subplot(3,2,6), imagesc(corrected_image), title('Fix Over-illumination'), grid on;
+% Fix over-illuminated edges with a median filter on each shadow pixel
+median_filtered = rgb2lab(corrected_image);
+h = floor(MED_FILTER_KERNEL_SIZE / 2);
 
+for i = 1:connected_shadow_regions.NumObjects
+    mask = false(connected_shadow_regions.ImageSize);
+    mask(connected_shadow_regions.PixelIdxList{i}) = true;
+    
+    for x = (1+h):(size(mask, 1)-h)
+        for y = (1+h):(size(mask, 2)-h)
+            if mask(x,y) == 1
+                hi = medfilt2(median_filtered(x-h:x+h,y-h:y+h,1), [MED_FILTER_KERNEL_SIZE MED_FILTER_KERNEL_SIZE]);
+                median_filtered(x, y, 1) = hi(h+1,h+1);
+            end
+        end
+    end
+    
+end
+
+median_filtered = lab2rgb(median_filtered);
+subplot(3,2,6), imagesc(median_filtered), title('Fix Over-illumination'), grid on;
 
 
 
