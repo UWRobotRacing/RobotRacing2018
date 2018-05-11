@@ -19,13 +19,13 @@ enum states {
 
 class EndlineCounter {
 	private :
-		ros::NodeHandle nh;
-		image_transport::ImageTransport it;
+		ros::NodeHandle nh_;
+		image_transport::ImageTransport it_;
 		
 		cv_bridge::CvImagePtr imgptr;
 		cv::Mat img;
 		
-		ros::Publisher pub;
+		ros::Publisher pub_;
 	
 	public :
 		int state;
@@ -34,6 +34,7 @@ class EndlineCounter {
 		EndlineCounter(ros::NodeHandle nodeh);
 		void img_callback(const sensor_msgs::ImageConstPtr&);
 		void find_el_state();
+		bool blob_detector();
 };
 
 #endif /*ENDLINE_DETECTION_HPP*/
