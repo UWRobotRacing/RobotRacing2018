@@ -11,7 +11,6 @@
 
 #include <ros/ros.h>
 #include <sensor_msgs/JointState.h>
-#include <geometry_msgs/Quaternion.h>
 #include <nav_msgs/Odometry.h>
 #include <tf/transform_broadcaster.h>
 #include <tf/transform_datatypes.h>
@@ -24,6 +23,7 @@ private:
   ros::NodeHandle nh_;
   ros::Publisher odom_pub_;
   ros::Subscriber joint_sub_;
+  ros::Time then_;
   tf::TransformBroadcaster br_;
   enum joints_{
     LEFT_STEERING = 2,
@@ -34,7 +34,8 @@ private:
     REAR_RIGHT_WHEEL = 4 
   };
   double angular_vel_sd_;
-  double linear_vel_sd_;
+  double linear_vel_x_sd_;
+  double linear_vel_y_sd_;
   double wheel_diameter_;
   double wheel_to_wheel_dist_;
   nav_msgs::Odometry odom_;

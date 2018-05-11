@@ -27,5 +27,6 @@ right_rear_wheel:
   diameter: 0.107
 
 angular_velocity_sd: 0.2
-linear_velocity_sd: 0.2
+linear_velocity_x_sd: 0.2
+linear_velocity_y_sd: 0.2
 wheel_to_wheel_dist: 0.335
