@@ -38,7 +38,7 @@
   <arg name="pitch" default="0.0"/>
   <arg name="yaw" default="0.0"/>
 
-  <include file="$(find rr_vehicle_description)/launch/rr_vehicle.launch">
+  <include file="$(find rr_description)/launch/rr_vehicle.launch">
     <arg name="namespace" value="$(arg namespace)"/>
   </include>
 
@@ -58,21 +58,21 @@
     <!-- Load the joint controllers. One of these publishes the joint states
          to joint_states. -->
     <node name="controller_spawner" pkg="controller_manager" type="spawner"
-          args="$(find rr_vehicle_gazebo)/config/joint_ctrlr_params.yaml"/>
+          args="$(find rr_gazebo)/config/joint_ctrlr_params.yaml"/>
 
     <!-- Control the steering and axle joints. -->
-    <node name="ackermann_controller" pkg="rr_vehicle_gazebo"
+    <node name="ackermann_controller" pkg="rr_gazebo"
           type="ackermann_controller.py">
       <param name="cmd_timeout" value="$(arg cmd_timeout)"/>
-      <rosparam file="$(find rr_vehicle_gazebo)/config/ctrlr_params.yaml" command="load"/>
+      <rosparam file="$(find rr_gazebo)/config/ctrlr_params.yaml" command="load"/>
     </node>
 
     <!-- Publish the vehicle odometry -->
-    <node name="simulated_odometry" pkg="rr_vehicle_gazebo"
+    <node name="simulated_odometry" pkg="rr_gazebo"
           type="simulated_odom" output="screen">
       <param name="angular_velocity_sd" value="0.2"/>
       <param name="linear_velocity_sd" value="0.2"/>
-      <rosparam file="$(find rr_vehicle_gazebo)/config/ctrlr_params.yaml" command="load"/>
+      <rosparam file="$(find rr_gazebo)/config/ctrlr_params.yaml" command="load"/>
     </node>
 
   </group>

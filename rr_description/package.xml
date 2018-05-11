@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <package>
-  <name>rr_vehicle_description</name>
+  <name>rr_description</name>
   <version>0.1.0</version>
   <description>
-    rr_vehicle_description contains the description (3D model,
+    rr_description contains the description (3D model,
     kinematics, mass, etc.) of a vehicle with Ackermann steering.
     It is based on the work from  the Wunderkammer Laboratory (see Copyright below)
     The model has been enhanced with sensors (stereo camera), IMU, etc.

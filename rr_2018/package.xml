@@ -13,8 +13,8 @@
   <license>BSD</license>
   <buildtool_depend>catkin</buildtool_depend>
 
-  <run_depend>rr_vehicle_gazebo</run_depend>
-  <run_depend>rr_vehicle_description</run_depend>
+  <run_depend>rr_gazebo</run_depend>
+  <run_depend>rr_description</run_depend>
   <run_depend>rr_path_planner</run_depend>
   <run_depend>rr_traffic_light</run_depend>
   <run_depend>rr_lane_detection</run_depend>

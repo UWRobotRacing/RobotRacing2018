@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!--@file rr_vehicle_teleop.launch
+<!--@file rr_teleop.launch
  -  @brief Use Gazebo to simulate a vehicle with Ackermann steering and spin up
            some nodes to control the simulated vehicle
  -         This code is inspired by code from the WunderKramer lab and GeorgiaTech's
@@ -15,7 +15,7 @@
   <arg name="namespace" default="rr_vehicle"/>
   <arg name="world_name" default="worlds/empty.world"/>
 
-  <include file="$(find rr_vehicle_gazebo)/launch/rr_vehicle.launch">
+  <include file="$(find rr_gazebo)/launch/rr_vehicle.launch">
     <arg name="namespace" value="$(arg namespace)"/>
     <arg name="world_name" value="$(arg world_name)"/>
   </include>
@@ -24,7 +24,7 @@
     <!-- Handle the joystick input -->
     <node pkg="joy" name="joy_node" type="joy_node"/>
     <node pkg="ps3joy" name="ps3joy" type="ps3joy.py" output="screen" args="--continuous-output"/>
-    <node name="vehicle_joystick" pkg="rr_vehicle_gazebo"
+    <node name="vehicle_joystick" pkg="rr_gazebo"
           type="vehicle_joystick.py" output="screen"/>
   </group>
 </launch>

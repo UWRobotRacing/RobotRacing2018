@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <package>
-  <name>rr_vehicle_gazebo</name>
+  <name>rr_gazebo</name>
   <version>0.1.0</version>
   <description>
-    rr_vehicle_gazebo is used with Gazebo to simulate a vehicle with
+    rr_gazebo is used with Gazebo to simulate a vehicle with
     Ackermann steering.
   </description>
   <maintainer email="ooogunma@edu.uwaterloo.ca">
@@ -25,7 +25,7 @@
   <run_depend>sensor_msgs</run_depend>
   <run_depend>geometry_msgs</run_depend>
   <run_depend>nav_msgs</run_depend>
-  <run_depend>rr_vehicle_description</run_depend>
+  <run_depend>rr_description</run_depend>
   <run_depend>controller_manager</run_depend>
   <run_depend>gazebo_ros</run_depend>
   <run_depend>gazebo_msgs</run_depend>
