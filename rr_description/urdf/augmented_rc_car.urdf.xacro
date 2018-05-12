@@ -325,7 +325,7 @@
     <visual name="outer_shell_stl">
       <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
       <geometry>
-        <mesh filename="package://rr_description/urdf/RR2018.stl" scale="0.02 0.02 0.02"/>
+        <mesh filename="package://rr_description/urdf/assets/RR2018.stl" scale="0.02 0.02 0.02"/>
       </geometry>
     </visual>
   </link>

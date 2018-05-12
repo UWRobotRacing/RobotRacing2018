@@ -1,14 +1,14 @@
 <?xml version="1.0"?>
-<sdf version="1.5">
-  <model name="track">
-    <static>true</static>
+<sdf version="1.4">
+<model name="asphalt_ground">
+  <static>true</static>
     <link name="link">
       <collision name="collision">
         <geometry>
-          <mesh>
-            <uri>model://urdf/assets/autoRallyTrack.dae</uri>
-            <scale>1.0 1.0 1.0</scale>
-          </mesh>
+          <plane>
+            <normal>0 0 1</normal>
+            <size>40 40</size>
+          </plane>
         </geometry>
         <surface>
           <friction>
@@ -22,15 +22,16 @@
       <visual name="visual">
         <cast_shadows>false</cast_shadows>
         <geometry>
-          <mesh>
-            <uri>model://urdf/assets/autoRallyTrack.dae</uri>
-            <scale>1.0 1.0 1.0</scale>
-          </mesh>
+          <plane>
+            <normal>0 0 1</normal>
+            <size>40 40</size>
+          </plane>
         </geometry>
         <material>
           <script>
-            <uri>model://urdf/assets/gazebo.material</uri>
-            <name>Gazebo/White</name>
+            <uri>model://urdf/models/asphalt_ground/materials/scripts</uri>
+            <uri>model://urdf/models/asphalt_ground/materials/textures</uri>
+            <name>Asphalt/Image</name>
           </script>
         </material>
       </visual>

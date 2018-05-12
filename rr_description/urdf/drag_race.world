@@ -18,19 +18,19 @@
     <include>
       <name>track</name>
       <uri>model://urdf/models/track</uri>
-      <pose>0 0 0.0762 0 0 0.785398</pose>
+      <pose>0 0 0.0762 0 0 0</pose>
     </include>
     <include>
-      <name>blended_plane</name>
-      <uri>model://urdf/models/blended_track</uri>
-      <pose>0 0 0 0 0 0.785398</pose>
+      <name>asphalt_ground</name>
+      <uri>model://urdf/models/asphalt_ground</uri>
+      <pose>0 0 0 0 0 0</pose>
     </include>
     <!-- A ground plane -->
     <include>
       <static>true</static>
       <name>cone_1</name>
       <uri>model://construction_cone</uri>
-      <pose>3.9 -10 0 0 0 0</pose>
+      <pose>3.9 -3 0 0 0 0</pose>
     </include>
     <include>
       <static>true</static>
@@ -42,7 +42,7 @@
       <static>true</static>
       <name>cone_3</name>
       <uri>model://construction_cone</uri>
-      <pose>-1.3 10.9 0 0 0 0</pose>
+      <pose>-1.3 4.9 0 0 0 0</pose>
     </include>
   </world>
 </sdf>
