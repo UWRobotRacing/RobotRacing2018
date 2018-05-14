@@ -154,13 +154,17 @@
       <origin rpy="${degrees_90} 0 0"/>
       <axis xyz="0 0 -1"/>
       <limit effort="${axle_eff_limit}" velocity="${axle_vel_limit}"/>
+      <dynamics damping="0.001" friction="0.5"/>
     </joint>
+
     <transmission name="${lr_prefix}_${fr_prefix}_axle_trans">
       <type>transmission_interface/SimpleTransmission</type>
       <joint name="${lr_prefix}_${fr_prefix}_axle">
         <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
       </joint>
       <actuator name="${lr_prefix}_${fr_prefix}_axle_act">
+        <!-- This hardwareInterface element exists for compatibility
+             with ROS Hydro. -->
         <hardwareInterface>EffortJointInterface</hardwareInterface>
         <mechanicalReduction>1</mechanicalReduction>
       </actuator>
@@ -191,14 +195,13 @@
       <xacro:thick_walled_tube_inertial
           inner_rad="${hub_dia / 2}" outer_rad="${tire_dia / 2}"
           height="${tire_width}" mass="${wheel_mass}"/>
+      <max_contacts>1</max_contacts>
     </link>
 
     <gazebo reference="${lr_prefix}_${fr_prefix}_wheel">
       <material>Gazebo/Black</material>
-      <kp>100000.0</kp>
-      <kd>1</kd>
-      <mu1>1.35</mu1>
-      <mu2>1.35</mu2>
+      <mu1>0.7</mu1>
+      <mu2>0.75</mu2>
       <fdir1>1 0 0</fdir1>
     </gazebo>
   </xacro:macro>
@@ -325,14 +328,14 @@
     <visual name="outer_shell_stl">
       <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
       <geometry>
-        <mesh filename="package://rr_description/urdf/assets/RR2018.stl" scale="0.02 0.02 0.02"/>
+        <mesh filename="package://rr_description/urdf/assets/RR2018.stl" scale="0.0254 0.0254 0.0254"/>
       </geometry>
     </visual>
   </link>
   <joint name="chassis_to_outer_shell" type="fixed">
     <parent link="chassis"/>
     <child link="outer_shell"/>
-    <origin xyz="-0.26 -0.11 0.05" rpy="${degrees_90} 0.0 ${degrees_90}"/>
+    <origin xyz="-0.26 -0.11 0.02" rpy="${degrees_90} 0.0 ${degrees_90}"/>
   </joint>
 
   <!-- Wheels -->
