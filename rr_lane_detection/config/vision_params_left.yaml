@@ -1,5 +1,6 @@
-# @file vision_params_right.yaml
-# @brief Parameters for the right camera
+%YAML:1.0
+# @file vision_params_left.yaml
+# @brief Parameters for the left camera
 # 
 # This camera is typically used for lane detection
 # This is used to transform point from camera coords to real world coords
@@ -8,13 +9,12 @@
 # @author Toni Ogunmade(oluwatoni)
 # @competition IARRC 2018
 
-%YAML:1.0
 #Size of Bird's Eye View grid
-bev_width: 398
-bev_height: 400
+bev_width: 270
+bev_height: 314
 bev_resolution: 0.01
 grid_offset_y: 0
-grid_offset_x: 3.0
+grid_offset_x: 0
 
 # 4 point coordinates in image plane. Note: OpenCV Image coordinates are in [x,y], where X is a column index (0 left, positive rightwards), and Y is a row index (0 top, positive downwards)
 # image_coords: [[0, 0], [640, 0], [0, 480], [640, 480]]
@@ -22,15 +22,15 @@ image_coords: !!opencv-matrix
    rows: 4
    cols: 2
    dt: f
-   data: [ 2., 0., 398., 157., 0, 372, 56, 400]
+   data: [ 0., 0., 640., 0., 0., 480., 640., 480]
 
 # 4 corresponding world coordinates, same format
-# world_coords: [[0, 0], [254, 178], [0 , 303], [52, 329]]
+# world_coords: [[0, 170], [240, 0], [186, 314], [240 , 291]]
 world_coords: !!opencv-matrix
    rows: 4
    cols: 2
    dt: f
-   data: [ 0., 0., 254., 178., 0, 303, 52, 329]
+   data: [ 0., 170., 240., 0., 186., 314., 240., 291.]
 
 multibounds: !!opencv-matrix
    rows: 3

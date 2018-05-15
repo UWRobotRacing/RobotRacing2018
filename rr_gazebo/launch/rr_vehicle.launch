@@ -31,22 +31,21 @@
   <arg name="cmd_timeout" default="0.5"/>
 
   <!-- Vehicle pose -->
-  <arg name="x" default="0.0"/>
-  <arg name="y" default="0.0"/>
-  <arg name="z" default="0.1"/>
+  <arg name="x" default="0.25"/>
+  <arg name="y" default="-30.0"/>
+  <arg name="z" default="0.0"/>
   <arg name="roll" default="0.0"/>
   <arg name="pitch" default="0.0"/>
-  <arg name="yaw" default="0.0"/>
+  <arg name="yaw" default="1.57079633"/>
 
   <include file="$(find rr_description)/launch/rr_vehicle.launch">
     <arg name="namespace" value="$(arg namespace)"/>
   </include>
 
   <group ns="$(arg namespace)">
-    <!-- Create the world. -->
-    <include file="$(find gazebo_ros)/launch/empty_world.launch">
-      <arg name="world_name" value="$(arg world_name)"/>
-    </include>
+    <!-- Create the world depending on which track was selected -->
+    <!-- TODO use args to select between different tracks -->
+    <include file="$(find rr_gazebo)/launch/rr_drag_race_world.launch"/>
 
     <!-- Spawn the vehicle. -->
     <node name="spawn_vehicle" pkg="gazebo_ros" type="spawn_model"

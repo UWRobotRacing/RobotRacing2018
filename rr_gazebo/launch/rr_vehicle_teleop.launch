@@ -13,8 +13,9 @@
 -->
 <launch>
   <arg name="namespace" default="rr_vehicle"/>
-  <arg name="world_name" default="worlds/empty.world"/>
+  <arg name="world_name" default="$(find rr_description)/urdf/drag_race.world"/>
 
+  <!-- TODO add support for the other maps -->
   <include file="$(find rr_gazebo)/launch/rr_vehicle.launch">
     <arg name="namespace" value="$(arg namespace)"/>
     <arg name="world_name" value="$(arg world_name)"/>

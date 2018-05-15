@@ -24,7 +24,7 @@
  -  @competition IARRC 2018
 -->
 
-<robot name="" xmlns:xacro="http://www.ros.org/wiki/xacro">
+<robot name="rr_platform" xmlns:xacro="http://www.ros.org/wiki/xacro">
   <!-- Degree-to-radian conversions -->
   <xacro:property name="degrees_45" value="0.785398163"/>
   <xacro:property name="degrees_90" value="1.57079633"/>
@@ -101,11 +101,11 @@
     <inertial>
       <xacro:insert_block name="origin"/>
       <mass value="${mass}"/>
-      <inertia ixx="${mass * (depth * depth + height * height) / 12}"
+      <inertia ixx="${mass * (depth * depth + height * height) / 12.0}"
                ixy="0" ixz="0"
-               iyy="${mass * (width * width + height * height) / 12}"
+               iyy="${mass * (width * width + height * height) / 12.0}"
                iyz="0"
-               izz="${mass * (width * width + depth * depth) / 12}"/>
+               izz="${mass * (width * width + depth * depth) / 12.0}"/>
     </inertial>
   </xacro:macro>
 
@@ -116,14 +116,14 @@
                params="inner_rad outer_rad height mass">
     <inertial>
       <mass value="${mass}"/>
-      <inertia ixx="${(1 / 12) * mass * (3 * (inner_rad * inner_rad +
+      <inertia ixx="${(1 / 12.0) * mass * (3.0 * (inner_rad * inner_rad +
                     outer_rad * outer_rad) + height * height)}"
                ixy="0" ixz="0"
-               iyy="${(1 / 12) * mass * (3 * (inner_rad * inner_rad +
+               iyy="${(1 / 12.0) * mass * (3.0 * (inner_rad * inner_rad +
                     outer_rad * outer_rad) + height * height)}"
                iyz="0"
                izz="${mass * (inner_rad * inner_rad +
-                    outer_rad * outer_rad) / 2}"/>
+                    outer_rad * outer_rad) / 2.0}"/>
     </inertial>
   </xacro:macro>
 
@@ -134,8 +134,8 @@
       <parent link="chassis"/>
       <child link="${child}"/>
 
-      <origin xyz="${fr_reflect * wheelbase / 2}
-                   ${lr_reflect * ((hex_hub_dist / 2) - axle_length)}
+      <origin xyz="${fr_reflect * wheelbase / 2.0}
+                   ${lr_reflect * ((hex_hub_dist / 2.0) - axle_length)}
                    0"/>
     </joint>
   </xacro:macro>
@@ -177,7 +177,7 @@
                      2 - hex_hub_depth))}
                      0"/>
         <geometry>
-          <cylinder radius="${tire_dia / 2}" length="${tire_width}"/>
+          <cylinder radius="${tire_dia / 2.0}" length="${tire_width}"/>
         </geometry>
         <material name="tire_mat"/>
       </visual>
@@ -188,21 +188,32 @@
                      2 - hex_hub_depth))}
                      0"/>
         <geometry>
-          <cylinder radius="${tire_dia / 2}" length="${tire_width}"/>
+          <cylinder radius="${tire_dia / 2.0}" length="${tire_width}"/>
         </geometry>
       </collision>
 
       <xacro:thick_walled_tube_inertial
-          inner_rad="${hub_dia / 2}" outer_rad="${tire_dia / 2}"
+          inner_rad="${hub_dia / 2.0}" outer_rad="${tire_dia / 2.0}"
           height="${tire_width}" mass="${wheel_mass}"/>
       <max_contacts>1</max_contacts>
+      <surface>
+        <contact>
+          <ode>
+            <soft_cfm>0.000000001</soft_cfm>
+            <soft_erp>0.2</soft_erp>
+            <kp>1e+10</kp>
+            <kd>10</kd>
+            <max_vel>0.01</max_vel>
+            <min_depth>0.005</min_depth>
+          </ode>
+        </contact>
+      </surface>
     </link>
 
     <gazebo reference="${lr_prefix}_${fr_prefix}_wheel">
       <material>Gazebo/Black</material>
       <mu1>0.7</mu1>
       <mu2>0.75</mu2>
-      <fdir1>1 0 0</fdir1>
     </gazebo>
   </xacro:macro>
 
@@ -283,13 +294,13 @@
   <joint name="baselink_to_bumper" type="fixed">
     <parent link="base_link"/>
     <child link="bumper_link"/>
-    <origin xyz="${chassis_length /2 + 0.12} 0.0 0.0" rpy="0.0 0.0 0.0"/>
+    <origin xyz="${chassis_length /2.0 + 0.12} 0.0 0.0" rpy="0.0 0.0 0.0"/>
   </joint>
 
   <!-- Chassis -->
   <link name="chassis">
     <visual>
-      <origin xyz="0 0 ${-chassis_height / 2}"/>
+      <origin xyz="0 0 ${-chassis_height / 2.0}"/>
       <geometry>
         <box size="${chassis_length} ${chassis_width} ${chassis_height}"/>
       </geometry>
@@ -297,7 +308,7 @@
     </visual>
 
     <collision>
-      <origin xyz="0 0 ${-chassis_height / 2}"/>
+      <origin xyz="0 0 ${-chassis_height / 2.0}"/>
       <geometry>
         <box size="${chassis_length} ${chassis_width} ${chassis_height}"/>
       </geometry>
@@ -306,7 +317,7 @@
     <xacro:solid_cuboid_inertial
         width="${chassis_length}" depth="${chassis_width}"
         height="${chassis_height}" mass="${chassis_mass}">
-      <origin xyz="0 0 ${-chassis_height / 2}"/>
+      <origin xyz="0 0 ${-chassis_height / 2.0}"/>
     </xacro:solid_cuboid_inertial>
   </link>
   <gazebo reference="chassis">
@@ -325,6 +336,12 @@
       <mass value="0.1"/>
       <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
+    <collision>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+      <geometry>
+        <mesh filename="package://rr_description/urdf/assets/RR2018.stl" scale="0.0254 0.0254 0.0254"/>
+      </geometry>
+    </collision>
     <visual name="outer_shell_stl">
       <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
       <geometry>
@@ -480,12 +497,12 @@
     </gazebo>
   </xacro:macro>
 
-  <xacro:rr_camera name="front_facing" x_offset="0.25"
+  <xacro:rr_camera name="front_facing" x_offset="0.45"
                 y_offset="0.0" z_offset="0.29" pitch="0.0" yaw="0.0"/>
-  <xacro:rr_camera name="left_facing" x_offset="0.25"
-                y_offset="-0.15" z_offset="0.29" pitch="0.349" yaw="-0.349"/>
-  <xacro:rr_camera name="right_facing" x_offset="0.25"
-                y_offset="0.15" z_offset="0.29" pitch="0.349" yaw="0.349"/>
+  <xacro:rr_camera name="right_facing" x_offset="0.45"
+                y_offset="-0.15" z_offset="0.29" pitch="0.6" yaw="-0.6"/>
+  <xacro:rr_camera name="left_facing" x_offset="0.45"
+                y_offset="0.15" z_offset="0.29" pitch="0.6" yaw="0.6"/>
 
   <!-- IMU -->
   <link name="imu_link">
