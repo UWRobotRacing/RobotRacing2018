@@ -9,7 +9,7 @@ EndlineCounter::EndlineCounter (ros::NodeHandle nh_) : it_(nh_)
 void EndlineCounter::img_callback(const sensor_msgs::ImageConstPtr& msg)
 {
 	ROS_INFO("%d", state);
-	cv::Mat init_img, hsv_img, mag_img, mag_img2;
+	cv::Mat init_img, hsv_img, mag_img, blur_img;
 	cv_bridge::CvImagePtr cv_ptr;
  	int iLowH = 145;
  	int iHighH = 165;
@@ -23,8 +23,8 @@ void EndlineCounter::img_callback(const sensor_msgs::ImageConstPtr& msg)
 		cv::cvtColor(init_img,hsv_img, CV_BGR2HSV);
 		cv::inRange(hsv_img, cv::Scalar(iLowH, 0,0), cv::Scalar(iHighH,255,255), mag_img);
 		
-		mag_img2 = mag_img.clone();
-		cv::GaussianBlur(mag_img, mag_img2, cv::Size(7,7), 0, 0);
+		blur_img = mag_img.clone();
+		cv::GaussianBlur(mag_img, blur_img, cv::Size(7,7), 0, 0);
 
 		//detect line
 
@@ -36,8 +36,9 @@ void EndlineCounter::img_callback(const sensor_msgs::ImageConstPtr& msg)
 		return;
 	}
 	
+	blob_detector(blur_img);
 	// Update GUI Window
-	cv::imshow("OPENCV_WINDOW", mag_img2);
+	cv::imshow("OPENCV_WINDOW", blur_img);
 	cv::waitKey(3);
 
 	//publish 
@@ -64,10 +65,19 @@ void EndlineCounter::find_el_state(){
     end */
 }
 
- bool EndlineCounter::blob_detector() {
-	cv::SimpleBlobDetector *detector = new SimpleBlobDetector();
-	detector->params.filterByArea = true;
-	detector->params.minArea = 500;
+ bool EndlineCounter::blob_detector(cv::Mat img) {
+	cv::SimpleBlobDetector::Params params;
+	params.filterByArea = true;
+	params.minArea = 500;
 
- 	return true;
+	cv::Ptr<cv::SimpleBlobDetector> detector = cv::SimpleBlobDetector::create(params);
+	std::vector<cv::KeyPoint> keypoints;
+	detector->detect(img, keypoints);
+
+	if (keypoints.size() > 0) {
+		ROS_INFO("%d", keypoints.size());
+ 		return true;
+	}
+	
+	return false;
  }

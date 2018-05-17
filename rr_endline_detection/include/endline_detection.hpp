@@ -8,6 +8,7 @@
 #include <sensor_msgs/image_encodings.h>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
+#include <opencv2/opencv.hpp>
 
 enum states {
 	BEGINNING = 0x00,
@@ -31,10 +32,10 @@ class EndlineCounter {
 		int state;
 		int get_state();
 
-		EndlineCounter(ros::NodeHandle nodeh);
+		EndlineCounter(ros::NodeHandle);
 		void img_callback(const sensor_msgs::ImageConstPtr&);
 		void find_el_state();
-		bool blob_detector();
+		bool blob_detector(cv::Mat);
 };
 
 #endif /*ENDLINE_DETECTION_HPP*/
