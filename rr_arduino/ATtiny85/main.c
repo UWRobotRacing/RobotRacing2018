@@ -15,11 +15,9 @@
 #include <stdint.h>                 //library for standard integer
 #include "usiTwiSlave.h"            //I2C lib_modified
 
-#define F_CPU          8000000UL       //set clock frequency to 8MHz
-#define SLAVE_ADDRESS  0x07            //salve address
-#define DATA_MASK      0x18            //data mask (0b011000)
-#define FIRST_8BIT     0xFF00
-#define SECOND_8BIT    0x00FF
+#define F_CPU          8000000UL         //set clock frequency to 8MHz
+#define SLAVE_ADDRESS  0x07     //salve address
+#define DATA_MASK      0x18     //data mask (0b011000)
 
 typedef enum {
     ZERO_ZERO   = 0x00,
@@ -28,9 +26,9 @@ typedef enum {
     ONE_ONE     = 0x03
 } encoder_state_t;
 
-volatile uint8_t encod_prev    = 0x00;
-volatile uint8_t encod_curr    = 0x00;
-volatile int16_t encod_count   = 0x00;
+volatile uint8_t encod_prev  = 0x00;
+volatile uint8_t encod_curr  = 0x00;
+volatile int16_t encod_count = 0x00;
 
 /** @brief Handles ISR when PB3 or PB4 detects logic change
  *  @param PCINT0_vect Checks for interrupt on PCINT0 (PORTB)
@@ -149,14 +147,10 @@ int main(void)
                 //trigger signal detected from master
                 case 'r':
                     cli();                              //disable interrupt
+                    usiTwiTransmitByte(encod_count);    //send encod_count to master
+                    PORTB |= ( 1 << PB1);
                 
-                    //send encod_count to master (first 8 bit)
-                    usiTwiTransmitByte( (encod_count & FIRST_8BIT) >> 8 );
-                
-                    //send encod_count to master (second 8 bit)
-                    usiTwiTransmitByte( (encod_count & SECOND_8BIT ));
-                
-                    encod_count = 0;                    //reset the count
+                    //encod_count = 0;                    //reset the count
     
                     sei();                              //enable interrupt
                 break;
