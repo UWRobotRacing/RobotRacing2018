@@ -27,7 +27,7 @@ int main(int argc, char** argv)
     bool_msg.data = true;
     null_vector.x = 0.0; null_vector.y = 0.0; null_vector.z = 0.0;
     twist_msg.linear = null_vector;
-    twist_msg.linear = null_vector;
+    twist_msg.angular = null_vector;
 
     // Publish messages
     null_pub.publish(bool_msg);
