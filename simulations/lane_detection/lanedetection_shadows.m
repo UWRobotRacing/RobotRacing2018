@@ -4,8 +4,10 @@ clear all;
 THRESHOLD_TOLERANCE = 0.8;
 MIN_SHADOW_AREA = 30;
 MASK_DILATION = 6;
-EXPANDED_MASK_DILATION = 10;
-MED_FILTER_KERNEL_SIZE = 5;
+EXPANDED_SHADOW_MASK_DILATION = 10;
+EXPANDED_EDGE_MASK_DILATION = 8;
+MED_FILTER_KERNEL_SIZE = 15;
+GAUSS_BLUR_SIGMA = 8;
 
 % Try using Lab colour space for shadows
 shadow = imread('shadowcrop.png');
@@ -49,7 +51,7 @@ corrected_image = shadow;
 for i = 1:connected_shadow_regions.NumObjects
     mask = false(connected_shadow_regions.ImageSize);
     mask(connected_shadow_regions.PixelIdxList{i}) = true;
-    expanded_mask = imdilate(mask, true(EXPANDED_MASK_DILATION));
+    expanded_mask = imdilate(mask, true(EXPANDED_SHADOW_MASK_DILATION));
     
     [B,L] = bwboundaries(expanded_mask, 'noholes');
     boundary = B{1};
@@ -147,26 +149,29 @@ end
 
 subplot(3,2,5), imagesc(corrected_image), title('Removed Shadows'), grid on;
 
-% Fix over-illuminated edges with a median filter on each shadow pixel
-median_filtered = rgb2lab(corrected_image);
+% THIS IS THE SLOWEST STEP
+% Fix over-illuminated edges with a median filter on shadow region edges
+median_filtered = rgb2hsv(corrected_image);
 h = floor(MED_FILTER_KERNEL_SIZE / 2);
 
 for i = 1:connected_shadow_regions.NumObjects
     mask = false(connected_shadow_regions.ImageSize);
     mask(connected_shadow_regions.PixelIdxList{i}) = true;
+    mask = edge(mask, 'canny');
+    mask = imdilate(mask, true(EXPANDED_EDGE_MASK_DILATION));
     
     for x = (1+h):(size(mask, 1)-h)
         for y = (1+h):(size(mask, 2)-h)
             if mask(x,y) == 1
-                hi = medfilt2(median_filtered(x-h:x+h,y-h:y+h,1), [MED_FILTER_KERNEL_SIZE MED_FILTER_KERNEL_SIZE]);
-                median_filtered(x, y, 1) = hi(h+1,h+1);
+                kernel = medfilt2(median_filtered(x-h:x+h,y-h:y+h,3), [MED_FILTER_KERNEL_SIZE MED_FILTER_KERNEL_SIZE]); 
+                median_filtered(x, y, 3) = kernel(h+1,h+1);
             end
         end
     end
     
 end
 
-median_filtered = lab2rgb(median_filtered);
+median_filtered = hsv2rgb(median_filtered);
 subplot(3,2,6), imagesc(median_filtered), title('Fix Over-illumination'), grid on;
 
 
