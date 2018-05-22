@@ -1,4 +1,4 @@
-function [hslimage] = rgb2hsl2(rgbimage)
+function [hslimage] = rgb2hsl(rgbimage)
     numRows = size(rgbimage, 1);
     numCols = size(rgbimage, 2);
     hslimage = zeros(numRows, numCols, 3);
