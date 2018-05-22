@@ -134,8 +134,8 @@ void lane_detection_processor::FindLanes(const sensor_msgs::Image::ConstPtr &msg
 
     // find mask_
     //Copy to output bridge
-    out.copyTo(cv_output_bridge_.image);
-    cv_output_bridge_.encoding = "mono8";
+    Im1_HSV_warped_.copyTo(cv_output_bridge_.image);
+    cv_output_bridge_.encoding = "rgb8";
 
     //Input Image has been processed and published
     image_pub_.publish(cv_output_bridge_.toImageMsg());
