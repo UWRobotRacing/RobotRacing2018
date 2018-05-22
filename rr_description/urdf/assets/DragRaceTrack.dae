@@ -5,8 +5,8 @@
 			<author> SimLab Soft http://www.simLab-soft.com </author>
 			<authoring_tool>SimLab Collada Exporter for Fusion 360</authoring_tool>
 		</contributor>
-		<created>2018-05-13T14:10:04</created>
-		<modified>2018-05-13T14:10:04</modified>
+		<created>2018-05-19T00:36:49</created>
+		<modified>2018-05-19T00:36:49</modified>
 		<unit meter="1.000000000000000" name="Meter"/>
 		<up_axis>Z_UP</up_axis>
 	</asset>
@@ -18,7 +18,7 @@
 					<matrix> 1 0 0 0 0 0 -1 -232.553 0 1 0 0.15 0 0 0 1 </matrix>
 					<instance_camera url="#ID1" />
 				</node>
-				<node  id="ID2" name="dragRace_v8">
+				<node  id="ID2" name="dragRace_v10">
 					<matrix> 0.01 0 0 0 0 0 -0.01 0 0 0.01 0 0 0 0 0 1 </matrix>
 					<node  id="ID3" name="START">
 						<matrix> 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 </matrix>
@@ -60,12 +60,12 @@
 						<matrix> 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 </matrix>
 						<node  id="ID13" name="Box">
 							<matrix> 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 </matrix>
-							<node  id="ID14" name="Box_Powder_Coat_-_Rough_(White)">
+							<node  id="ID14" name="Box_Powder_Coat_(Red)">
 								<matrix> 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 </matrix>
 								<instance_geometry url="#ID15">
 									<bind_material>
 										<technique_common>
-											<instance_material symbol="Powder_Coat_-_Rough_(White)" target="#ID16">
+											<instance_material symbol="Powder_Coat_(Red)" target="#ID16">
 												<bind_vertex_input semantic="UVSET0" input_semantic="TEXCOORD" input_set="0" />
 											</instance_material>
 										</technique_common>
@@ -78,12 +78,12 @@
 						<matrix> 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 </matrix>
 						<node  id="ID18" name="Middle">
 							<matrix> 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 </matrix>
-							<node  id="ID19" name="Middle_Paint_-_Enamel_Glossy_(White)">
+							<node  id="ID19" name="Middle_Powder_Coat_-_Rough_(White)">
 								<matrix> 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 </matrix>
 								<instance_geometry url="#ID20">
 									<bind_material>
 										<technique_common>
-											<instance_material symbol="Paint_-_Enamel_Glossy_(White)" target="#ID21">
+											<instance_material symbol="Powder_Coat_-_Rough_(White)" target="#ID21">
 												<bind_vertex_input semantic="UVSET0" input_semantic="TEXCOORD" input_set="0" />
 											</instance_material>
 										</technique_common>
@@ -3545,7 +3545,7 @@
 				<vertices id="geo_49-Vertex">
 					<input semantic="POSITION" source="#geo_49-Position"/>
 				</vertices>
-				<triangles count="36" material="Powder_Coat_-_Rough_(White)">
+				<triangles count="36" material="Powder_Coat_(Red)">
 					<input offset="0" semantic="VERTEX" source="#geo_49-Vertex"/>
 					<input offset="1" semantic="NORMAL"  source="#geo_49-Normals"/>
 					<p>0 0 1 1 2 2 2 2 1 1 3 3 4 4 5 5 6 6 6 6 5 5 7 7 8 8 9 9 10 10 10 10 9 9 11 11 12 12 13 13 14 14 14 14 13 13 15 15 16 16 17 17 18 18 18 18 17 17 19 19 20 20 21 21 22 22 22 22 21 21 23 23 24 24 25 25 26 26 26 26 25 25 27 27 28 28 29 29 30 30 30 30 29 29 31 31 32 32 33 33 34 34 34 34 33 33 35 35 36 36 37 37 38 38 38 38 37 37 39 39 40 40 41 41 42 42 42 42 41 41 43 43 44 44 45 45 46 46 46 46 45 45 47 47 48 48 49 49 50 50 50 50 49 49 51 51 52 52 53 53 54 54 54 54 53 53 55 55 56 56 57 57 58 58 58 58 57 57 59 59 60 60 61 61 62 62 62 62 61 61 63 63 64 64 65 65 66 66 66 66 65 65 67 67 68 68 69 69 70 70 70 70 69 69 71 71 </p>
@@ -3897,7 +3897,7 @@
 				<vertices id="geo_60-Vertex">
 					<input semantic="POSITION" source="#geo_60-Position"/>
 				</vertices>
-				<triangles count="12" material="Paint_-_Enamel_Glossy_(White)">
+				<triangles count="12" material="Powder_Coat_-_Rough_(White)">
 					<input offset="0" semantic="VERTEX" source="#geo_60-Vertex"/>
 					<input offset="1" semantic="NORMAL"  source="#geo_60-Normals"/>
 					<p>0 0 1 1 2 2 2 2 1 1 3 3 4 4 5 5 6 6 6 6 5 5 7 7 8 8 9 9 10 10 10 10 9 9 11 11 12 12 13 13 14 14 14 14 13 13 15 15 16 16 17 17 18 18 18 18 17 17 19 19 20 20 21 21 22 22 22 22 21 21 23 23 </p>
@@ -5986,16 +5986,16 @@
 		</geometry>
 	</library_geometries>
 	<library_materials>
-		<material id="ID21" name="Paint_-_Enamel_Glossy_(White)">
+		<material id="ID7" name="Paint_-_Enamel_Glossy_(Magenta)">
 			<instance_effect url="#ID391"/>
 		</material>
-		<material id="ID16" name="Powder_Coat_-_Rough_(White)">
+		<material id="ID16" name="Powder_Coat_(Red)">
 			<instance_effect url="#ID392"/>
 		</material>
-		<material id="ID26" name="Paint_-_Enamel_Glossy_(Orange)">
+		<material id="ID21" name="Powder_Coat_-_Rough_(White)">
 			<instance_effect url="#ID393"/>
 		</material>
-		<material id="ID7" name="Paint_-_Enamel_Glossy_(Magenta)">
+		<material id="ID26" name="Paint_-_Enamel_Glossy_(Orange)">
 			<instance_effect url="#ID394"/>
 		</material>
 	</library_materials>
@@ -6007,7 +6007,7 @@
 						<emission><color>0 0 0 1</color></emission>
 						<ambient><color>0 0 0 1</color></ambient>
 						<diffuse>
-							<color>0.964706 0.964706 0.952941 1</color>
+							<color>1 0 1 1</color>
 						</diffuse>
 						<specular><color>1 1 1 1</color></specular>
 						<transparent opaque="A_ONE"><color>1.0 1.0 1.0 1.0</color></transparent>
@@ -6033,7 +6033,7 @@
 						<emission><color>0 0 0 1</color></emission>
 						<ambient><color>0 0 0 1</color></ambient>
 						<diffuse>
-							<color>0.964706 0.964706 0.952941 1</color>
+							<color>0.631373 0.25098 0.0196078 1</color>
 						</diffuse>
 						<specular><color>1 1 1 1</color></specular>
 						<transparent opaque="A_ONE"><color>1.0 1.0 1.0 1.0</color></transparent>
@@ -6044,12 +6044,22 @@
 		</effect>
 		<effect id="ID393">
 			<profile_COMMON>
+				<newparam sid="ID400">
+					<surface type="2D">
+						<init_from>ID399</init_from>
+					</surface>
+				</newparam>
+				<newparam sid="ID398">
+					<sampler2D>
+						<source>ID400</source>
+					</sampler2D>
+				</newparam>
 				<technique sid="standard">
 					<phong>
 						<emission><color>0 0 0 1</color></emission>
 						<ambient><color>0 0 0 1</color></ambient>
 						<diffuse>
-							<color>1 0.501961 0.0784314 1</color>
+							<color>1 1 1 1</color>
 						</diffuse>
 						<specular><color>1 1 1 1</color></specular>
 						<transparent opaque="A_ONE"><color>1.0 1.0 1.0 1.0</color></transparent>
@@ -6065,7 +6075,7 @@
 						<emission><color>0 0 0 1</color></emission>
 						<ambient><color>0 0 0 1</color></ambient>
 						<diffuse>
-							<color>1 0 1 1</color>
+							<color>1 0.45098 0 1</color>
 						</diffuse>
 						<specular><color>1 1 1 1</color></specular>
 						<transparent opaque="A_ONE"><color>1.0 1.0 1.0 1.0</color></transparent>
@@ -6076,7 +6086,10 @@
 		</effect>
 	</library_effects>
 	<library_images>
-		<image id="ID396" name="Img_1_1_mats_texture_rough_height.png.png">
+		<image id="ID396" name="Img_1_1_mats_texture_orangepeel_height.png.png">
+			<init_from>file:////Users/jackxu/Library/Application Support/Autodesk/Common/Material Library/17081601/slib/resource/cloud/resource/1/1_mats_texture_orangepeel_height.png.png</init_from>
+		</image>
+		<image id="ID399" name="Img_2_1_mats_texture_rough_height.png.png">
 			<init_from>file:////Users/jackxu/Library/Application Support/Autodesk/Common/Material Library/17081601/slib/resource/cloud/resource/1/1_mats_texture_rough_height.png.png</init_from>
 		</image>
 	</library_images>

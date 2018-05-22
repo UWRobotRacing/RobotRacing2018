@@ -497,12 +497,12 @@
     </gazebo>
   </xacro:macro>
 
-  <xacro:rr_camera name="front_facing" x_offset="0.45"
+  <xacro:rr_camera name="front_facing" x_offset="0.35"
                 y_offset="0.0" z_offset="0.29" pitch="0.0" yaw="0.0"/>
-  <xacro:rr_camera name="right_facing" x_offset="0.45"
-                y_offset="-0.15" z_offset="0.29" pitch="0.6" yaw="-0.6"/>
-  <xacro:rr_camera name="left_facing" x_offset="0.45"
-                y_offset="0.15" z_offset="0.29" pitch="0.6" yaw="0.6"/>
+  <xacro:rr_camera name="right_facing" x_offset="0.35"
+                y_offset="-0.15" z_offset="0.29" pitch="0.55" yaw="-0.3"/>
+  <xacro:rr_camera name="left_facing" x_offset="0.35"
+                y_offset="0.15" z_offset="0.29" pitch="0.55" yaw="0.3"/>
 
   <!-- IMU -->
   <link name="imu_link">

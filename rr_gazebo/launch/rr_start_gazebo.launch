@@ -1,5 +1,10 @@
 <?xml version="1.0"?>
-
+<!--@file rr_start_gazebo.launch
+ -  @brief Start Gazebo with the set parameters
+ -
+ -  @author Toni Ogunmade(oluwatoni)
+ -  @competition IARRC 2018
+-->
 <launch>
   <env name="GAZEBO_MODEL_PATH" value="$(find rr_description)"/>
   <env name="GAZEBO_RESOURCE_PATH" value="$(find rr_description)"/>
@@ -13,8 +18,9 @@
   <arg name="debug" default="false"/>
   <arg name="physics" default="dart"/>
   <arg name="verbose" default="false"/>
-  <arg name="world_name" default="model://urdf/drag_race.world"/>
+  <arg name="world_name" default="worlds/empty.world"/>
   <arg name="cmd_timeout" default="0.5"/>
+
   <!-- set use_sim_time flag -->
   <group if="$(arg use_sim_time)">
     <param name="/use_sim_time" value="true" />
@@ -42,5 +48,4 @@
   <group if="$(arg gui)">
     <node name="gazebo_gui" pkg="gazebo_ros" type="gzclient" respawn="false" output="screen"/>
   </group>
-
 </launch>

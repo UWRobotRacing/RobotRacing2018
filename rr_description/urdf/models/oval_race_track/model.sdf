@@ -6,7 +6,7 @@
       <collision name="collision">
         <geometry>
           <mesh>
-            <uri>model://urdf/assets/DragRaceTrack.dae</uri>
+            <uri>model://urdf/assets/OvalRaceTrack.dae</uri>
             <scale>1.0 1.0 1.0</scale>
           </mesh>
         </geometry>
@@ -23,7 +23,7 @@
         <cast_shadows>false</cast_shadows>
         <geometry>
           <mesh>
-            <uri>model://urdf/assets/DragRaceTrack.dae</uri>
+            <uri>model://urdf/assets/OvalRaceTrack.dae</uri>
             <scale>1.0 1.0 1.0</scale>
           </mesh>
         </geometry>

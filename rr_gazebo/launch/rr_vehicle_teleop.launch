@@ -1,7 +1,8 @@
 <?xml version="1.0"?>
 <!--@file rr_teleop.launch
  -  @brief Use Gazebo to simulate a vehicle with Ackermann steering and spin up
-           some nodes to control the simulated vehicle
+           some nodes to control the simulated vehicle, also accepts the type of
+           test track wanted
  -         This code is inspired by code from the WunderKramer lab and GeorgiaTech's
  -         AutoRally team
  -         The repositories are linked here:
@@ -13,13 +14,14 @@
 -->
 <launch>
   <arg name="namespace" default="rr_vehicle"/>
-  <arg name="world_name" default="$(find rr_description)/urdf/drag_race.world"/>
+  <arg name="type" default="drag"/>
 
-  <!-- TODO add support for the other maps -->
-  <include file="$(find rr_gazebo)/launch/rr_vehicle.launch">
-    <arg name="namespace" value="$(arg namespace)"/>
-    <arg name="world_name" value="$(arg world_name)"/>
-  </include>
+  <!-- TODO switch to selecting the map -->
+  <group if="$(eval type == 'drag')">
+    <include file="$(find rr_gazebo)/launch/rr_drag_race_sim.launch">
+      <arg name="namespace" value="$(arg namespace)"/>
+    </include>
+  </group>
 
   <group ns="$(arg namespace)">
     <!-- Handle the joystick input -->

@@ -17,7 +17,7 @@
     </include>
     <include>
       <name>track</name>
-      <uri>model://urdf/models/drag_race_track</uri>
+      <uri>model://urdf/models/circuit_race_track</uri>
       <pose>0 -30 0.001 0 0 0</pose>
     </include>
     <include>
