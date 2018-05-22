@@ -12,8 +12,8 @@ subplot(2,2,2), imagesc(image2), title('White Lane'), grid on;
 %% Convert from RGB to HSV
 % image1_HSV = rgb2hsv(image1);
 % image2_HSV = rgb2hsv(image2);
-image1_HSL = rgb2hsl2(image1);
-image2_HSL = rgb2hsl2(image2);
+image1_HSL = rgb2hsl(image1);
+image2_HSL = rgb2hsl(image2);
 
 % subplot(2,2,1), imagesc(image1), title('White Curve'), grid on;
 % subplot(2,2,2), imagesc(image1_HSL), title('White Curve HSL');
