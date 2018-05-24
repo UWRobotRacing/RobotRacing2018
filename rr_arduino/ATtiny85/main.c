@@ -11,13 +11,13 @@
 
 #include <avr/io.h>
 #include <util/delay.h>
-#include <avr/interrupt.h>          //library for interrupt
-#include <stdint.h>                 //library for standard integer
-#include "usiTwiSlave.h"            //I2C lib_modified
+#include <avr/interrupt.h>                //library for interrupt
+#include <stdint.h>                       //library for standard integer
+#include "usiTwiSlave.h"                  //I2C lib
 
 #define F_CPU          8000000UL         //set clock frequency to 8MHz
-#define SLAVE_ADDRESS  0x07     //salve address
-#define DATA_MASK      0x18     //data mask (0b011000)
+#define SLAVE_ADDRESS  0x07              //salve address
+#define DATA_MASK      0x18              //data mask (0b011000)
 
 typedef enum {
     ZERO_ZERO   = 0x00,
@@ -53,81 +53,73 @@ ISR(PCINT0_vect){
     switch (encod_prev) {
         
         case (ZERO_ZERO):
-            if ( encod_curr - ONE_ZERO == 0 ){
+            if ( encod_curr == ONE_ZERO  ){
                 encod_count++;
             }
-            else if ( encod_curr - ZERO_ONE == 0 ){
+            else if ( encod_curr == ZERO_ONE ){
                 encod_count--;
             }
             encod_prev = encod_curr;
-            sei();
+        sei();
         break;
             
         case (ZERO_ONE):
-            if ( encod_curr - ZERO_ZERO == 0 ){
+            if ( encod_curr == ZERO_ZERO ){
                 encod_count++;
             }
-            else if ( encod_curr - ONE_ONE == 0 ){
+            else if ( encod_curr == ONE_ONE ){
                 encod_count--;
             }
             encod_prev = encod_curr;
-            sei();
+        sei();
         break;
         
         case (ONE_ZERO):
-            if ( encod_curr - ONE_ONE == 0 ){
+            if ( encod_curr == ONE_ONE ){
                 encod_count++;
             }
-            else if ( encod_curr - ZERO_ZERO == 0 ){
+            else if ( encod_curr == ZERO_ZERO ){
                 encod_count--;
             }
             encod_prev = encod_curr;
-            sei();
+        sei();
         break;
         
         case (ONE_ONE):
-            if ( encod_curr - ZERO_ONE == 0 ){
+            if ( encod_curr == ZERO_ONE ){
                 encod_count++;
             }
-            else if ( encod_curr - ONE_ZERO == 0 ){
+            else if ( encod_curr == ONE_ZERO ){
                 encod_count--;
             }
             encod_prev = encod_curr;
-            sei();
+        sei();
         break;
         
     }
-    
-    
 }
-
 
 
 int main(void)
 {
     
-    //port register
+//port register
+//set PB5 to output
     
     DDRB &= ~(1 << DDB0) | ~(1 << DDB2) | ~(1 << DDB3) | ~(1 << DDB4) ; //set pins to input
-        //set PB5 to output
 
-        //three wire mode [Slave]
-            //PB0 to input  (USI_DI)  threee wire mode
-            //PB1 to putput (USI_DO) three wire mode
-            //PB2 to input  (USI_SCK) three wire mod
+//two wire mode [Slave]
+    //PB0 input initially (SDA)
+    //PB2 input (SCK)
     
-        //two wire mode [Slave]
-            //PB0 input initially (SDA)
-            //PB2 input (SCK)
+//encoder pulses
+    //PB3 to input  (PULSE A)
+    //PB4 to input  (PULSE B)
     
-        //encoder pulses
-            //PB3 to input  (PULSE A)
-            //PB4 to input  (PULSE B)
-    
-    //Set up the USI communicatin
+//Set up the USI communicatin
     usiTwiSlaveInit(SLAVE_ADDRESS);
 
-    //initial encoder value
+//initial encoder value
     encod_prev = (PINB & DATA_MASK) >> 3;     //mask the data for PB3 and PB4 and shift 3 bits to right
 
     
@@ -138,7 +130,8 @@ int main(void)
     
     
     
-    while(1){
+    while(1)
+    {
         
         //if data received from master
         if(usiTwiDataInReceiveBuffer()){
@@ -152,7 +145,7 @@ int main(void)
                 
                     //encod_count = 0;                    //reset the count
     
-                    sei();                              //enable interrupt
+                sei();                                    //enable interrupt
                 break;
             }
         }

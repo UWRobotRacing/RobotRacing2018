@@ -1,6 +1,6 @@
 /*
  * @Author      : Tsugumi Murata (tsuguminn0401)
- * @Descrip     : Encoder_firmware I2C test code for ATtiny85 
+ * @brief       : Encoder_firmware I2C test code for ATtiny85 
  *                 Arduino is the Master 
  *                 ATtiny85 is the Slave 
  * 

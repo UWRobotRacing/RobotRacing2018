@@ -1,7 +1,7 @@
-# Name: Makefile
-# Author: <insert your name here>
-# Copyright: <insert your copyright message here>
-# License: <insert your license reference here>
+# Name: Makefile for ATtiny85
+# Author: <Tsugumi Murata> (tsuguminn0401) 
+# Copyright: <University of Waterloo Robotics Team> 
+
 
 # This is a prototype Makefile. Modify it according to your needs.
 # You should at least check the settings for
