@@ -26,16 +26,24 @@ void loop() {
   // put your main code here, to run repeatedly:
   Serial.print("Begin counter pulse \n"); 
 
+　//Send request to slave (ATtiny85)
+  //begins the I2C communication 
   Wire.beginTransmission(SLAVE_ADDRESS); 
   Wire.write(request_message); 
   Wire.endTransmission(false);
-   
+
+  //resets count 
   count = 0; 
+  //data receive mode 
   Wire.requestFrom(SLAVE_ADDRESS, 1, true); 
+  //reads the first 8 bit sent  
   count_first = Wire.read(); 
+  //data receive mode 
   Wire.requestFrom(SLAVE_ADDRESS, 1, true); 
+  //reads the first 8 bit sent
   count_second = Wire.read();
   
+  //shifts the count_first 8 bit to left, and bitwise or with count_second
   count = (count_first << 8) | count_second; 
   Serial.println(count); 
 
