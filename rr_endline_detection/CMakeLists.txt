@@ -4,6 +4,7 @@ project(rr_endline_detection)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
+  std_srvs
   cv_bridge
   image_transport
 )

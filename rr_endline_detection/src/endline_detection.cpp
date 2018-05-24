@@ -3,7 +3,9 @@
 //constructor
 EndlineCounter::EndlineCounter (ros::NodeHandle nh_) : it_(nh_) 
 {
-	pub_ = nh_.advertise<std_msgs::Bool>("endline",1);
+	//pub_ = nh_.advertise<std_msgs::Bool>("endline",1);
+
+	client_ = nh_.serviceClient<std_srvs::Trigger>("supervisor", true);
 }
 
 //callback to handle detection

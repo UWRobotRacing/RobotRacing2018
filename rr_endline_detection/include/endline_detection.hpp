@@ -9,6 +9,7 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/opencv.hpp>
+#include <std_srvs/Trigger.h>
 
 class EndlineCounter {
 	private :
@@ -18,7 +19,7 @@ class EndlineCounter {
 		cv_bridge::CvImagePtr imgptr;
 		cv::Mat img;
 		
-		ros::Publisher pub_;
+		ros::ServiceClient client_;
 	
 	public :
 		EndlineCounter(ros::NodeHandle);
