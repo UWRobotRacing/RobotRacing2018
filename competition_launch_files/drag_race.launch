@@ -4,7 +4,9 @@
     <param name="~port" value="/dev/ttyACM2" />
     <param name="~baud" value="57600" />
   </node>
-    
+
+  <param name="Launch/race_type" value="drag" />
+
   <!-- Traffic Light Detection -->
   <include file="$(find rr_traffic_light)/launch/rr_traffic_light.launch" />
 

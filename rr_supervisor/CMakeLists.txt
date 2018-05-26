@@ -4,6 +4,7 @@ project(rr_supervisor)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
+  std_srvs
   geometry_msgs
 )
 
@@ -15,6 +16,8 @@ include_directories(include
 
 add_executable(supervisor
   src/main.cpp
+  src/supervisor.cpp
+  include/supervisor.hpp
 )
 
 target_link_libraries(supervisor

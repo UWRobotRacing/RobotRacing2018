@@ -10,8 +10,15 @@
 
 locks:
 -
-  name    : null
-  topic   : no_movement
+  name    : idle
+  topic   : /Supervisor/no_movement
   timeout : 0.0
   # This will block joystick and path planner twist messages from being published
   priority: 30
+-
+  name    : start
+  topic   : /Supervisor/enable_movement
+  timeout : 0.0
+  # Lock priority less than joystick and path planners messages, allowing them to be
+  # published
+  priority: 5

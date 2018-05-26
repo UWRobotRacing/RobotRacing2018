@@ -13,11 +13,11 @@ topics:
   priority: 20
 -
   name    : path_planner
-  topic   : pp_mux
+  topic   : /PathPlanner/twist_mux
   timeout : 0.5
   priority: 10
 -
   name    : null
-  topic   : null_mux
+  topic   : /Supervisor/twist_mux
   timeout : 0.5
   priority: 100

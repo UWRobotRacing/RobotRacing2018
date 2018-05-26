@@ -5,6 +5,8 @@
     <param name="~baud" value="115200" />
   </node>
 
+  <param name="Launch/race_type" value="circuit" />
+
   <!-- Traffic Light Detection -->
   <!--include file="$(find rr_traffic_light)/launch/rr_traffic_light.launch" /--> 
 
