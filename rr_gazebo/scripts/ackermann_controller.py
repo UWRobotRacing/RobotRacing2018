@@ -5,9 +5,7 @@
 #  Control the wheels of the University of Waterloo Robot Racing Vehicle
 
 #  Subscribed Topics:
-#      velocity_cmd (std_msgs/Float32)
-#          It contains the vehicle's desired speed angle.
-#      steering_cmd (std_msgs/Float32)
+#      vel_cmd (geometry_msgs/Twist)
 #          It contains the vehicle's desired velocity.
 
 #  Published Topics:
@@ -88,12 +86,13 @@ import math
 import numpy
 import threading
 
-from math import pi
+from math import *
 
 import rospy
 import tf
 
-from std_msgs.msg import Float64, Float32
+from geometry_msgs.msg import Twist
+from std_msgs.msg import Float64
 from controller_manager_msgs.srv import ListControllers
 
 ## Robot racing simulation controller
@@ -107,7 +106,9 @@ class _RRController(object):
         rospy.init_node("rr_controller")
 
         # Parameters
-
+        self._wheel_to_wheel_dist = rospy.get_param("simulated_odometry/wheel_to_wheel_dist")
+        self._lr = self._wheel_to_wheel_dist / 2
+        self._lf = self._lr
         # Wheels
         (left_steer_link_name, left_steer_ctrlr_name,
          left_front_axle_ctrlr_name, self._left_front_inv_circ) = \
@@ -202,12 +203,9 @@ class _RRController(object):
         self._right_rear_axle_cmd_pub = \
             _create_axle_cmd_pub(list_ctrlrs, right_rear_axle_ctrlr_name)
 
-        self._steering_cmd_sub = \
-            rospy.Subscriber("/rr_vehicle/steering_cmd", Float32,
-                             self.steering_cb, queue_size=1)
-        self._velocity_cmd_sub = \
-            rospy.Subscriber("/rr_vehicle/velocity_cmd", Float32,
-                             self.velocity_cb, queue_size=1)
+        self._cmd_sub = \
+            rospy.Subscriber("/rr_vehicle/vel_cmd", Twist,
+                             self.cmd_cb, queue_size=1)
 
     ## Control the vehicle
     def spin(self):
@@ -256,22 +254,20 @@ class _RRController(object):
     ## velocity command callback
 
     # :Parameters:
-    #     steering : Float32
-    #     steering command.
-    def steering_cb(self, steering):
+    #     velocity_cmd : Twist
+    #     steering and speed command.
+    def cmd_cb(self, cmd):
         self._last_cmd_time = rospy.get_time()
         with self._rr_cmd_lock:
-            self._steer_ang = steering.data
-
-    ## velocity command callback
-
-    # :Parameters:
-    #     velocity : Float32
-    #     velocity command.
-    def velocity_cb(self, velocity):
-        self._last_cmd_time = rospy.get_time()
-        with self._rr_cmd_lock:
-            self._speed = velocity.data
+            #convert the velocities to a steering and throttle message
+            self._speed = sqrt(cmd.linear.x**2 + cmd.linear.y**2)
+            if  cmd.linear.x < 0 and cmd.linear.y < 0:
+                self._speed *= -1
+            try:
+                beta = asin(cmd.angular.z / (self._speed /self._lr))
+            except ZeroDivisionError:
+                beta = 0
+            self._steer_ang = atan((tan(beta) * (self._wheel_to_wheel_dist)) / self._lr)
 
     # Get front wheel parameters. Return a tuple containing the steering
     # link name, steering controller name, axle controller name (or None),
@@ -400,7 +396,7 @@ class _RRController(object):
     _DEF_WHEEL_DIA = 1.0    # Default wheel diameter. Unit: meter.
     _DEF_EQ_POS = 0.0       # Default equilibrium position. Unit: meter.
     _DEF_CMD_TIMEOUT = 0.5  # Default command timeout. Unit: second.
-    _DEF_PUB_FREQ = 30.0    # Default publishing frequency. Unit: hertz.
+    _DEF_PUB_FREQ = 50.0    # Default publishing frequency. Unit: hertz.
 # end _AckermannCtrlr
 
 # Wait for the specified controller to be in the "running" state.

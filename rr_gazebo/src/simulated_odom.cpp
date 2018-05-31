@@ -79,16 +79,14 @@ void SimulatedOdom::jointStateCb(const sensor_msgs::JointState::ConstPtr &msg) {
   // get the steering data
   double steering_angle = (msg->position[LEFT_STEERING] +
                            msg->position[RIGHT_STEERING]) / 2.0;
-  //ROS_INFO("steering: %f radians", steering_angle);
+  // ROS_INFO("steering: %f radians", steering_angle);
 
   // get each wheels velocity
   double wheel_velocity = (msg->velocity[FRONT_LEFT_WHEEL] +
-                           msg->velocity[FRONT_RIGHT_WHEEL] +
-                           msg->velocity[REAR_LEFT_WHEEL] +
-                           msg->velocity[REAR_RIGHT_WHEEL]) / 4.0;
+                           msg->velocity[FRONT_RIGHT_WHEEL]) / 2.0;
   // convert it to linear velocity
   wheel_velocity *= (wheel_diameter_ / 2.0);
-  //ROS_INFO("wheel speed: %f m/s", wheel_velocity);
+  // ROS_INFO("wheel speed: %f m/s", wheel_velocity);
   double yaw, pitch, roll;
   tf::Quaternion q(odom_.pose.pose.orientation.x, odom_.pose.pose.orientation.y,
                    odom_.pose.pose.orientation.z, odom_.pose.pose.orientation.w);
@@ -99,9 +97,9 @@ void SimulatedOdom::jointStateCb(const sensor_msgs::JointState::ConstPtr &msg) {
   // assuming the center of gravity is in the middle of the robot
   // Kinematic and Dynamic Vehicle Models for Autonomous Driving Control Design
   // http://www.me.berkeley.edu/~frborrel/pdfpub/IV_KinematicMPC_jason.pdf
-  double lf = wheel_to_wheel_dist_ / 2.0;
-  double lr = lf;
-  double beta = atan((lr / (lf + lr)) * tan(steering_angle));
+  double lf = wheel_to_wheel_dist_ * 0.5;
+  double lr = wheel_to_wheel_dist_ - lf;
+  double beta = atan2(lr * tan(steering_angle), lf + lr);
 
   double x_dot = wheel_velocity * cos(yaw + beta); 
   double y_dot = wheel_velocity * sin(yaw + beta); 
@@ -130,7 +128,8 @@ void SimulatedOdom::jointStateCb(const sensor_msgs::JointState::ConstPtr &msg) {
   odom_trans.transform.rotation.y = q.y();
   odom_trans.transform.rotation.z = q.z();
 
-  //send the transform
+  //publish the odometry and send the transform
+  odom_pub_.publish(odom_);
   br_.sendTransform(odom_trans);
-  ROS_INFO("x: %f, y: %f, theta: %f", odom_.pose.pose.position.x, odom_.pose.pose.position.y);
+  //ROS_INFO("x: %f, y: %f, theta: %f", odom_.pose.pose.position.x, odom_.pose.pose.position.y);
 }
