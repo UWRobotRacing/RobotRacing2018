@@ -22,6 +22,7 @@ class EndlineCounter {
 		ros::ServiceClient client_;
 	
 	public :
+		uint8_t status;
 		EndlineCounter(ros::NodeHandle);
 		void img_callback(const sensor_msgs::ImageConstPtr&);
 		bool blob_detector(cv::Mat);

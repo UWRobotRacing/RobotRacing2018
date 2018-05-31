@@ -3,6 +3,7 @@
     <node pkg="rr_endline_detection" type="endline_detection" name="endline_detection_node" output="screen" required="true">
     </node>
     
-    <include file="$(find rr_endline_detection)/launch/webcam_test.launch" />
+    
+    <!-- <include file="$(find rr_endline_detection)/launch/webcam_test.launch" /> -->
 
 </launch>

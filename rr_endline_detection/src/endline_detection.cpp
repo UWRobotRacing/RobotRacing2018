@@ -4,18 +4,18 @@
 EndlineCounter::EndlineCounter (ros::NodeHandle nh_) : it_(nh_) 
 {
 	//pub_ = nh_.advertise<std_msgs::Bool>("endline",1);
-
+	status = 0;
 	client_ = nh_.serviceClient<std_srvs::Trigger>("supervisor", true);
 }
 
 //callback to handle detection
 void EndlineCounter::img_callback(const sensor_msgs::ImageConstPtr& msg)
 {
-	uint8_t status = 0;
 	cv::Mat init_img, hsv_img, mag_img, blur_img;
 	cv_bridge::CvImagePtr cv_ptr;
  	int iLowH = 145;
  	int iHighH = 165;
+	std_srvs::Trigger srv;
 
 	try
 	{
@@ -23,18 +23,18 @@ void EndlineCounter::img_callback(const sensor_msgs::ImageConstPtr& msg)
 
 		//filter for magenta
 		init_img = cv_ptr->image;
-		cv::cvtColor(init_img,hsv_img, CV_BGR2HSV);
+		cv::cvtColor(init_img, hsv_img, CV_BGR2HSV);
 		cv::inRange(hsv_img, cv::Scalar(iLowH, 0,0), cv::Scalar(iHighH,255,255), mag_img);
 		
 		blur_img = mag_img.clone();
 		cv::GaussianBlur(mag_img, blur_img, cv::Size(7,7), 0, 0);
 
 		//detect endline
-		status << 1;
+		status = status << 1;
 		if (blob_detector(blur_img)){
-			status++;
+			++status;
+			ROS_INFO("sts %x", status);
 		}
-		status &= 0xF;
 	}
 	catch (cv_bridge::Exception& e)
 	{
@@ -47,9 +47,15 @@ void EndlineCounter::img_callback(const sensor_msgs::ImageConstPtr& msg)
 	cv::waitKey(3);
 
 	//notify service if consecutive 1's
+	status &= 0xF;
+	ROS_INFO("2sts %x", status);
 	if (status > 8) {
-		ROS_INFO("TRUE");
-		//	true;
+		if(client_.call(srv))
+		{
+			ROS_INFO("TRUE");
+		} else {
+			ROS_INFO("FALSE");
+		}
 	}
 }
 
@@ -57,7 +63,7 @@ void EndlineCounter::img_callback(const sensor_msgs::ImageConstPtr& msg)
  bool EndlineCounter::blob_detector(cv::Mat img) {
 	cv::SimpleBlobDetector::Params params;
 	params.filterByArea = true;
-	params.minArea = 200;
+	params.minArea = 50;
 
 	cv::Ptr<cv::SimpleBlobDetector> detector = cv::SimpleBlobDetector::create(params);
 	std::vector<cv::KeyPoint> keypoints;
