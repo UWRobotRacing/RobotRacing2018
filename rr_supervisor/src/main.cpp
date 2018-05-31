@@ -7,13 +7,13 @@
 
 int main(int argc, char** argv)
 {
-	ros::init(argc, argv, "supervisor");
-	ROS_INFO("Initializing supervisor node");
-    ros::NodeHandle nh_;
+  ros::init(argc, argv, "supervisor");
+  ROS_INFO("Initializing supervisor node");
+  ros::NodeHandle nh_;
 
-    // Instantiate Supervisor object
-    Supervisor supervisor;
+  // Instantiate Supervisor object
+  Supervisor supervisor;
 
-	ros::spin();
-    return 0;
+  ros::spin();
+  return 0;
 }

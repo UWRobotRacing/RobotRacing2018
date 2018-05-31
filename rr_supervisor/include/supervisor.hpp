@@ -11,14 +11,16 @@
 #include <string>
 
 #include <ros/ros.h>
+#include <std_msgs/Bool.h>
+#include <std_srvs/Trigger.h>
 
 class Supervisor
 {
   public:
     Supervisor();
     // Service callback methods
-    void startRace();
-    void countLap();
+    bool startRace(std_srvs::Trigger::Request &req, std_srvs::Trigger::Response &res);
+    bool countLap(std_srvs::Trigger::Request &req, std_srvs::Trigger::Response &res);
   private:
     // ROS Variables
     ros::NodeHandle nh_;

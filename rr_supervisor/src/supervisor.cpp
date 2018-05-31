@@ -3,6 +3,7 @@
 // Author: Waleed Ahmed
 // Date: 2018 05 25
 
+#include <ros/ros.h>
 #include <supervisor.hpp>
 #include <std_msgs/Bool.h>
 #include <geometry_msgs/Twist.h>
@@ -22,8 +23,8 @@ Supervisor::Supervisor()
     remove_null_lock = nh_.advertise<std_msgs::Bool>("/Supervisor/enable_movement", 1);
 
     // Setup service servers
-    start_race_service = nh_.advertiseService("/Supervisor/start_race", startRace);
-    count_lap_service  = nh_.advertiseService("/Supervisor/count_lap", countLap);
+    start_race_service = nh_.advertiseService("/Supervisor/start_race", &Supervisor::startRace, this);
+    count_lap_service  = nh_.advertiseService("/Supervisor/count_lap", &Supervisor::countLap, this);
 
     // Message objects
     geometry_msgs::Twist twist_msg;
@@ -44,7 +45,7 @@ Supervisor::Supervisor()
  * @brief service callback method for starting the race
  * @param res response that will be sent back to client
  */
-void Supervisor::startRace(std_srvs::Trigger::Response &res)
+bool Supervisor::startRace(std_srvs::Trigger::Request &req, std_srvs::Trigger::Response &res)
 {
     res.success = true;
 
@@ -54,13 +55,14 @@ void Supervisor::startRace(std_srvs::Trigger::Response &res)
     remove_null_lock.publish(bool_msg);
 
     res.message = "Race started";
+    return true;
 }
 
 /**
  * @brief service callback method for tracking lap count
  * @param res response that will be sent back to client
  */
-void Supervisor::countLap(std_srvs::Trigger::Response &res)
+bool Supervisor::countLap(std_srvs::Trigger::Request &req, std_srvs::Trigger::Response &res)
 {
     if (race_type == "drag") {
         lap_count += 1;
@@ -77,4 +79,5 @@ void Supervisor::countLap(std_srvs::Trigger::Response &res)
             }
         }
     }
+    return true;
 }
