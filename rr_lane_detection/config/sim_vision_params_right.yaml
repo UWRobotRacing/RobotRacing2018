@@ -1,3 +1,4 @@
+%YAML:1.0
 # @file vision_params_right.yaml
 # @brief Parameters for the right camera
 # 
@@ -8,7 +9,6 @@
 # @author Toni Ogunmade(oluwatoni)
 # @competition IARRC 2018
 
-%YAML:1.0
 #Size of Bird's Eye View grid
 bev_width: 398
 bev_height: 400
@@ -22,7 +22,7 @@ image_coords: !!opencv-matrix
    rows: 4
    cols: 2
    dt: f
-   data: [ 2., 0., 398., 157., 0, 372, 56, 400]
+   data: [ 175, 23, 204, 12., 0, 251, 396, 171]
 
 # 4 corresponding world coordinates, same format
 # world_coords: [[0, 0], [254, 178], [0 , 303], [52, 329]]
@@ -30,7 +30,7 @@ world_coords: !!opencv-matrix
    rows: 4
    cols: 2
    dt: f
-   data: [ 0., 0., 254., 178., 0, 303, 52, 329]
+   data: [ 240, 0., 400, 0, 240 , 320, 400, 320]
 
 multibounds: !!opencv-matrix
    rows: 3

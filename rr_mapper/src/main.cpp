@@ -50,9 +50,8 @@ int main(int argc, char **argv)
 #ifdef DEBUG
   enable = true;
 #endif
-  while (ros::ok())
-  {
-    laserProcessor.ProcessMap();
+  while (ros::ok()) {
+    laserProcessor.PublishMap();
     ros::spin();
   }
 

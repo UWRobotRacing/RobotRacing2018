@@ -13,11 +13,11 @@
 #include <occupancy_grid_utils.hpp>
 
 /**
+ * @name LaserMapper
  * @brief initiliazes the LaserMapper class
  * @return NONE
  */
-LaserMapper::LaserMapper()
-{
+LaserMapper::LaserMapper() {
   // Load Parameters
   GetParam();
 
@@ -25,35 +25,42 @@ LaserMapper::LaserMapper()
   map_pub_ = nh_.advertise<nav_msgs::OccupancyGrid>(occupancy_grid_name_, 1);
   
   // SUBSCRIBERS
-  scan_sub_ = nh_.subscribe(laser_scan_name_, 1, &LaserMapper::LidarCallBack, this);
+  scan_sub_ = nh_.subscribe(laser_scan_name_, 1, &LaserMapper::LidarCallback, this);
   lane_detection_left_sub_ = nh_.subscribe("/output_point_list_left", 1, &LaserMapper::DetectLeftLaneCallback, this);
   lane_detection_right_sub_ = nh_.subscribe("/output_point_list_right", 1, &LaserMapper::DetectRightLaneCallback, this);
 
-  // Initialize an occupancy grid
+  // Initialize an occupancy grid (std::vector<int>)
   InitMap();
 }
 
 /**
+ * @name ~LaserMapper
  * @brief destructs the LaserMapper class
  * @return NONE
  */
 LaserMapper::~LaserMapper() {
-  DeleteMap();
+  belief_map_.clear();
 }
 
-/** @brief get the rosparams
- *  @return NONE
+/**
+ * @name InitMap
+ * @brief initiliazes the belief_map_ with UNKNOWNS
+ * @return NONE
  */
-void LaserMapper::GetParam()
-{
+void LaserMapper::InitMap() {
+  //Fills the map with Unknown values in the vector
+  belief_map_.resize(map_W_*map_H_, UNKNOWN_);
+  ROS_INFO("Map Initialized with UNKNOWN, Height: %d, Width: %d", map_H_, map_W_);
+}
+
+/**
+ * @name GetParam
+ * @brief Obtains ROS Params
+ * @return NONE
+ */
+void LaserMapper::GetParam() {
   nh_.param<std::string>("LaserMapper/Occupancy_Grid_Name", occupancy_grid_name_, "/map");
   nh_.param<std::string>("LaserMapper/Laser_Scan_Name", laser_scan_name_, "/scan");
-
-  // nh_.param<double>("LaserMapper/NO_OBS", NO_OBS_, 0);
-  // nh_.param<double>("LaserMapper/OBS", OBS_, 200);
-  // nh_.param<double>("LaserMapper/UNKNOWN", UNKNOWN_, -1);
-  // nh_.param<double>("LaserMapper/OBS_SCALE", OBS_SCALE_, 1);
-  // nh_.param<int>("LaserMapper/INFLATE_OBS", inflate_obstacle_, 2);
 
   nh_.param<double>("LaserMapper/map_res", map_res_, 0.01);
   nh_.param<int>("LaserMapper/map_W", map_W_, 800);
@@ -63,10 +70,9 @@ void LaserMapper::GetParam()
 
   nh_.param<double>("LaserMapper/max_angle", max_angle_, 3.14/2.0);
   nh_.param<double>("LaserMapper/min_angle", min_angle_, -3.14/2.0);
-  nh_.param<double>("LaserMapper/minrange", minrange_, 0.001);
-  nh_.param<double>("LaserMapper/maxrange", maxrange_, 4);
+  nh_.param<double>("LaserMapper/minrange", min_range_, 0.001);
+  nh_.param<double>("LaserMapper/maxrange", max_range_, 4);
   nh_.param<int>("LaserMapper/samplerate", samplerate_, 1);
-  nh_.param<bool>("LaserMapper/DEBUG", DEBUG_, false);
   nh_.param<int>("LaserMapper/scan_processing_subsample", scan_subsample_, 0);
   nh_.param<int>("LaserMapper/mechanical_offset", mech_offset_, 0);
 
@@ -76,100 +82,161 @@ void LaserMapper::GetParam()
   nh_.param<int>("LaserMapper/lane_detection_right_msg/offset_width", offset_width_right_, 500);
 }
 
-/** @brief callback for the left lane grid
- *  @param msg the occupancy grid message
- *  @return NONE
+
+/**
+ * @name PublishMap
+ * @brief Joins the entire map together
+ *        & Publishes the full_map_
+ * @return NONE
  */
-void LaserMapper::DetectLeftLaneCallback(const nav_msgs::OccupancyGrid::ConstPtr& msg)
-{
+void LaserMapper::PublishMap() {
+  nav_msgs::OccupancyGrid full_map_;
+
+  full_map_.header.frame_id = "/map";
+  full_map_.info.resolution = map_res_;
+  full_map_.info.width = map_W_;
+  full_map_.info.height = map_H_;
+  full_map_.info.origin.position.x = map_W_/2*map_res_;//-map_W_/2*map_res_; //map_W_/2*map_res_
+  full_map_.info.origin.position.y = 0;//-map_H_/2*map_res_; //map_H_*map_res_
+  full_map_.info.origin.orientation =
+             tf::createQuaternionMsgFromRollPitchYaw(M_PI, -1*M_PI, 0);
+  full_map_.data.resize(map_W_*map_H_);
+
+  //Deletes Values based on new position
+  ShiftMap(belief_map_);
+
+  //Checks for lidar msg
+  if(lidar_msg_call_){
+    int n = floor(abs(min_angle_-laser_msg_.angle_min)/laser_msg_.angle_increment)+mech_offset_;    
+    double increment = (samplerate_)*laser_msg_.angle_increment;
+
+    if (prev_header_.seq != laser_msg_.header.seq) {
+      for (double i = min_angle_; i < max_angle_; i+= increment) {
+        // Check for NaN ranges
+        if (std::isnan (laser_msg_.ranges[n]) == false) {
+          RayTracing(i, laser_msg_.ranges[n], 0);
+        }
+        n += samplerate_;
+      }
+      prev_header_ = laser_msg_.header;
+    }
+
+    for (int i = 0; i < map_W_*map_H_; i++) {
+      double weight = std::min(100.0, OBS_SCALE_*belief_map_[i]);
+      weight = std::max(0.0, weight);
+
+      full_map_.data[i] =
+      std::max(static_cast<int>(weight), static_cast<int>(belief_map_[i]));
+    }
+    lidar_msg_call_ = false;
+  }
+
+  //Checks for left lane msg
+  if (left_msg_call_) {
+    JoinOccupancyGrid(full_map_, lane_detection_left_msg_, 
+                      offset_height_left_, offset_width_left_);
+    left_msg_call_ = false;
+  }
+  else 
+    ROS_WARN("No Left Name Data Detected");
+
+  //Checks for right lane msg
+  if (right_msg_call_) {
+    JoinOccupancyGrid(full_map_, lane_detection_right_msg_,
+                      offset_height_right_, offset_width_right_);
+    right_msg_call_ = false;
+  } 
+  else
+    ROS_WARN("No Right Lane Data Detected");
+  
+  map_pub_.publish(full_map_);
+}
+
+/**
+ * @name LidarCallback
+ * @brief Obtains message sent by Lidar
+ *        & Processes it to belief_map_
+ * @param[in] msg: Lidar Message
+ * @return NONE
+ */
+void LaserMapper::LidarCallback(const sensor_msgs::LaserScan::ConstPtr& msg) {
+  /* 
+    Lidar, Left Lane, Right Lane callbacks all require
+    DeleteValues - Deletes values of the 
+                  belief map based on how much it moved
+    StitchMap - Attaches the new map onto the front of the map
+  */
+
+  laser_msg_ = *msg;
+  lidar_msg_call_ = true;
+}
+
+/**
+ * @name DetectLeftLaneCallback
+ * @brief Retrieves the leftlanecallback message and stores it
+ * @param[in] msg: Left lane message
+ * @return NONE
+ */
+void LaserMapper::DetectLeftLaneCallback(const nav_msgs::OccupancyGrid::ConstPtr& msg) {
   lane_detection_left_msg_ = *msg;
-
-  // if (!ready2Maplane_detectionLeft_)
-  //   ready2Maplane_detectionLeft_ = true;
-  // Assumes laser is much faster than lane_detection data
-  // Note: modify this function after camera integration
+  left_msg_call_ = true;
 }
 
-/** @brief callback for the right lane grid
- *  @param msg the occupancy grid message
- *  @return NONE
+/**
+ * @name DetectRightLaneCallback
+ * @brief Retrieves the rightlanecallback message and stores it
+ * @param[in] msg: Right lane message
+ * @return NONE
  */
-void LaserMapper::DetectRightLaneCallback(const nav_msgs::OccupancyGrid::ConstPtr& msg)
-{
+void LaserMapper::DetectRightLaneCallback(const nav_msgs::OccupancyGrid::ConstPtr& msg) {
   lane_detection_right_msg_ = *msg;
-
-  // if (!ready2Maplane_detectionRight_)
-  //   ready2Maplane_detectionRight_ = true;
-  // Assumes laser is much faster than lane_detection data
-  // Note: modify this function after camera integration
+  right_msg_call_ = true;
 }
 
-/** @brief initiliazes an occupancy grid and sets all the cells to unknown
- *  @return NONE
+/**
+ * @name UpdateLaserMap
+ * @brief Updates the belief map with 
+ *        new occupany grid value if valid
+ * @param[in] x: width comparator
+ * @param[in] y: height comparator
+ * @param[in] value: occupancy grid value
+ * @return NONE
  */
-void LaserMapper::InitMap()
-{
-  belief_map_.resize(map_W_*map_H_, UNKNOWN_);
-  ROS_INFO("Map Initialization Done. Size(%d, %d).", map_H_,map_W_);
-}
-
-/** @brief empties the underlying vector of the map
- *  @return NONE
- */
-void LaserMapper::DeleteMap()
-{
-  belief_map_.clear();
-}
-
-/** @brief sets cell at location x and y to value passed in
- *  @param x the x-axis value
- *  @param y the y-axis value
- *  @param value the new value for the cell on the map
- *  @return NONE
- */ 
-void LaserMapper::UpdateLaserMap(const int& x, const int& y, const double& value)
-{
-  // In occupancy grid scale, not world scale
-  // Change it to update using vectors, and then put it into a 1D array.
-  if (abs(x) < map_W_/2 && y < map_H_ && y > 0)
-  {
-    int Map_index = (map_W_/2-x)+(map_H_ - y)*map_W_;
-    belief_map_[Map_index] = value;
-    // ROS_INFO("map update with value %f", value);
+void LaserMapper::UpdateLaserMap(const int& x, const int& y, const double& value) {
+  if (abs(x) < map_W_/2 && y < map_H_ && y > 0) {
+    int map_index = (map_W_/2 - x) + (map_H_ - y)*map_W_;
+    belief_map_[map_index] = value;
   }
 }
 
-/** @brief returns the value of the cell with the cell coordinates
- *  @param x the x-axis value
- *  @param y the y-axis value
- *  @return NONE
+/**
+ * @name CheckMap
+ * @brief Checks value of the cell of occupancy grid 
+ * @param[in] x: width comparator
+ * @param[in] y: height comparator
+ * @return double: value of occupany grid at belief map
  */
-double LaserMapper::CheckMap(int x, int y)
-{
-  if (abs(x) < map_W_/2 && y < map_H_ && y > 0)
-  {
-    int Map_index = (map_W_/2-x)+(map_H_ - y)*map_W_;
-    return belief_map_[Map_index];
+//TODO Change this function to have less redundant code (Duplicate with UpdateLaserMap)
+double LaserMapper::CheckMap(const int& x, const int& y) {
+  if (abs(x) < map_W_/2 && y < map_H_ && y > 0) {
+    int map_index = (map_W_/2 - x) + (map_H_ - y)*map_W_;
+    return belief_map_[map_index];
   }
   return OBS_;
 }
 
-/** @brief places a single line of the laser data unto the map
- *  @param angle the line 
- *  @param range the distance reading of the laser
- *  @param inflate_factor the number of cells used to inflate the map
+/**
+ * @name RayTracing
+ * @brief Checks value of the cell of occupancy grid 
+ * @param[in] angle: width comparator
+ * @param[in] range: height comparator
+ * @param[in] inflate_factor: magnification value
  *  @return NONE
  */
-void LaserMapper::RayTracing(float angle, float range, int inflate_factor)
-{
-  if (range < minrange_)
+void LaserMapper::RayTracing(const float& angle, const float& range, const int& inflate_factor) {
+  if (range < min_range_ || range > max_range_)
     return;
-  else if (range > maxrange_)
-    return;
-
-  // x1, y1 is are the end position of the ray
-  // If dis(x0,y0, x1,y1) < range, it hit an obstacle, else, its unknown
-
+  
   int x1 = LASER_ORIENTATION_*round(sin(angle)*range/map_res_);
   int y1 = round(cos(angle)*range/map_res_);
 
@@ -193,13 +260,11 @@ void LaserMapper::RayTracing(float angle, float range, int inflate_factor)
   int x = 0;
   int y = 0;
 
-  while (true)
-  {
+  while (true) {
     if (CheckMap(x, y) < OBS_)
       UpdateLaserMap(x, y, NO_OBS_);
 
-    if (x == x1 && y == y1)
-    {
+    if (x == x1 && y == y1) {
       for (int i = -inflate_factor; i < inflate_factor; i++) {
         for (int j = -inflate_factor; j < inflate_factor; j++) {
           UpdateLaserMap(x+i, y+j, OBS_);
@@ -209,161 +274,109 @@ void LaserMapper::RayTracing(float angle, float range, int inflate_factor)
     }
 
     int e2 = 2*err;
-    if (e2 > -dy)
-    {
-      err = err -dy;
-      x = x + sx;
+    if (e2 > -dy) {
+      err -= dy;
+      x += sx;
     }
 
-    if (x == x1 && y == y1)
-    {
+    if (x == x1 && y == y1) {
       for (int i = -inflate_factor; i < inflate_factor; i++)
         for (int j = -inflate_factor; j < inflate_factor; j++)
           UpdateLaserMap(x+i, y+j, OBS_);
         return;
     }
-    if (e2 < dx)
-    {
-      err = err + dx;
-      y = y+sy;
+    if (e2 < dx) {
+      err += dx;
+      y += sy;
     }
-  }
+  } 
 }
 
-/** @brief copies the recieved lidar data
- *  @param msg the laser scan data
- *  @return NONE
+/**
+ * @name ShiftMap
+ * @brief Shifts the map based on x y movement
+ * @param[in] prev_map: map that needs to be updated
+ * @return Updates the prev_map with shifting map
  */
-void LaserMapper::LidarCallBack(const sensor_msgs::LaserScan::ConstPtr& msg)
-{
-  static int scan_subsample_counter = 0;
-  ++scan_subsample_counter;
-  if (msg->angle_min > min_angle_)
-  {
-    min_angle_= msg->angle_min;
-  }
-  else if (msg->angle_max < max_angle_)
-  {
-    max_angle_ = msg->angle_max;
-  }
-  if (scan_subsample_counter >= scan_subsample_)
-  {
-    scan_subsample_counter = 0;
-  }
-
-  if (scan_subsample_counter != 0)
-  {
-    return;
-  }
-
-  laser_msg_ = *msg;  
-
-  // ROS_INFO ("Mapper: Copied laser data");
-
-  if (!ready2Map_)
-    ready2Map_ = true;
-
-  // Assumes laser is much faster than lane_detection data
-  // Note: modify this function after camera integration
-}
-
-/** @brief combines the sensor data together into a single map and 
- *  then publishes it
- * 
- *  if laser data is saved it starts the process of creating a map
- *  it raytraces the lidar data over the occupancy grid and adds the lanes 
- *  detected if they're available
- *
- *  @return NONE
- */
-void LaserMapper::ProcessMap()
-{
-  if (!ready2Map_)
-    return;
-
-  nav_msgs::OccupancyGrid grid_msg_;
-
-  int n = floor(abs(min_angle_-laser_msg_.angle_min)/laser_msg_.angle_increment)+mech_offset_;    
-  // for (double i = laser_msg.angle_min; i < laser_msg.angle_max; i+= increment)
-  double increment = (samplerate_)*laser_msg_.angle_increment;
-  // ROS_INFO ("Value of pre seq is : %d", prev_header_.seq);
-  // ROS_INFO ("Value of cur seq is : %d", laser_msg_.header.seq);
-  if (prev_header_.seq != laser_msg_.header.seq)
-  {
-    // ROS_INFO ("Value of obs is : %f", OBS);
-    // ROS_INFO ("Value of no_obs is : %f", NO_OBS);
-
-    for (double i = min_angle_; i < max_angle_; i+= increment)
-    {
-      // Check for NaN ranges
-      if (std::isnan (laser_msg_.ranges[n]) == false)
-      {
-        RayTracing(i, laser_msg_.ranges[n], 0);
-        // ROS_INFO ("1");
-      }
-      n+= samplerate_;
-    }
-    prev_header_ = laser_msg_.header;
-  }
-
-  grid_msg_.header.frame_id = "/map";
-  grid_msg_.info.resolution = map_res_;
-  grid_msg_.info.width = map_W_;
-  grid_msg_.info.height = map_H_;
-  grid_msg_.info.origin.position.x = map_W_/2*map_res_;//-map_W_/2*map_res_; //map_W_/2*map_res_
-  grid_msg_.info.origin.position.y = map_H_/2*map_res_;//-map_H_/2*map_res_; //map_H_*map_res_
-  grid_msg_.info.origin.orientation =
-             tf::createQuaternionMsgFromRollPitchYaw(M_PI, -1*M_PI, 0);
-  grid_msg_.data.resize(map_W_*map_H_);
-
-  for (int i = 0; i < map_W_*map_H_; i++)
-  {
-    double weight = std::min(100.0, OBS_SCALE_*belief_map_[i]);
-    weight = std::max(0.0, weight);
-
-    grid_msg_.data[i] =
-    std::max(static_cast<int>(weight), static_cast<int>(belief_map_[i]));
-  }
-
-  // Join the lane_detection occupancy and the laser occupancy together.
-  if (ready2Map_ && ready2Maplane_detectionLeft_ && ready2Maplane_detectionRight_)
-  {
-    // ROS_INFO("Joining maps");
-    JoinOccupancyGrid(grid_msg_, lane_detection_left_msg_, offset_height_left_, offset_width_left_);
-    JoinOccupancyGrid(grid_msg_, lane_detection_right_msg_, offset_height_right_, offset_width_right_);
-  }
-
-  map_pub_.publish(grid_msg_);
-
-  // DeleteMap();
-  // ShiftMap();
-  // InitMap();
-}
-
-void LaserMapper::StitchMap(std::string ref_name) {
-
+void LaserMapper::ShiftMap(std::vector<int> prev_map) {
   tf::StampedTransform transform;
   try {
-    position_listener_.lookupTransform("/base_link", ref_name,
+    position_listener_.lookupTransform("/odom", "/base_link",
                               ros::Time(0), transform);
+
   } catch (tf::TransformException ex) {
       ROS_ERROR("%s",ex.what());
       ros::Duration(1.0).sleep();
   }
-  //Listens for tf and uses lookup transform 
-  /*
-  tf::StampedTransform transform;
-  try{
-     listener_.lookupTransform("/turtle2", "/turtle1",  
-                              ros::Time(0), transform);
-   }
-   catch (tf::TransformException ex){
-     ROS_ERROR("%s",ex.what());
-     ros::Duration(1.0).sleep();
-   }
-   ...
-   transform.getOrigin().y();
-   transform.getOrigin().x();
-  */
-  //Should also do the distance calculation
+
+  // Assumes previous value is given
+  if (prev_x_ != 0 && prev_y_ != 0) {
+    /*Gains the difference in x and y transition
+      If the diff value is negative it is 
+      either fill left or bottom (vice versa)
+    */
+    int diff_x = transform.getOrigin().x() - prev_x_;
+    int diff_y = transform.getOrigin().y() - prev_y_;
+
+    //Filling UNKNOWN for x
+    if (diff_x > 0) {
+      for(int i = 0; i < map_H_; i++) {
+        std::vector<int> temp(map_W_);
+        std::copy(prev_map.begin(), prev_map.begin()+map_W_, temp.begin());
+        std::rotate(temp.begin(), temp.begin()+abs(diff_x), temp.end());
+        std::fill(temp.rbegin(), temp.rbegin()+abs(diff_x), UNKNOWN_);
+        std::copy(temp.begin(), temp.end(), prev_map.begin());
+      }
+
+      // Replaces functionality with std::fill()
+      // for(int i = 1; i <= map_H_; i++) {
+      //   for(int j = 1; j <= abs(diff_x); j++) {
+      //     prev_map[(j*i)-1] = UNKNOWN_;
+      //   }
+      // }
+
+    }
+    else {
+      for(int i = 0; i < map_H_; i++) {
+        std::vector<int> temp(map_W_);
+        std::copy(prev_map.begin(), prev_map.begin()+map_W_, temp.begin());
+        std::rotate(temp.begin(), temp.begin()+abs(diff_x), temp.end());
+        std::fill(temp.begin(), temp.begin()+abs(diff_x), UNKNOWN_);
+        std::copy(temp.begin(), temp.end(), prev_map.begin());
+      }
+
+      // Replaces functionality with std::fill()
+      // for(int i = map_H_; i >= 1; i--) {
+      //   for(int j = abs(diff_x); j >= 1; j--) {
+      //     prev_map[(j*i)-1] = UNKNOWN_;
+      //   }
+      // }
+    }
+    
+    //Filling UNKNOWN for y
+    if (diff_y > 0) {
+      //'Rotates' the map dragging all values 
+      //By abs(diff_y)*map_W_ amount
+      std::rotate(prev_map.begin(), 
+          prev_map.begin()+(abs(diff_y)*map_W_), 
+          prev_map.end());
+
+      for(int i = 0; i < abs(diff_y)*map_W_; i++) {
+        prev_map[i] = UNKNOWN_;
+      }
+    }
+    else {
+      std::rotate(prev_map.rbegin(), 
+          prev_map.rbegin()+(abs(diff_y)*map_W_), 
+          prev_map.rend());
+
+      for(int i = (abs(diff_y)*map_W_)-1; i >= 0; i--) {
+        prev_map[i] = UNKNOWN_;
+      }
+    }
+  }
+
+  prev_x_ = transform.getOrigin().x();
+  prev_y_ = transform.getOrigin().y();
+
 }

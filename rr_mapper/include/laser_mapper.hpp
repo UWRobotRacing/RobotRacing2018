@@ -35,24 +35,22 @@ class LaserMapper
     LaserMapper();
     ~LaserMapper();
 
-    // Publishers
-    void ProcessMap();
+    // Publishers 
+    void PublishMap();
 
   private:    
     // Subscribers
-    void LidarCallBack(const sensor_msgs::LaserScan::ConstPtr& msg);
+    void LidarCallback(const sensor_msgs::LaserScan::ConstPtr& msg);
     void DetectLeftLaneCallback(const nav_msgs::OccupancyGrid::ConstPtr& msg);
     void DetectRightLaneCallback(const nav_msgs::OccupancyGrid::ConstPtr& msg);
 
     // Methods
-    void GetParam();
     void InitMap();
-    void DeleteMap();
+    void GetParam();
     void UpdateLaserMap(const int& x, const int& y, const double& value);
-    double CheckMap(int x, int y);
-    void RayTracing(float angle, float range, int inflate_factor);
-    void StitchMap(std::string ref_name);
-    void ShiftMap();
+    double CheckMap(const int& x, const int& y);
+    void RayTracing(const float& angle, const float& range, const int& inflate_factor);
+    void ShiftMap(std::vector<int> prev_map);
 
     // ROS Variables
     ros::NodeHandle nh_;
@@ -63,10 +61,15 @@ class LaserMapper
     tf::TransformListener position_listener_;
 
     // Map Variables
-    std::vector<double> belief_map_;
+    std::vector<int> belief_map_;
     nav_msgs::OccupancyGrid lane_detection_left_msg_;
     nav_msgs::OccupancyGrid lane_detection_right_msg_;
     sensor_msgs::LaserScan laser_msg_;
+
+    // Callback Toggle
+    bool left_msg_call_ = false;
+    bool right_msg_call_ = false;
+    bool lidar_msg_call_ = false;
 
     std::string occupancy_grid_name_;
     std::string laser_scan_name_;
@@ -81,8 +84,8 @@ class LaserMapper
     // Scan Parameters
     double max_angle_;
     double min_angle_;
-    double minrange_;
-    double maxrange_;
+    double min_range_;
+    double max_range_;
     int samplerate_;
     int inflate_obstacle_;
     int scan_subsample_;
@@ -90,9 +93,6 @@ class LaserMapper
     double LASER_ORIENTATION_;
 
     // Map Values
-    // double NO_OBS_;
-    // double OBS_;
-    // double UNKNOWN_;
     const double OBS_SCALE_ = 1;
 
     // lane_detection Map Values
@@ -101,17 +101,15 @@ class LaserMapper
     int offset_width_left_;
     int offset_width_right_;
 
-    // Debug Purposes
-    bool DEBUG_;
-    bool ready2Map_ = true;
-    bool ready2Maplane_detectionLeft_ = false;
-    bool ready2Maplane_detectionRight_ = false;
-
     enum CellState {
         NO_OBS_ = 0,
         OBS_ = 100,
         UNKNOWN_ = -1
     };
+
+    //Storing values
+    double prev_x_;
+    double prev_y_;
 
 };
 

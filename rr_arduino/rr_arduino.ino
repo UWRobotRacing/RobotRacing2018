@@ -72,13 +72,12 @@ ros::Publisher encoder("/arduino/enc_vel", &actual_velocity_msg);
 ros::Publisher debugger ("/arduino/debug", &debug);
 ros::Publisher velDebugger ("/arduino/velDebug", &velDebug);
 ros::Publisher battery("/arduino/battery_state", &battery_percentage_msg);
-ros::Subscriber <std_msgs::Float32> velocity_msg ("/PathPlanner/vel_level", cmdVelocityCallback);
-ros::Subscriber <std_msgs::Float32> steering_msg ("/PathPlanner/steer_cmd", cmdSteeringCallback);
+ros::Subscriber <std_msgs::Float32> velocity_msg ("/rr_vehicle/velocity_cmd", cmdVelocityCallback);
+ros::Subscriber <std_msgs::Float32> steering_msg ("/rr_vehicle/steering_cmd", cmdSteeringCallback);
 ros::Subscriber <std_msgs::Float32MultiArray> PID_msg ("/Throttle_PID_array", ThrottlePIDArrayCallback);
 
 int steeringAngle = 1500;
 int ROS_watchdog = 0;
-
 
 void setup() {
 #ifdef TEST_OUTPUT
