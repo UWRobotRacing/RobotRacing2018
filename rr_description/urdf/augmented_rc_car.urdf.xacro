@@ -11,7 +11,7 @@
  -
  -         To work with Gazebo, each link must have an inertial element, even if
  -         the link only serves to connect two joints. To be visible in Gazebo, a link
- -         must have a collision element. Furthermore, the link must have a Gazebo
+ -         must have a visual element. Furthermore, the link must have a Gazebo
  -         material.
  -           
  -         This code is inspired by code from the WunderKramer lab
@@ -280,12 +280,11 @@
               <box size="0.01 0.3 0.01"/>
           </geometry>
       </visual>
-      <collision>
-          <!-- origin is relative -->
+      <!-- <collision>
           <geometry>
               <box size="0.01 0.3 0.01"/>
           </geometry>
-      </collision>
+      </collision> -->
   </link>
   <gazebo reference="bumper_link">
     <material>Gazebo/Black</material>
@@ -294,7 +293,7 @@
   <joint name="baselink_to_bumper" type="fixed">
     <parent link="base_link"/>
     <child link="bumper_link"/>
-    <origin xyz="${chassis_length /2.0 + 0.12} 0.0 0.0" rpy="0.0 0.0 0.0"/>
+    <origin xyz="${(chassis_length /2.0) + 0.22} 0.0 0.0" rpy="0.0 0.0 0.0"/>
   </joint>
 
   <!-- Chassis -->
@@ -330,18 +329,12 @@
   </joint>
 
   <!-- Outer Shell -->
-  <link name="outer_shell">
+  <!-- <link name="outer_shell">
     <inertial>
       <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
       <mass value="0.1"/>
       <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
-    <collision>
-      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
-      <geometry>
-        <mesh filename="package://rr_description/urdf/assets/RR2018.stl" scale="0.0254 0.0254 0.0254"/>
-      </geometry>
-    </collision>
     <visual name="outer_shell_stl">
       <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
       <geometry>
@@ -352,8 +345,8 @@
   <joint name="chassis_to_outer_shell" type="fixed">
     <parent link="chassis"/>
     <child link="outer_shell"/>
-    <origin xyz="-0.26 -0.11 0.02" rpy="${degrees_90} 0.0 ${degrees_90}"/>
-  </joint>
+    <origin xyz="-0.26 -0.11 0.04" rpy="${degrees_90} 0.0 ${degrees_90}"/>
+  </joint> -->
 
   <!-- Wheels -->
   <xacro:front_wheel lr_prefix="left" fr_prefix="front"
@@ -368,12 +361,12 @@
   <!-- Sensors -->
   <!-- Lidar -->
   <link name="hokuyo_link">
-    <collision>
+    <!-- <collision>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
         <box size="0.1 0.1 0.1"/>
       </geometry>
-    </collision>
+    </collision> -->
     <inertial>
       <mass value="1e-5" />
       <origin xyz="0 0 0" rpy="0 0 0"/>
@@ -434,7 +427,7 @@
         </geometry>
       </visual>
       <gazebo reference="${name}_cam_link">
-        <material>Gazebo/Black</material>
+        <material>Gazebo/Green</material>
       </gazebo>
       <collision>
         <origin xyz="0 0 0" rpy="0 0 0"/>
@@ -498,11 +491,11 @@
   </xacro:macro>
 
   <xacro:rr_camera name="front_facing" x_offset="0.35"
-                y_offset="0.0" z_offset="0.29" pitch="0.0" yaw="0.0"/>
+                y_offset="0.0" z_offset="0.4" pitch="0.5" yaw="0.0"/>
   <xacro:rr_camera name="right_facing" x_offset="0.35"
-                y_offset="-0.15" z_offset="0.29" pitch="0.55" yaw="-0.3"/>
+                y_offset="-0.15" z_offset="0.4" pitch="0.55" yaw="-0.3"/>
   <xacro:rr_camera name="left_facing" x_offset="0.35"
-                y_offset="0.15" z_offset="0.29" pitch="0.55" yaw="0.3"/>
+                y_offset="0.15" z_offset="0.4" pitch="0.55" yaw="0.3"/>
 
   <!-- IMU -->
   <link name="imu_link">
@@ -517,12 +510,12 @@
         <box size="0.001 0.001 0.001"/>
       </geometry>
     </visual>
-    <collision>
+    <!-- <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
         <box size=".001 .001 .001"/>
       </geometry>
-    </collision>
+    </collision> -->
   </link>
 
   <joint name="imu_joint" type="fixed">

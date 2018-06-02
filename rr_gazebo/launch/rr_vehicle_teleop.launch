@@ -15,19 +15,31 @@
 <launch>
   <arg name="namespace" default="rr_vehicle"/>
   <arg name="type" default="drag"/>
+  <arg name="headless" default="false"/>
 
-  <!-- TODO switch to selecting the map -->
   <group if="$(eval type == 'drag')">
     <include file="$(find rr_gazebo)/launch/rr_drag_race_sim.launch">
       <arg name="namespace" value="$(arg namespace)"/>
+      <arg name="headless" value="$(arg headless)"/>
+    </include>
+  </group>
+  <group if="$(eval type == 'oval')">
+    <include file="$(find rr_gazebo)/launch/rr_oval_race_sim.launch">
+      <arg name="namespace" value="$(arg namespace)"/>
+      <arg name="headless" value="$(arg headless)"/>
+    </include>
+  </group>
+  <group if="$(eval type == 'circuit')">
+    <include file="$(find rr_gazebo)/launch/rr_circuit_race_sim.launch">
+      <arg name="namespace" value="$(arg namespace)"/>
+      <arg name="headless" value="$(arg headless)"/>
     </include>
   </group>
 
   <group ns="$(arg namespace)">
     <!-- Handle the joystick input -->
     <node pkg="joy" name="joy_node" type="joy_node"/>
-    <node pkg="ps3joy" name="ps3joy" type="ps3joy.py" output="screen" args="--continuous-output"/>
-    <node name="vehicle_joystick" pkg="rr_gazebo"
-          type="vehicle_joystick.py" output="screen"/>
+    <node name="joystick_controller" pkg="rr_gazebo" type="vehicle_joystick.py"
+          output="screen"/>
   </group>
 </launch>
