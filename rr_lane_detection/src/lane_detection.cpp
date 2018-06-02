@@ -22,7 +22,8 @@
 
 /** @brief main file that starts the subscribers and calls spin
  */
-int main(int argc, char** argv) {
+int main(int argc, char** argv)
+{
   //Node and image transport initialization
   ros::init(argc, argv, "lane_detection");
   std::string camera_source;
