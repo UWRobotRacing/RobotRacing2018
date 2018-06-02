@@ -5,7 +5,7 @@ EndlineCounter::EndlineCounter (ros::NodeHandle nh_) : it_(nh_)
 {
 	//pub_ = nh_.advertise<std_msgs::Bool>("endline",1);
 	status = 0;
-	client_ = nh_.serviceClient<std_srvs::Trigger>("supervisor", true);
+	client_ = nh_.serviceClient<std_srvs::Trigger>("/Supervisor/count_lap", true);
 }
 
 //callback to handle detection
@@ -52,6 +52,9 @@ void EndlineCounter::img_callback(const sensor_msgs::ImageConstPtr& msg)
 	if (status > 8) {
 		if(client_.call(srv))
 		{
+			if (srv.response.success){
+				ROS_INFO("SUCCESS");
+			}
 			ROS_INFO("TRUE");
 		} else {
 			ROS_INFO("FALSE");
