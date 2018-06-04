@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
   roslib
   sensor_msgs
   roslint
+  darknet_ros_msgs
 )
 
 catkin_package()
