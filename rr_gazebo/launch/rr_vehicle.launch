@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<!--@file rr_vehicle.launch
+ -  @brief Use Gazebo to simulate a vehicle with Ackermann steering.
+ -         Arguments:
+ -             namespace (string, default: ackermann_vehicle)
+ -                 Vehicle namespace.
+ -          This code is inspired by code from the WunderKramer lab and GeorgiaTech's
+ -          AutoRally team
+ -          The repositories are linked here:
+ -          https://github.com/autorally/Autorally
+ -          https://github.com/vugolfcart/ackermann_vehicle
+ -
+ -  @author Toni Ogunmade(oluwatoni)
+ -  @competition IARRC 2018
+-->
+<launch>
+  <arg name="cmd_timeout" default="0.5"/>
+
+  <include file="$(find rr_description)/launch/rr_vehicle.launch"/>
+
+  <!-- Load the joint controllers. One of these publishes the joint states
+        to joint_states. -->
+  <node name="controller_spawner" pkg="controller_manager" type="spawner"
+        args="$(find rr_gazebo)/config/joint_ctrlr_params.yaml"/>
+
+  <!-- Control the steering and axle joints. -->
+  <node name="ackermann_controller" pkg="rr_gazebo"
+        type="ackermann_controller.py" output="screen">
+    <param name="cmd_timeout" value="$(arg cmd_timeout)"/>
+    <rosparam file="$(find rr_gazebo)/config/ctrlr_params.yaml" command="load"/>
+  </node>
+
+  <!-- Publish the vehicle odometry -->
+  <node name="simulated_odometry" pkg="rr_gazebo"
+        type="simulated_odom" output="screen">
+    <param name="angular_velocity_sd" value="0.2"/>
+    <param name="linear_velocity_sd" value="0.2"/>
+    <rosparam file="$(find rr_gazebo)/config/ctrlr_params.yaml" command="load"/>
+  </node>
+</launch>

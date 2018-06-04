@@ -1,0 +1,24 @@
+<!--@file dual_cam_lane_detection.launch
+ -  @brief This launch file is used to run the nodes publishing the camera 
+ -         streams for both cameras it then launches the lane detection 
+ -         software on both
+ -  @author Matthew Post
+ -  @author Toni Ogunmade(oluwatoni)
+ -  @competition IARRC 2018
+ -->
+<launch>
+<!-- Output the camera streams
+  <node ns ="left" name="output_video_cam_left" pkg="image_view" type="image_view" respawn="false" output="screen">
+       <remap from="image" to="/left/usb_cam_left/image_raw" />
+       <param name="autosize" value="true" />
+   </node>
+
+   <node ns ="right" name="output_video_cam_right" pkg="image_view" type="image_view" respawn="false" output="screen">
+       <remap from="image" to="/right/usb_cam_right/image_raw" />
+       <param name="autosize" value="true" />
+   </node>
+-->
+    <!-- TODO pass left or right into this launch file -->
+   <include file="$(find rr_lane_detection)/launch/lane_detection_left_cam.launch" />
+   <!-- <include ns ="right" file="$(find lane_detection)/launch/lane_detection_right_cam.launch" /> -->
+</launch>

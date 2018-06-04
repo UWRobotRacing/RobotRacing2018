@@ -45,8 +45,8 @@ PathPlanner::PathPlanner() {
   //Normal Pub and Subscriber
   enable_sub = node.subscribe("/enable", 1, &PathPlanner::EnableCallBack, this);
   map_sub = node.subscribe("/map", 1, &PathPlanner::ProcessMap, this);
-  vel_pub = node.advertise<std_msgs::Float32>("/PathPlanner/vel_level", 1, true);
-  steer_pub = node.advertise<std_msgs::Float32>("/PathPlanner/steer_cmd", 1, true);
+  vel_pub = node.advertise<std_msgs::Float32>("/rr_vehicle/velocity_cmd", 1, true);
+  steer_pub = node.advertise<std_msgs::Float32>("/rr_vehicle/steering_cmd", 1, true);
 }
 
 /** @brief get the parameters and initialize the member variables
