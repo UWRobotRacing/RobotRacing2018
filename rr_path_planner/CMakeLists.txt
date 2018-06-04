@@ -10,6 +10,7 @@ find_package(catkin REQUIRED
   nav_msgs 
   geometry_msgs
   roslint
+  rr_common
 )
 
 catkin_package(
@@ -20,6 +21,7 @@ catkin_package(
   std_msgs 
   nav_msgs 
   geometry_msgs
+  rr_common
   visualization_msgs
   DEPENDS system_lib
 )
