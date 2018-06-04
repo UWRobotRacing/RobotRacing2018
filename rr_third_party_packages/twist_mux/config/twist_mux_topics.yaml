@@ -8,12 +8,12 @@
 topics:
 -
   name    : joystick
-  topic   : joy_mux
+  topic   : /rr_vehicle/joy_cmd
   timeout : 0.5
   priority: 20
 -
   name    : path_planner
-  topic   : /PathPlanner/twist_mux
+  topic   : /rr_vehicle/pp_cmd
   timeout : 0.5
   priority: 10
 -

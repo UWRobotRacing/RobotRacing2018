@@ -3,12 +3,9 @@
 // Author: Waleed Ahmed
 // Date: 2018 05 25
 
-#include <ros/ros.h>
 #include <supervisor.hpp>
-#include <std_msgs/Bool.h>
 #include <geometry_msgs/Twist.h>
 #include <geometry_msgs/Vector3.h>
-#include <std_srvs/Trigger.h>
 
 // Supervisor Class constructor
 Supervisor::Supervisor()
@@ -45,16 +42,13 @@ Supervisor::Supervisor()
  * @brief service callback method for starting the race
  * @param res response that will be sent back to client
  */
-bool Supervisor::startRace(std_srvs::Trigger::Request &req, std_srvs::Trigger::Response &res)
+bool Supervisor::startRace(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res)
 {
-    res.success = true;
-
     // Publish a bool that the twist multiplexer will pick up that will allow
     // allow path planner and joystick messages to be published
     bool_msg.data = true;
     remove_null_lock.publish(bool_msg);
 
-    res.message = "Race started";
     return true;
 }
 

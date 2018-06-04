@@ -13,13 +13,14 @@
 #include <ros/ros.h>
 #include <std_msgs/Bool.h>
 #include <std_srvs/Trigger.h>
+#include <std_srvs/Empty.h>
 
 class Supervisor
 {
   public:
     Supervisor();
     // Service callback methods
-    bool startRace(std_srvs::Trigger::Request &req, std_srvs::Trigger::Response &res);
+    bool startRace(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res);
     bool countLap(std_srvs::Trigger::Request &req, std_srvs::Trigger::Response &res);
   private:
     // ROS Variables

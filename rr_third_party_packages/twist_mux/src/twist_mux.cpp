@@ -60,7 +60,7 @@ TwistMux::TwistMux(int window_size)
   getTopicHandles(nh, nh_priv, "locks" , *lock_hs_ );
 
   /// Publisher for output topic:
-  cmd_pub_ = nh.advertise<geometry_msgs::Twist>("cmd_vel_out", 1);
+  cmd_pub_ = nh.advertise<geometry_msgs::Twist>("/rr_vehicle/vel_cmd", 1);
 
   /// Diagnostics:
   diagnostics_ = boost::make_shared<diagnostics_type>();
