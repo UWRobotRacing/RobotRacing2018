@@ -1,0 +1,8 @@
+<!--@file rr_traffic_light.launch
+ -  @author Adrian Malaran
+ -  @competition IARRC 2018
+ -->
+<launch>
+	<node pkg="traffic_light_detection" type="traffic_light_detector" name="traffic_light_detector" output="screen">
+	</node>
+</launch>
