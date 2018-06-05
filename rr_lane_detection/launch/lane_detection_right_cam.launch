@@ -6,10 +6,10 @@
  -  @competition IARRC 2018
  -->
 <launch>
-	<node pkg="lane_detection" type="lineNode" name="lane_detection_right"/>
+	<node pkg="lane_detection" type="lane_detection" name="lane_detection_right"/>
 	<param name="Debug_Flag" type="bool" value="true" />
 	
-	<param name="Camera_Source_Topic" type="string" value="/rr_vehicle/right_facing_camera/image_raw" />
+	<param name="Camera_Source_Topic" type="string" value="/rr_vehicle/right_cam/image_raw" />
 	<param name="Output_Image_topic" type="string" value="/output_video_right" />
 	<param name="Output_Pointlist_topic" type ="string" value="/output_point_list_right"/>
 	<param name="PointListOut" type="bool" value="true" />
