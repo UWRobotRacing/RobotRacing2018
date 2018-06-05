@@ -23,7 +23,7 @@
 #include <PID_v1.h>
 
 
-//brief Serial, velocity and battery monitoring defines respectively
+//Serial, velocity and battery monitoring defines respectively
 #define ROS_BAUD_RATE         57600
 #define EC_BAUD_RATE          115200
 

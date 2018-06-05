@@ -1,11 +1,11 @@
-/**
+/*
  * @file robot_racer
  * @competition IARRC 2018
  */
 
 #include "robot_racer.h"
 
-/**
+/*
  * @brief Constructs Car and assigns values to attributes
  * values can be found in robot_racer.h library
  */
@@ -26,8 +26,10 @@ Car::Car()
 }
 /*
  *@brief assigns pin values
+ *@param no input
  *values can be found in robot_racer library
  *BRAKE currently has not been defined, when defined, a pin is assigned
+ *@returns void
  */
 void Car::setup()
 {
@@ -76,8 +78,8 @@ void Car::SetState(CarState set)
 /*
  *@brief Method for Estop car state
  *throttle is reduced to neutral, thats how the car gradually stops.
- * steering is re_adjusted to neutral
- * returns void
+ *steering is re_adjusted to neutral
+ *@returns void
  */
 void Car::Estop()
 {
@@ -122,7 +124,7 @@ void Car::RC_read()
       if (Serial2.available() != buffer_size)
         i = 0;
 
-      //! make sure we are at the end of a transmition
+      // make sure we are at the end of a transmition
       buffer_size = Serial2.available();
     }
 

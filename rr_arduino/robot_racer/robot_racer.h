@@ -4,10 +4,10 @@
 #include "Servo.h"
 #include "Arduino.h"
 
-//* #define BRAKE
+// #define BRAKE
 #define TEST_OUTPUT 1
 
-//* servo defines
+// servo defines
 #define SERVO_THROTTLE_PIN    10
 #define SERVO_STEER_PIN       11
 #define SERVO_BRAKE_PIN       12
@@ -32,7 +32,7 @@
 #define RC_CHANNELS           8
 #define DELAY                 250 // Time in milliseconds for estop to trigger when r/c disconnects
 
-//* States for eStop, RC, and Auto
+// States for eStop, RC, and Auto
 enum CarState
 {
   ESTOP,
@@ -40,7 +40,7 @@ enum CarState
   AUTO
 };
 
-//* Has all variables for the car
+// Has all variables for the car
 class Car
 {
   private:
@@ -62,7 +62,7 @@ class Car
     
     Servo ThrottleServo_, SteerServo_;
 #ifdef BRAKE
-    Servo BrakeServo_;//*< brakeServo not used?
+    Servo BrakeServo_;//< brakeServo not used?
 #endif
 
   public:
