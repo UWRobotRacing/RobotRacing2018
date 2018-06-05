@@ -13,12 +13,15 @@
 #include <algorithm>
 #include <vector>
 #include <limits> // for infinity
+#include <math.h>
 
 #include <ros/ros.h>
 #include <ros/console.h>
+#include "msg_srv_names.hpp"
 #include <nav_msgs/OccupancyGrid.h>
 #include <geometry_msgs/Point32.h>
 #include <geometry_msgs/Pose2D.h>
+#include <geometry_msgs/Twist.h>
 #include <std_msgs/Int8.h>
 #include <std_msgs/Float32.h>
 #include <std_msgs/Bool.h>
@@ -41,18 +44,17 @@ private:
     void EnableCallBack(const std_msgs::Int8::ConstPtr& msg);
     bool IsCellOccupied(int index);
     int CheckLength(int angle_index);
-    std_msgs::Float32 Velocity(double dist, double steer);
+    double Velocity(double dist, double steer);
     double StopDistFromVel(double vel1);
 
     //ROS nodes, pub, sub, msgs & variables
-    ros::NodeHandle node;
-    ros::Subscriber map_sub;
+    ros::NodeHandle nh_;
+    ros::Subscriber map_sub_;
 
-    ros::Publisher vel_pub;
-    ros::Publisher steer_pub;
+    double wheel_to_wheel_dist_;
+    ros::Publisher cmd_pub_;
     nav_msgs::OccupancyGrid::ConstPtr map_;  //map in 2d grid
-    std_msgs::Float32 velMsg;   //velocity msg
-    std_msgs::Float32 steerMsg; // steer msg
+    geometry_msgs::Twist vel_cmd_;
     std_msgs::Float32 last_velMsg;
 
     ros::Subscriber enable_sub;

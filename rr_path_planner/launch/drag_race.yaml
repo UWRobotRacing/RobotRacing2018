@@ -7,7 +7,6 @@
 #TrajRoll/DRAG_MODE:           true
 # In Nano Seconds
 TrajRoll/DRAG_DURATION:       90.0
-TrajRoll/DRAG_DURATION_NANO:  440000000
 
 #Map Size
 TrajRoll/MAP_WIDTH:            600
@@ -39,10 +38,6 @@ TrajRoll/MAX_STEERING_ANGLE:   0.2
 TrajRoll/CAR_WIDTH:            0.2
 TrajRoll/DIST_COST_FACTOR:     10.0
 TrajRoll/MIN_OFFSET_DIST:      0.05
-
-#End Line Detection
-TrajRoll/HORIZONTAL_LINE_RATIO:  0.65
-TrajRoll/HORIZONTAL_LINE_THICKENESS: 3
 
 #For Debugging 
 #Visualization

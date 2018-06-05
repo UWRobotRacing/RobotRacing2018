@@ -15,8 +15,10 @@
 #include <tf/transform_broadcaster.h>
 #include <tf/transform_datatypes.h>
 #include <math.h>
+#include "msg_srv_names.hpp"
 
-class SimulatedOdom{
+class SimulatedOdom
+{
 public:
   SimulatedOdom();
 private:
