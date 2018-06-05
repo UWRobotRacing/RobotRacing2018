@@ -102,6 +102,16 @@ ISR(PCINT0_vect){
 }
 
 
+/** @brief
+ 1. Sets up the register (ISR, GPIO)
+ 2. Waits for signal from the i2c master (Arduino Mega)
+ 3. if it receives 'r' from master
+ 3.1 disable interrupt
+ 3.2 send the first 8bit of the count data
+ 3.3 send the second 8it of the count data
+ 3.4 resets the count data
+ 3.5 enables the interrupt
+ **/
 
 int main(void)
 {
