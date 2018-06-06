@@ -31,7 +31,6 @@ void enable_cb(const std_msgs::Bool& enable_msg)
 }
 
 /** @brief starts the path_planner node
- *
  *  This node doesn't act until it gets the enable signal
  *
  *  @return NONE

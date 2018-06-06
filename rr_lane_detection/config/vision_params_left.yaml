@@ -1,3 +1,4 @@
+%YAML:1.0
 # @file vision_params_left.yaml
 # @brief Parameters for the left camera
 # 
@@ -8,7 +9,6 @@
 # @author Toni Ogunmade(oluwatoni)
 # @competition IARRC 2018
 
-%YAML:1.0
 #Size of Bird's Eye View grid
 bev_width: 270
 bev_height: 314

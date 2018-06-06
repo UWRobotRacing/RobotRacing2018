@@ -75,7 +75,6 @@ std_msgs::Int8 battery_percentage_msg;
 // Callback functions used by subscriber
 void cmd_velocity_callback(const std_msgs::Float32 & cmd_vel_msg);
 void cmd_steering_callback(const std_msgs::Float32 & cmd_str_msg);
-void throttle_PID_array_callback(const std_msgs::Float32MultiArray & array);
 
 // ROS publisher and subscriber commands
 
@@ -86,7 +85,6 @@ ros::Publisher velDebugger_pub ("/arduino/velDebug", &velDebug);
 ros::Publisher battery_pub("/arduino/battery_state", &battery_percentage_msg);
 ros::Subscriber <std_msgs::Float32> velocity_sub ("/PathPlanner/vel_level", cmd_velocity_callback);
 ros::Subscriber <std_msgs::Float32> steering_sub ("/PathPlanner/steer_cmd", cmd_steering_callback);
-//ros::Subscriber <std_msgs::Float32MultiArray> PID_msg ("/Throttle_PID_array", throttle_PID_array_callback);
 
 int steering_angle = 1500;
 int ROS_watchdog = 0;
@@ -97,6 +95,7 @@ int ROS_watchdog = 0;
  *@param no input
  *@returns void
  */
+
 void setup() {
 #ifdef TEST_OUTPUT
   Serial.begin(ROS_BAUD_RATE);
