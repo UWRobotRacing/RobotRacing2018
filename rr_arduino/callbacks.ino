@@ -1,5 +1,5 @@
 //ROS callbacks are automatically linked with through the Arduino IDE
-void ThrottlePIDArrayCallback(const std_msgs::Float32MultiArray & array) {
+void throttle_PID_array_callback(const std_msgs::Float32MultiArray & array) {
   // P,I,D respectively
   // for(int i = 0; i < 3; i++)
   // {
