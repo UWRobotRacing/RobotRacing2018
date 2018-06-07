@@ -25,6 +25,8 @@
 #include <ros/console.h>
 #include <std_msgs/Int8.h>
 #include <std_msgs/Float32.h>
+#include <std_srvs/Empty.h>
+#include <std_srvs/Trigger.h>
 
 // OPENCV includes
 #include <opencv2/opencv.hpp>
@@ -79,6 +81,8 @@ class TrafficLightProcessor
      //    double traffic_light_coords[4];
 
     ros::NodeHandle nh_;
+
+    ros::ServiceClient client_;
 
     ros::Subscriber image_subscriber_;
     ros::Subscriber found_object_subscriber_;

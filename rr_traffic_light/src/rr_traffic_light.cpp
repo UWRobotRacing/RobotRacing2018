@@ -224,6 +224,9 @@ void TrafficLightProcessor::Initialize() {
 
   // Initialize Traffic Light State
   traffic_light_state_ = NO_TRAFFIC_LIGHT;
+
+  // Service
+  client_ = nh_.serviceClient<std_srvs::Empty>("/Supervisor/start_race", true);
 }
 
 /**@name InitializePubsAndSubs 
@@ -264,8 +267,12 @@ void TrafficLightProcessor::TrafficLightImageCallback(const sensor_msgs::ImageCo
  * @param traffic_light_image: The detected traffic light image to be parsed
  */
 bool TrafficLightProcessor::FindTrafficLightColorState(const cv::Mat& traffic_light_image) {
+  // Dimensions
   cv::Size image_size = traffic_light_image.size();
   int image_height = image_size.height, image_width = image_size.width;
+  
+  std_srvs::Empty srv;
+
 
   if (image_height == 0 || image_width == 0) return false;
 
@@ -298,6 +305,9 @@ bool TrafficLightProcessor::FindTrafficLightColorState(const cv::Mat& traffic_li
     if (red_pixel_count < red_pixel_threshold  && green_pixel_count > green_pixel_threshold) {
       ROS_INFO("-- GREEN LIGHT --");
       traffic_light_state_ = GREEN;
+
+      // Invoke Service call
+      client_.call(srv);
     } else if (red_pixel_count > red_pixel_threshold && green_pixel_count < green_pixel_threshold) {
       ROS_INFO("-- RED LIGHT --");
       traffic_light_state_ = RED;

@@ -27,7 +27,7 @@
  * TODO (Adrian): 
  * - Refactor main function to depend on darknet_ros node to retrieve the TL state instead of polling
  * - Remove all unnecesarry comments
- * - Integrate service call for traffic light to initiate race
+ * - Configure launch files to start up darknet node
  */
 
 /**
