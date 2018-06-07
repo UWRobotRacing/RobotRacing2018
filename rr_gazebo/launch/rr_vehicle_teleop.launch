@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<!--@file rr_teleop.launch
+ -  @brief Use Gazebo to simulate a vehicle with Ackermann steering and spin up
+           some nodes to control the simulated vehicle, also accepts the type of
+           test track wanted
+ -         This code is inspired by code from the WunderKramer lab and GeorgiaTech's
+ -         AutoRally team
+ -         The repositories are linked here:
+ -         https://github.com/autorally/Autorally
+ -         https://github.com/vugolfcart/ackermann_vehicle
+ -
+ -  @author Toni Ogunmade(oluwatoni)
+ -  @competition IARRC 2018
+-->
+<launch>
+  <arg name="namespace" default="rr_vehicle"/>
+  <arg name="type" default="drag"/>
+  <arg name="headless" default="false"/>
+
+  <group if="$(eval type == 'drag')">
+    <include file="$(find rr_gazebo)/launch/rr_drag_race_sim.launch">
+      <arg name="namespace" value="$(arg namespace)"/>
+      <arg name="headless" value="$(arg headless)"/>
+    </include>
+  </group>
+  <group if="$(eval type == 'oval')">
+    <include file="$(find rr_gazebo)/launch/rr_oval_race_sim.launch">
+      <arg name="namespace" value="$(arg namespace)"/>
+      <arg name="headless" value="$(arg headless)"/>
+    </include>
+  </group>
+  <group if="$(eval type == 'circuit')">
+    <include file="$(find rr_gazebo)/launch/rr_circuit_race_sim.launch">
+      <arg name="namespace" value="$(arg namespace)"/>
+      <arg name="headless" value="$(arg headless)"/>
+    </include>
+  </group>
+
+  <group ns="$(arg namespace)">
+    <!-- Handle the joystick input -->
+    <node pkg="joy" name="joy_node" type="joy_node"/>
+    <node name="joystick_controller" pkg="rr_gazebo" type="vehicle_joystick.py"
+          output="screen"/>
+  </group>
+</launch>

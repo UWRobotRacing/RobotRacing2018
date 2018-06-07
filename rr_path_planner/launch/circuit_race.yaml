@@ -35,11 +35,6 @@ TrajRoll/CAR_WIDTH:            0.30
 TrajRoll/DIST_COST_FACTOR:     2.0
 TrajRoll/MIN_OFFSET_DIST:      0.05
 
-#End Line Detection
-
-TrajRoll/HORIZONTAL_LINE_RATIO:  1
-TrajRoll/HORIZONTAL_LINE_THICKENESS: 0
-
 #For Debugging 
 #Visualization
 TrajRoll/VISUALIZATION:        true

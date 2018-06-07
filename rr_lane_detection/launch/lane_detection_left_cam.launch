@@ -6,10 +6,11 @@
  -  @competition IARRC 2018
  -->
 <launch>
-	<node pkg="lane_detection" type="lineNode" name="lane_detection_left"/>
+	<arg name="direction" default="left"/>
+	<node pkg="rr_lane_detection" type="lane_detection" name="lane_detection_left" output="screen"/>
 	<param name="Debug_Flag" type="bool" value="true" />
 	
-	<param name="Camera_Source_Topic" type="string" value="/left/usb_cam_left/image_raw" />
+	<param name="Camera_Source_Topic" type="string" value="/rr_vehicle/left_cam/image_raw"/>
 	<param name="Output_Image_topic" type="string" value="/output_video_left" />
 	<param name="Output_Pointlist_topic" type ="string" value="/output_point_list_left"/>
 	<param name="PointListOut" type="bool" value="true" />
@@ -20,6 +21,6 @@
 	<param name="Adaptive_HSV_Min_V" type ="int" value = "-20"/>
 	<param name="Adaptive_HSV_MPatch_Size" type ="int" value = "25"/>
 
-	<param name="OpenCVMatFile" type="string" value="$(find lane_detection)/launch/vision_params_left.yaml" />
+	<param name="OpenCVMatFile" type="string" value="$(find rr_lane_detection)/config/vision_params_left.yaml" />
 	<!-- FYI: OpenCV Image coordinates are in [x,y], where X is a column index (0 left), and Y is a row index (0 top) -->
 </launch>

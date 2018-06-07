@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<!--@file rr_circuit_race_sim.launch
+ -  @brief Spawn the robot at the start line on the circuit test track
+ -
+ -  @author Toni Ogunmade(oluwatoni)
+ -  @competition IARRC 2018
+-->
+
+<launch>
+  <!-- Vehicle pose -->
+  <arg name="x" default="-0.5"/>
+  <arg name="y" default="-30.0"/>
+  <arg name="z" default="0.0"/>
+  <arg name="roll" default="0.0"/>
+  <arg name="pitch" default="0.0"/>
+  <arg name="yaw" default="1.57079633"/>
+  <arg name="world_name" default="model://urdf/circuit_race.world"/>
+  <arg name="namespace" default="rr_vehicle"/>
+  <arg name="cmd_timeout" default="0.5"/>
+  <arg name="headless" default="false"/>
+
+  <group ns="$(arg namespace)">
+    <!-- Start Gazebo with the default settings -->
+    <include file="$(find rr_gazebo)/launch/rr_start_gazebo.launch">
+      <arg name="cmd_timeout" value="$(arg cmd_timeout)"/>
+      <arg name="world_name" value="$(arg world_name)"/>
+      <arg name="headless" value="$(arg headless)"/>
+    </include>
+
+    <!-- Spawn the vehicle with the necessary controllers -->
+    <node name="spawn_vehicle" pkg="gazebo_ros" type="spawn_model"
+          args="-urdf -param robot_description -model ackermann_vehicle
+                -gazebo_namespace /$(arg namespace)/gazebo
+                -x $(arg x) -y $(arg y) -z $(arg z)
+                -R $(arg roll) -P $(arg pitch) -Y $(arg yaw)" output="screen"/>
+
+    <!-- Spawn the vehicle with the necessary controllers -->
+    <include file="$(find rr_gazebo)/launch/rr_vehicle.launch">
+      <arg name="cmd_timeout" value="$(arg cmd_timeout)"/>
+    </include>
+  </group>
+</launch>
