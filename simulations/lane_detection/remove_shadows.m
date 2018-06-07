@@ -1,5 +1,6 @@
 % Try using Lab colour space to detect and remove shadows
 function [o_image] = remove_shadows(i_image)
+    % TODO: add function parameters for constants
     % Configurable constants
     THRESHOLD_TOLERANCE = 0.8;
     MIN_SHADOW_AREA = 30;
@@ -32,7 +33,7 @@ function [o_image] = remove_shadows(i_image)
     shadow_pixels_morph = bwareaopen(shadow_pixels_morph, MIN_SHADOW_AREA);
     shadow_pixels_morph = imdilate(shadow_pixels_morph, true(MASK_DILATION));
 
-    subplot(3,2,1), imagesc(shadow), title('Shadow'), grid on;
+    subplot(3,2,1), imagesc(i_image), title('Shadow'), grid on;
     subplot(3,2,2), imagesc(shadow_pixels), title('Shadow Pixels'), grid on;
     subplot(3,2,3), imagesc(shadow_pixels_morph), title('Shadow Morphed'), grid on;
 
@@ -42,7 +43,7 @@ function [o_image] = remove_shadows(i_image)
     subplot(3,2,4), imshow(label2rgb(labelmatrix(connected_shadow_regions), @jet, [.5 .5 .5])), title('Shadow Regions')
     hold on
 
-    corrected_image = shadow;
+    corrected_image = i_image;
     % Loop over every shadow region
     for i = 1:connected_shadow_regions.NumObjects
         mask = false(connected_shadow_regions.ImageSize);
@@ -150,7 +151,8 @@ function [o_image] = remove_shadows(i_image)
     median_filtered = rgb2hsv(corrected_image);
     h = floor(MED_FILTER_KERNEL_SIZE / 2);
 
-    for i = 1:connected_shadow_regions.NumObjects
+    % TODO: uncomment below
+    for i = 9:9%1:connected_shadow_regions.NumObjects
         mask = false(connected_shadow_regions.ImageSize);
         mask(connected_shadow_regions.PixelIdxList{i}) = true;
         mask = edge(mask, 'canny');
