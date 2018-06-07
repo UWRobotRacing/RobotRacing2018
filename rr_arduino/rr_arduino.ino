@@ -24,6 +24,7 @@
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BNO055.h>
 #include <utility/imumaths.h>
+#include <geometry_msgs/Twist.h>
 #include <PID_v1.h>
 #include <sensor_msgs/MagneticField.h>
 #include <sensor_msgs/Imu.h>
@@ -31,6 +32,7 @@
 //Serial, velocity and battery monitoring defines respectively
 const float ROS_BAUD_RATE  =  57600;
 const float RC_BAUD_RATE   =  115200;
+const float WHEEL_TO_WHEEL_DIST = 0.335;
 
 //I2C address for encoder counter 
 const int SLAVE_ADDRESS = 07;
@@ -90,13 +92,10 @@ std_msgs::Int8 battery_percentage_msg;
 sensor_msgs::Imu imu_msg;
 sensor_msgs::MagneticField magnetic_msg;
 
-//Callback functions for subscriber
-void CmdVelocityCallback(const std_msgs::Float32 &cmd_vel_msg);
-void CmdSteeringCallback(const std_msgs::Float32 &cmd_str_msg);
+//!Prototypes for Callbacks
+void cmdCallback(const geometry_msgs::Twist & cmd_msg);
 
-
-// ROS publisher and subscriber commands
-
+//!ROS publisher and subscriber commands
 ros::Publisher state_pub("/arduino/vehicle_state", &state_msg);
 ros::Publisher encoder_pub("/arduino/enc_vel", &actual_velocity_msg);
 ros::Publisher debugger_pub ("/arduino/debug", &debug);
@@ -104,8 +103,7 @@ ros::Publisher velDebugger_pub ("/arduino/velDebug", &velDebug);
 ros::Publisher battery_pub("/arduino/battery_state", &battery_percentage_msg);
 ros::Publisher imu_pub("/arduino/imu_data", &imu_msg);
 ros::Publisher magnetic_pub("/arduino/mag_data", &magnetic_msg);
-ros::Subscriber <std_msgs::Float32> velocity_sub ("/PathPlanner/vel_level", CmdVelocityCallback);
-ros::Subscriber <std_msgs::Float32> steering_sub ("/PathPlanner/steer_cmd", CmdSteeringCallback);
+ros::Subscriber <geometry_msgs::Twist> cmd_sub ("/rr_vehicle/vel_cmd", cmdCallback);
 
 int steering_angle = 1500;
 int ROS_watchdog = 0;
@@ -135,10 +133,10 @@ void setup() {
   nh.advertise(battery_pub);
   nh.advertise(imu_pub);
   nh.advertise(magnetic_pub);
-  nh.subscribe(velocity_sub);
-  nh.subscribe(steering_sub);
-
+  nh.subscribe(cmd_sub);
+  pinMode(13,OUTPUT);
   robot_racer.setup();
+
 /**
  *PID setup
  *ThrottlePID.SetMode(AUTOMATIC); //<turn the PID on
@@ -255,6 +253,9 @@ void GetBatteryState(long current_time){
   }
 }
 
+// PLEASE READ
+// To enable this to work the ISR defined in HardwareSerial2.cpp must be commented out
+// To enable regular use of Serial2 port uncomment the ISR in the HardwareSerial2.cpp
 ISR (USART2_RX_vect)
 {
   cli();
