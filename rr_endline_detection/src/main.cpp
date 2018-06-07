@@ -16,7 +16,7 @@ int main(int argc, char** argv)
 	ros::init(argc, argv, "endline_detection");
 	ROS_INFO("Initializing endline_detection");	
     //std::string camera_source = "/robot_racing/forward_facing_cam/image_raw";
-    std::string camera_source = "/left/image_raw";
+    std::string camera_source = "/rr_vehicle/front_facing_cam/image_raw";
     ros::NodeHandle nh_;
 	image_transport::ImageTransport it_(nh_);
     EndlineCounter ec(nh_);
