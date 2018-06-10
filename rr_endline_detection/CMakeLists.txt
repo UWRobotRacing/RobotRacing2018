@@ -1,11 +1,14 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(rr_endline_detection)
 
+set(CMAKE_BUILD_TYPE Release)
+
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
   std_srvs
   cv_bridge
+  rr_common
   image_transport
 )
 find_package(OpenCV REQUIRED)
