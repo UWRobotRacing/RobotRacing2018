@@ -20,8 +20,8 @@ class EndlineCounter {
   
   public :
     EndlineCounter(ros::NodeHandle);
-    void img_callback(const sensor_msgs::ImageConstPtr&);
-    bool blob_detector(cv::Mat);
+    void ImgCb(const sensor_msgs::ImageConstPtr&);
+    bool BlobDetector(cv::Mat);
 };
 
 #endif /*ENDLINE_DETECTION_HPP*/

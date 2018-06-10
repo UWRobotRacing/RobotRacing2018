@@ -10,7 +10,7 @@ EndlineCounter::EndlineCounter (ros::NodeHandle nh_) : it_(nh_)
 }
 
 //callback to handle detection
-void EndlineCounter::img_callback(const sensor_msgs::ImageConstPtr& msg)
+void EndlineCounter::ImgCb(const sensor_msgs::ImageConstPtr& msg)
 {
   cv::Mat init_img, hsv_img, mag_img, blur_img;
   cv_bridge::CvImagePtr cv_ptr;
@@ -26,11 +26,10 @@ void EndlineCounter::img_callback(const sensor_msgs::ImageConstPtr& msg)
     init_img = cv_ptr->image;
     cv::cvtColor(init_img, hsv_img, CV_BGR2HSV);
     cv::inRange(hsv_img, cv::Scalar(iLowH, 0,0), cv::Scalar(iHighH,255,255), mag_img);
-    
     cv::GaussianBlur(mag_img, mag_img, cv::Size(7,7), 0, 0);
 
     //detect endline
-    if (blob_detector(mag_img))
+    if (BlobDetector(mag_img))
     {
       if (!detection_status_)
       {
@@ -85,7 +84,7 @@ void EndlineCounter::img_callback(const sensor_msgs::ImageConstPtr& msg)
 }
 
 //determines by area if blob is large enough
-bool EndlineCounter::blob_detector(cv::Mat img)
+bool EndlineCounter::BlobDetector(cv::Mat img)
 {
   cv::SimpleBlobDetector::Params params;
   params.filterByArea = true;
