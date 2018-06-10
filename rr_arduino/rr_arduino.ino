@@ -205,7 +205,7 @@ void get_battery_state(long current_time){
 
 //publish the average value
     battery_percentage_msg.data = (int)(sum / AVERAGING_SIZE);
-    battery.publish(&battery_percentage_msg);
+    battery_pub.publish(&battery_percentage_msg);
 
     prev_time = millis();
   }
