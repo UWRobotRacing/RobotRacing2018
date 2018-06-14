@@ -20,8 +20,8 @@ LaserMapper/LASER_ORIENTATION:              -1
 #Map Parameters#
 #map_res in meter
 LaserMapper/map_res:                        0.01
-LaserMapper/map_W:                          600
-LaserMapper/map_H:                          400
+LaserMapper/map_W:                          1100
+LaserMapper/map_H:                          700
 LaserMapper/map_orientation:                0
 
 #Scan parameters#
@@ -29,16 +29,16 @@ LaserMapper/map_orientation:                0
 LaserMapper/max_angle:                      1.35
 LaserMapper/min_angle:                      -1.35
 LaserMapper/minrange:                       0.20
-LaserMapper/maxrange:                       4
+LaserMapper/maxrange:                       6
 LaserMapper/samplerate:                     1
 LaserMapper/scan_processing_subsample:      0
 LaserMapper/mechanical_offset:              0
 
 LaserMapper/lane_detection_left_msg/offset_height:     0
-LaserMapper/lane_detection_left_msg/offset_width:      35
+LaserMapper/lane_detection_left_msg/offset_width:      0
 
 LaserMapper/lane_detection_right_msg/offset_height:    0
-LaserMapper/lane_detection_right_msg/offset_width:     300
+LaserMapper/lane_detection_right_msg/offset_width:     -20
 
 #Debugging#
 LaserMapper/DEBUG:                          false

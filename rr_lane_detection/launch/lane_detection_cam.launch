@@ -9,7 +9,7 @@
   <arg name="config_file" default=""/>
 
   <group ns="$(arg camera)">
-    <node pkg="rr_lane_detection" type="lane_detection" name="lane_detection_right" output="screen"/>
+    <node pkg="rr_lane_detection" type="lane_detection" name="lane_detection_$(arg camera)" output="screen"/>
     <param name="Debug_Flag" type="bool" value="true" />
 
     <param name="Camera_Source_Topic" type="string" value="/rr_vehicle/$(arg camera)/image_raw" />
