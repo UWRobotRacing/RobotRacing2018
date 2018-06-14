@@ -49,6 +49,8 @@
        <param name="autosize" value="true" />
    </node>
 -->
-   <include ns ="left" file="$(find lane_detection)/launch/lane_detection_left_cam.launch" />
+  <include file="$(find rr_lane_detection)/launch/lane_detection_left_cam.launch">
+    <arg name="config_file" default="$(find rr_lane_detection)/config/vision_params_left.yaml"/>
+  </include>
    <include ns ="right" file="$(find lane_detection)/launch/lane_detection_right_cam.launch" />
 </launch>

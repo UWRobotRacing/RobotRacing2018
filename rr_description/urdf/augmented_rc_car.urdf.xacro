@@ -493,9 +493,9 @@
   <xacro:rr_camera name="front" x_offset="0.35"
                 y_offset="0.0" z_offset="0.4" pitch="0.5" yaw="0.0"/>
   <xacro:rr_camera name="right" x_offset="0.35"
-                y_offset="-0.15" z_offset="0.4" pitch="0.55" yaw="-0.3"/>
+                y_offset="-0.15" z_offset="0.4" pitch="0.62" yaw="-0.3"/>
   <xacro:rr_camera name="left" x_offset="0.35"
-                y_offset="0.15" z_offset="0.4" pitch="0.55" yaw="0.3"/>
+                y_offset="0.15" z_offset="0.4" pitch="0.62" yaw="0.3"/>
 
   <!-- IMU -->
   <link name="imu_link">

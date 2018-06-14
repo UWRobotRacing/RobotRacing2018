@@ -8,9 +8,9 @@
 
 <launch>
   <!-- Vehicle pose -->
-  <arg name="x" default="-0.25"/>
+  <arg name="x" default="0.0"/>
   <arg name="y" default="-30.0"/>
-  <arg name="z" default="0.0"/>
+  <arg name="z" default="0.4"/>
   <arg name="roll" default="0.0"/>
   <arg name="pitch" default="0.0"/>
   <arg name="yaw" default="1.57079633"/>

@@ -39,8 +39,8 @@ LaserMapper::LaserMapper()
   scan_sub_ = nh_.subscribe<sensor_msgs::LaserScan>
                       (laser_scan_name_, 1, &LaserMapper::CallBack, this);
 
-  lane_detection_left_sub_ = nh_.subscribe("/output_point_list_left", 1, &LaserMapper::DetectLeftLane, this);
-  lane_detection_right_sub_ = nh_.subscribe("/output_point_list_right", 1, &LaserMapper::DetectRightLane, this);
+  lane_detection_left_sub_ = nh_.subscribe("/output_point_list_left_cam", 1, &LaserMapper::DetectLeftLane, this);
+  lane_detection_right_sub_ = nh_.subscribe("/output_point_list_right_cam", 1, &LaserMapper::DetectRightLane, this);
 
   // Initialize an occupancy grid
   InitMap();

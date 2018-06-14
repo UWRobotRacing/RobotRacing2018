@@ -15,7 +15,10 @@
 
 //OPENCV includes
 #include <opencv2/opencv.hpp>
-#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/highgui.hpp>
+#include <opencv2/imgproc.hpp>
+
+#include <iostream>
 
 class lane_detection_processor
 {
