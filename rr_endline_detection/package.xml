@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>rr_endline_detection</name>
+  <version>0.0.0</version>
+  <description>The rr_endline_detection package</description>
+  <maintainer email="a4gu@edu.uwaterloo.ca">angegu</maintainer>
+
+  <license>TODO</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>std_srvs</build_depend>
+  <build_depend>rr_common</build_depend>
+  <build_depend>cv_bridge</build_depend>
+  <build_depend>image_transport</build_depend>
+  <build_export_depend>roscpp</build_export_depend>
+  <build_export_depend>std_msgs</build_export_depend>
+  <build_export_depend>std_srvs</build_export_depend>
+  <build_export_depend>std_srvs</build_export_depend>
+  <exec_depend>roscpp</exec_depend>
+  <exec_depend>std_msgs</exec_depend>  
+  <exec_depend>std_srvs</exec_depend>  
+  <exec_depend>rr_common</exec_depend>  
+
+  <export>
+  </export>
+</package>
