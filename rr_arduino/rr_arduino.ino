@@ -46,9 +46,6 @@ void get_battery_state(long current_time);
 
 Car robot_racer;
 
-int encoder_counts_to_meters = 28673; // MUST be a decimal number
-Encoder Encoder(ENCODER_PIN, encoder_counts_to_meters, ENCODER_FREQUENCY);
-
 //PID tuning parameter
 //double throttle_PID_val[3] = {0, 0, 0};
 double rr_velocity = 0.0f , goal_velocity = 0.0f, autonomous_throttle = 1500.0f;
@@ -86,7 +83,6 @@ ros::Publisher velDebugger_pub ("/arduino/velDebug", &velDebug);
 ros::Publisher battery_pub("/arduino/battery_state", &battery_percentage_msg);
 ros::Subscriber <std_msgs::Float32> velocity_sub ("/PathPlanner/vel_level", cmd_velocity_callback);
 ros::Subscriber <std_msgs::Float32> steering_sub ("/PathPlanner/steer_cmd", cmd_steering_callback);
-//ros::Subscriber <std_msgs::Float32MultiArray> PID_msg ("/Throttle_PID_array", throttle_PID_array_callback);
 
 int steering_angle = 1500;
 int ROS_watchdog = 0;
@@ -116,7 +112,7 @@ void setup() {
   nh.advertise(battery_pub);
   nh.subscribe(velocity_sub);
   nh.subscribe(steering_sub);
-  Encoder.setup();
+
 
   robot_racer.setup();
 /**
@@ -140,12 +136,12 @@ void loop() {
   nh.spinOnce();
   long current_time = millis();
   long double time_diff = (current_time - previous_time)/1000.0;
-  if(Encoder.updateSpeed(time_diff,(float &) rr_velocity))
+  /*if(Encoder.updateSpeed(time_diff,(float &) rr_velocity))
   {
     previous_time = millis();
     actual_velocity_msg.data = rr_velocity;
     encoder.publish(&actual_velocity_msg);
-  }
+  }*/
   switch (robot_racer.GetState()) {
 //case for emergency stop
     case ESTOP:

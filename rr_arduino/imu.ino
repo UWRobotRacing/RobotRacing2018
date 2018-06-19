@@ -19,7 +19,7 @@ ros::NodeHandle nh;
 Adafruit_BNO055 bno = Adafruit_BNO055(55);
 
 
-//X, Y ans Z variables represent accelerometer, magnetometer and gyroscope readings
+
 void setup(void)
 {
 Serial3.begin(IMU_BAUD_RATE);
@@ -70,6 +70,7 @@ Serial.print(event.orientation.y, 4);
 Serial.print("\tZ: ");
 Serial.print(event.orientation.z, 4);
 Serial.println("");
+
 
 delay(1000);
 //call function to publish imu_readings
