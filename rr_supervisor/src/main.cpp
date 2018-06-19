@@ -1,7 +1,8 @@
-// Copyright [2018] University of Waterloo Robotics Team
-// Robot Racing Supervisor Main
-// Author: Waleed Ahmed
-// Date: 2018 05 16
+/** @file main.cpp
+ *  @brief Supervisor main method, initialize supervisor node
+ *  @author Waleed Ahmed(w29ahmed)
+ *  @competition IARRC 2018
+ */
 
 #include <supervisor.hpp>
 

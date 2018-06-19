@@ -18,6 +18,6 @@ topics:
   priority: 10
 -
   name    : null
-  topic   : /Supervisor/twist_mux
+  topic   : /Supervisor/cmd
   timeout : 0.5
   priority: 100

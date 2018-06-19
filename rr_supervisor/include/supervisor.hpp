@@ -1,5 +1,6 @@
 /** @file supervisor.hpp
- *  @author Waleed Ahmed (w29ahmed)
+ *  @brief Supervisor prototypes
+ *  @author Waleed Ahmed(w29ahmed)
  *  @competition IARRC 2018
  */
 
@@ -38,11 +39,13 @@ class Supervisor
 
     // Variables
     std_msgs::Bool bool_msg;
+    geometry_msgs::Twist twist_msg;
+    geometry_msgs::Vector3 null_vector;
     std::string race_type;
+    clock_t begin_time;
     int lap_count;
     int twist_msg_count;
     float speed_sum;
-    clock_t begin_time;
     float race_time;
     float average_speed;
 };
