@@ -179,6 +179,7 @@ void LaserMapper::LidarCallback(const sensor_msgs::LaserScan::ConstPtr& msg) {
  */
 void LaserMapper::DetectLeftLaneCallback(const nav_msgs::OccupancyGrid::ConstPtr& msg) {
   lane_detection_left_msg_ = *msg;
+  ROS_INFO("Left Data Received!");
   left_msg_call_ = true;
 }
 
@@ -190,6 +191,7 @@ void LaserMapper::DetectLeftLaneCallback(const nav_msgs::OccupancyGrid::ConstPtr
  */
 void LaserMapper::DetectRightLaneCallback(const nav_msgs::OccupancyGrid::ConstPtr& msg) {
   lane_detection_right_msg_ = *msg;
+  ROS_INFO("Right Data Receieved!");
   right_msg_call_ = true;
 }
 
@@ -203,6 +205,7 @@ void LaserMapper::DetectRightLaneCallback(const nav_msgs::OccupancyGrid::ConstPt
  * @return NONE
  */
 void LaserMapper::UpdateLaserMap(const int& x, const int& y, const double& value) {
+  ROS_INFO("Center Data Received!");
   if (abs(x) < map_W_/2 && y < map_H_ && y > 0) {
     int map_index = (map_W_/2 - x) + (map_H_ - y)*map_W_;
     belief_map_[map_index] = value;

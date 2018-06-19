@@ -72,7 +72,7 @@ class LaserMapper
     bool lidar_msg_call_ = false;
 
     std::string occupancy_grid_name_;
-    std::string laser_scan_name_;
+    std::string laser_scan_name_ = "/rr_vehicle/laserscan";
     std_msgs::Header prev_header_;
 
     // Map Parameters
