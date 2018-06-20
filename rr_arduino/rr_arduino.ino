@@ -16,7 +16,6 @@
 #include <std_msgs/Int8.h>
 #include <std_msgs/Float32.h>
 #include <std_msgs/Float32MultiArray.h>
-#include <geometry_msgs/Twist.h>
 #include <PID_v1.h>
 
 
@@ -32,7 +31,6 @@
 #define BATTERY_FREQUENCY     2
 #define BATTERY_PIN           A0
 #define AVERAGING_SIZE        5
-#define WHEEL_TO_WHEEL_DIST   0.335
 
 void get_battery_state(long current_time);
 
@@ -64,7 +62,8 @@ std_msgs::Float32 velDebug;
 std_msgs::Int8 battery_percentage_msg;
 
 //!Prototypes for Callbacks
-void cmdCallback(const geometry_msgs::Twist & cmd_msg);
+void cmdVelocityCallback(const std_msgs::Float32 & cmd_vel_msg);
+void cmdSteeringCallback(const std_msgs::Float32 & cmd_str_msg);
 void ThrottlePIDArrayCallback(const std_msgs::Float32MultiArray & array);
 
 //!ROS publisher and subscriber commands
@@ -73,7 +72,8 @@ ros::Publisher encoder("/arduino/enc_vel", &actual_velocity_msg);
 ros::Publisher debugger ("/arduino/debug", &debug);
 ros::Publisher velDebugger ("/arduino/velDebug", &velDebug);
 ros::Publisher battery("/arduino/battery_state", &battery_percentage_msg);
-ros::Subscriber <std_msgs::Float32> cmd_sub ("/rr_vehicle/vel_cmd", cmdCallback);
+ros::Subscriber <std_msgs::Float32> velocity_msg ("/rr_vehicle/velocity_cmd", cmdVelocityCallback);
+ros::Subscriber <std_msgs::Float32> steering_msg ("/rr_vehicle/steering_cmd", cmdSteeringCallback);
 ros::Subscriber <std_msgs::Float32MultiArray> PID_msg ("/Throttle_PID_array", ThrottlePIDArrayCallback);
 
 int steeringAngle = 1500;
@@ -95,9 +95,6 @@ void setup() {
   nh.advertise(battery);
   nh.subscribe(velocity_msg);
   nh.subscribe(steering_msg);
-  if(!nh_.getParam("simulated_odometry/wheel_to_wheel_dist", wheel_to_wheel_dist_)){
-    ROS_ERROR("the wheel to wheel distance was not specified");
-  }
   Encoder.setup();
 
   RobotRacer.setup();
