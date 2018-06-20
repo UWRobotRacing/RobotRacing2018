@@ -42,7 +42,7 @@ int main(int argc, char **argv)
   std::cout << "Starting trafficLightNode\n";
   
   std::string camera_source;
-  nh_.param<std::string>("Camera_Source_Topic", camera_source, "/traffic_light/image_raw");///traffic_light/usb_cam_traffic_light/image_raw");
+  nh_.param<std::string>("Camera_Source_Topic", camera_source, "/traffic_light/image_raw");
   int testmode;
   nh_.param<int>("Testmode", testmode, 0);
   
