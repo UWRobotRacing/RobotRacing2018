@@ -5,8 +5,8 @@
 # @competition IARRC 2018
 
 #Map Size
-TrajRoll/MAP_WIDTH:            600
-TrajRoll/MAP_HEIGHT:           400
+TrajRoll/MAP_WIDTH:            1100
+TrajRoll/MAP_HEIGHT:           700
 TrajRoll/RESOLUTION:           0.01
 
 #Trajectory Generation Parameters
@@ -39,4 +39,3 @@ TrajRoll/MIN_OFFSET_DIST:      0.05
 #Visualization
 TrajRoll/VISUALIZATION:        true
 TrajRoll/DEBUG_ON:             false
-TrajRoll/Check_Traffic:        true

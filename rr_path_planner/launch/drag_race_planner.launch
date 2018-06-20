@@ -5,10 +5,7 @@
  -  @competition IARRC 2018
  -->
 <launch>
-
-  <!-- <include file="$(find lane_detection)/launch/dual_cam_lane_detection.launch" /> -->
-  
-  <rosparam file="$(find rr_path_planner)/launch/parameters/drag_race.yaml"/>
+  <rosparam file="$(find rr_path_planner)/config/drag_race.yaml"/>
 
   <node pkg="rr_path_planner" name="rr_path_planner" type="rr_path_planner" output="screen">
   </node>  
