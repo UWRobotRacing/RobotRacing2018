@@ -20,12 +20,17 @@
 #include <std_msgs/Int8.h>
 #include <std_msgs/Float32.h>
 #include <std_msgs/Float32MultiArray.h>
+#include <Wire.h>
+#include <Adafruit_Sensor.h>
+#include <Adafruit_BNO055.h>
+#include <utility/imumaths.h>
 #include <PID_v1.h>
 
 
 //Serial, velocity and battery monitoring defines respectively
 #define ROS_BAUD_RATE         57600
 #define EC_BAUD_RATE          115200
+#define IMU_BAUD_RATE         38400
 
 
 //I2C address for encoder counter 
@@ -68,8 +73,12 @@ std_msgs::Float32 actual_velocity_msg;
 std_msgs::Float32 debug;
 std_msgs::Float32 velDebug;
 std_msgs::Int8 battery_percentage_msg;
+
+
+//creating IMU data message objects
 sensory_msgs::Imu imu_msg;
 sensory_msgs::MagneticField magnetic_msg;
+
 
 
 

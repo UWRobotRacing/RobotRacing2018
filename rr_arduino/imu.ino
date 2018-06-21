@@ -1,20 +1,3 @@
-#include <Wire.h>
-#include <Adafruit_Sensor.h>
-#include <Adafruit_BNO055.h>
-#include <utility/imumaths.h>
-#include <ros.h>
-#include <std_msgs/Int8.h>
-#include <std_msgs/Float32.h>
-#include <std_msgs/Float32MultiArray.h>
-
-#define TEST_OUTPUT
-#define IMU_BAUD_RATE       38400
-
-
-//creating message objects
-
-
-
 
 //ROS publisher commands
 ros::Publisher imu_pub(&imu_msg);
