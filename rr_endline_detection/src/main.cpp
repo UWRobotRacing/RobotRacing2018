@@ -1,7 +1,12 @@
-// Copyright [2018] University of Waterloo Robotics Team
-// Robot Racing Endline Detection Main
-// Author: Angela Gu
-// Date: 2018 04 18
+/** @file main.cpp
+ * @brief Robot Racer endline detection main method
+ *
+ * This function subscribes to camera feed and then its only task is to call supervisor when endline is detected.
+ *  
+ *
+ * @author Angela Gu (angegu)
+ * @author Toni Ogunmade (oluwatoni)
+ */
 
 #include <ros/ros.h>
 #include "endline_detection.hpp"

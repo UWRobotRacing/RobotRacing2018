@@ -1,3 +1,10 @@
+/** @file endline_detection.hpp
+ * @brief Endline Counter prototypes
+ *
+ * @author Angela Gu (angegu)
+ * @author Toni Ogunmade (oluwatoni)
+ */
+
 #ifndef ENDLINE_DETECTION_HPP
 #define ENDLINE_DETECTION_HPP
 

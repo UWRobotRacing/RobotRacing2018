@@ -19,6 +19,7 @@
   <run_depend>rr_traffic_light</run_depend>
   <run_depend>rr_lane_detection</run_depend>
   <run_depend>rr_mapper</run_depend>
+  <run_depend>rr_endline_detection</run_depend>
 
   <export>
     <metapackage />

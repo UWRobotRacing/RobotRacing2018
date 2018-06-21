@@ -1,3 +1,16 @@
+/** @file endline_detection.cpp
+ * @brief Robot Racer endline detection function implementation
+ *
+ * Topics Subscribed:
+ *   /rr_vehicle/front_facing_cam/image_raw
+ *
+ * Service called:
+ *   /Supervisor/count_lap         --used by supervisor node
+ *
+ * @author Angela Gu (angegu)
+ * @author Toni Ogunmade (oluwatoni)
+ */
+
 #include "endline_detection.hpp"
 
 //constructor
@@ -28,28 +41,34 @@ void EndlineCounter::ImgCb(const sensor_msgs::ImageConstPtr& msg)
     cv::inRange(hsv_img, cv::Scalar(iLowH, 0,0), cv::Scalar(iHighH,255,255), mag_img);
     cv::GaussianBlur(mag_img, mag_img, cv::Size(7,7), 0, 0);
 
-    //detect endline
+    //calls BlobDetector to evaluate area
     if (BlobDetector(mag_img))
     {
       if (!detection_status_)
       {
+        //increment when endline not confirmed
         hysteresis_counter_++;
         if (hysteresis_counter_ > hysteresis_constant_)
         {
+          //counter has passed threshold constant
           hysteresis_counter_ = 0;
           detection_status_ = true;
           ROS_INFO("DETECTED");
+
+          //make service call
           if(client_.call(srv))
           {
             if (srv.response.success)
             {
               ROS_INFO("SUCCESS");
+              //TODO: ros shutdown
             }
           }
         }
       }
       else
       {
+        //decay if detection not true
         if (hysteresis_counter_)
         {
           hysteresis_counter_--;
@@ -58,8 +77,10 @@ void EndlineCounter::ImgCb(const sensor_msgs::ImageConstPtr& msg)
     }
     else
     {
+      //BlobCounter did not detect anything
       if (!detection_status_)
       {
+        //decay
         if (hysteresis_counter_)
         {
           hysteresis_counter_--;
@@ -67,6 +88,7 @@ void EndlineCounter::ImgCb(const sensor_msgs::ImageConstPtr& msg)
       }
       else
       {
+        //post detection, detect when endline no longer in sight
         hysteresis_counter_++;
         if (hysteresis_counter_ > hysteresis_constant_){
           hysteresis_counter_ = 0;
