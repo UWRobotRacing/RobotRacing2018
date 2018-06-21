@@ -3,7 +3,6 @@
  *
  *  Topics Subscribed:
  *    /map
- *    /enable       --std_msgs::Int8
  *
  *  Topics Published:
  *    /PathPlanner/vel_level          --used by arduino
@@ -11,8 +10,6 @@
  *
  *  motion model used: 4 wheeled front steered car model
  *
- * If enable is off, then steering stops publishing anything! Velocity( publishes zero
- * If distance to the object < MIN_DISTANCE_, then the vehicle stops
  * Always assumes initial vehicle position is at (0,0) = mid bottom of the image
  *
  *  @author Ajay Kumar Singh
@@ -21,7 +18,6 @@
 #include <path_planner.h>
 
 /** @brief initializes the path planner object
- *  @return NONE
  */
 PathPlanner::PathPlanner() {
   // Setting initial variables and parameters
@@ -32,28 +28,24 @@ PathPlanner::PathPlanner() {
 
   //VISUALIZATION Pub
   if(VISUALIZATION_) {
-    all_path_pub_ = node.advertise<visualization_msgs::Marker>("/Visualization/all_paths", 1, true);
-    selected_path_pub_ = node.advertise<visualization_msgs::Marker>("/Visualization/selected_path", 1, true);
-    rayTrace_pub_ = node.advertise<visualization_msgs::Marker>("/Visualization/rayTrace", 1, true);
-    //X_axis_pub = node.advertise<visualization_msgs::Marker>("/Visualization/X_axis", 1, true);
-    //Y_axis_pub = node.advertise<visualization_msgs::Marker>("/Visualization/Y_axis", 1, true);
+    all_path_pub_ = nh_.advertise<visualization_msgs::Marker>("/Visualization/all_paths", 1, true);
+    selected_path_pub_ = nh_.advertise<visualization_msgs::Marker>("/Visualization/selected_path", 1, true);
+    rayTrace_pub_ = nh_.advertise<visualization_msgs::Marker>("/Visualization/rayTrace", 1, true);
+    //X_axis_pub = nh_.advertise<visualization_msgs::Marker>("/Visualization/X_axis", 1, true);
+    //Y_axis_pub = nh_.advertise<visualization_msgs::Marker>("/Visualization/Y_axis", 1, true);
   }
   //initializing all possible paths of trajectory rollout
   GenerateIdealPaths();
 
   //ros topics init
   //Normal Pub and Subscriber
-  enable_sub = node.subscribe("/enable", 1, &PathPlanner::EnableCallBack, this);
-  map_sub = node.subscribe("/map", 1, &PathPlanner::ProcessMap, this);
-  vel_pub = node.advertise<std_msgs::Float32>("/PathPlanner/vel_level", 1, true);
-  steer_pub = node.advertise<std_msgs::Float32>("/PathPlanner/steer_cmd", 1, true);
+  map_sub_ = nh_.subscribe(rr_processed_topics::fused_map, 1, &PathPlanner::ProcessMap, this);
+  cmd_pub_ = nh_.advertise<geometry_msgs::Twist>(rr_cmd_topics::path_planner_cmd, 1, true);
 }
 
 /** @brief get the parameters and initialize the member variables
- *  @return NONE
  */
 void PathPlanner::Init() {
-  enable.data=0;
   GetParams();
   // debug parameters
   all_path_marker_id_=0; //id for the selected path marker
@@ -88,52 +80,48 @@ void PathPlanner::Init() {
 }
 
 /** @brief save the values of the ros parameters used for path generation
- *  @return NONE
  */
 void PathPlanner::GetParams() {
-  node.param<bool>("TrajRoll/DRAG_MODE", DRAG_MODE_, false);
-  node.param<int>("TrajRoll/DRAG_DURATION", DRAG_DURATION_, 5);
-  node.param<int>("TrajRoll/DRAG_DURATION_NANO", DRAG_DURATION_NANO_, 5);
-  drag_duration_ = ros::Duration(DRAG_DURATION_, DRAG_DURATION_NANO_);
+  nh_.param<bool>("TrajRoll/DRAG_MODE", DRAG_MODE_, false);
+  nh_.param<int>("TrajRoll/DRAG_DURATION", DRAG_DURATION_, 5);
+  drag_duration_ = ros::Duration(DRAG_DURATION_);
 
-  node.param<int>("TrajRoll/MAP_WIDTH", map_W_, 600);
-  node.param<int>("TrajRoll/MAP_HEIGHT", map_H_, 400);
-  node.param<double>("TrajRoll/RESOLUTION", resolution_, 0.01);
-  node.param<int>("TrajRoll/X_START", X_START_, 0);
-  node.param<int>("TrajRoll/Y_START", Y_START_, -2);
+  nh_.param<int>("TrajRoll/MAP_WIDTH", map_W_, 600);
+  nh_.param<int>("TrajRoll/MAP_HEIGHT", map_H_, 400);
+  nh_.param<double>("TrajRoll/RESOLUTION", resolution_, 0.01);
+  nh_.param<int>("TrajRoll/X_START", X_START_, 0);
+  nh_.param<int>("TrajRoll/Y_START", Y_START_, -2);
 
-  node.param<double>("TrajRoll/PLANNER_VELOCITY", PLANNER_VELOCITY_, 2.0);
+  nh_.param<double>("TrajRoll/PLANNER_VELOCITY", PLANNER_VELOCITY_, 2.0);
   // Trajectory Rollout Parameters
-  node.param<int>("TrajRoll/NUM_PATHS", NUM_PATHS_, 21);
+  nh_.param<int>("TrajRoll/NUM_PATHS", NUM_PATHS_, 21);
   if ((NUM_PATHS_ % 2) == 0)
   {
     ROS_WARN("PathPlanner: NUM_PATHS is not odd. Using 21 as default.");
     NUM_PATHS_ = 21;
   }
-  node.param<int>("TrajRoll/TRAJECTORY_STEPS", TRAJECTORY_STEPS_, 100);
-  node.param<double>("TrajRoll/dt", dt_, 0.05);  //**should be calculated as per the frequency rate given in main.cpp
-  node.param<int>("TrajRoll/OBS_THRESHOLD", OBS_THRESHOLD_, 0);
-  node.param<double>("TrajRoll/MIN_STOPPING_DIST", MIN_STOPPING_DIST_, 0.2);
-  node.param<double>("TrajRoll/STOPPING_FACTOR", STOPPING_FACTOR_, 0.15);
+  nh_.param<int>("TrajRoll/TRAJECTORY_STEPS", TRAJECTORY_STEPS_, 100);
+  nh_.param<double>("TrajRoll/dt", dt_, 0.05);  //**should be calculated as per the frequency rate given in main.cpp
+  nh_.param<int>("TrajRoll/OBS_THRESHOLD", OBS_THRESHOLD_, 0);
+  nh_.param<double>("TrajRoll/MIN_STOPPING_DIST", MIN_STOPPING_DIST_, 0.2);
+  nh_.param<double>("TrajRoll/STOPPING_FACTOR", STOPPING_FACTOR_, 0.15);
 
-  node.param<double>("TrajRoll/ANGLE_WEIGHT", ANGLE_WEIGHT_, 1);
-  node.param<double>("TrajRoll/DISTANCE_WEIGHT", DISTANCE_WEIGHT_, 1.9);
-  node.param<double>("TrajRoll/ANGLE_WEIGHT_DIFF", ANGLE_WEIGHT_DIFF_, 1);
+  nh_.param<double>("TrajRoll/ANGLE_WEIGHT", ANGLE_WEIGHT_, 1);
+  nh_.param<double>("TrajRoll/DISTANCE_WEIGHT", DISTANCE_WEIGHT_, 1.9);
+  nh_.param<double>("TrajRoll/ANGLE_WEIGHT_DIFF", ANGLE_WEIGHT_DIFF_, 1);
 
-  node.param<double>("TrajRoll/UX_DESIRED", UX_DESIRED_, 2.0);
-  node.param<double>("TrajRoll/MIN_ACCELERATION_ANGLE", MIN_ACCELERATION_ANGLE_, 2.0);
-  node.param<double>("TrajRoll/STRAIGHT_SPEED", STRAIGHT_SPEED_, 0.5);
+  nh_.param<double>("TrajRoll/UX_DESIRED", UX_DESIRED_, 2.0);
+  nh_.param<double>("TrajRoll/MIN_ACCELERATION_ANGLE", MIN_ACCELERATION_ANGLE_, 2.0);
+  nh_.param<double>("TrajRoll/STRAIGHT_SPEED", STRAIGHT_SPEED_, 0.5);
 
-  node.param<double>("TrajRoll/MAX_STEERING_ANGLE", MAX_STEERING_ANGLE_, 0.8);   //** 0.2 rad ~ 11 degree; 0.8 rad ~ 45 degree;
-  node.param<double>("TrajRoll/CAR_WIDTH", CAR_WIDTH_, 0.27);
-  node.param<double>("TrajRoll/DIST_COST_FACTOR", DIST_COST_FACTOR_, 1.0);
-  node.param<double>("TrajRoll/MIN_OFFSET_DIST", min_offset_dist_, 0.1);
+  nh_.param<double>("TrajRoll/MAX_STEERING_ANGLE", MAX_STEERING_ANGLE_, 0.8);   //** 0.2 rad ~ 11 degree; 0.8 rad ~ 45 degree;
+  nh_.param<double>("TrajRoll/CAR_WIDTH", CAR_WIDTH_, 0.27);
+  nh_.param<double>("TrajRoll/DIST_COST_FACTOR", DIST_COST_FACTOR_, 1.0);
+  nh_.param<double>("TrajRoll/MIN_OFFSET_DIST", min_offset_dist_, 0.1);
 
-  node.param<double>("TrajRoll/HORIZONTAL_LINE_RATIO", HORIZONTAL_LINE_RATIO_, 0.02);
-  node.param<int>("TrajRoll/HORIZONTAL_LINE_THICKENESS", HORIZONTAL_LINE_THICKENESS_, 3);
-
-  node.param<bool>("TrajRoll/VISUALIZATION", VISUALIZATION_, true);
-  node.param<bool>("TrajRoll/DEBUG_ON", DEBUG_ON_, false);
+  nh_.param<bool>("TrajRoll/VISUALIZATION", VISUALIZATION_, true);
+  nh_.param<bool>("TrajRoll/DEBUG_ON", DEBUG_ON_, false);
+  nh_.param<double>("simulated_odometry/wheel_to_wheel_dist", wheel_to_wheel_dist_, 0.339);
 
   //ROS_INFO("<<<<<<<< Loaded Parameters >>>>>>>>");
   if(DEBUG_ON_) 
@@ -164,14 +152,23 @@ std::vector< std::vector <double> > PathPlanner::GetAnglesAndWeights(double max_
   return angle_n_weights;
 }
 
+/**
+ * @brief Get the Velocity Magnitude object
+ * 
+ * @param input 
+ * @return double 
+ */
+inline double GetVelocityMagnitude(geometry_msgs::Twist input)
+{
+  return sqrt(pow(input.linear.x, 2) + pow(input.linear.y, 2));
+}
+
 /** @brief generate paths based on the steering angles in angles_and_weights
  *
  *  theta is the steering angle
  *  the steering angles are used to generate a list of point that is then
  *  saved for later use
  *  if VISUALIZATION_ is set it will be displayed
- *
- *  @return NONE
  */
 void PathPlanner::GenerateIdealPaths() {
   for(int i=0;i<NUM_PATHS_;i++) {
@@ -210,34 +207,39 @@ void PathPlanner::GenerateIdealPaths() {
       }
     }
   }
-  if(!all_path_pub_) {ROS_WARN("Invalid publisher");}
+  if(!all_path_pub_)
+  {
+    ROS_WARN("Invalid publisher");
+  }
   if(VISUALIZATION_) {
     DrawPath(all_path_pub_, trajectory_points_, all_path_marker_id_, -1, 50, 0, 0, 0.01, 1.0);
     //DrawPath(X_axis_pub, X_axis_marker_points, X_axis_marker_id, -1, 100, 0, 0, 0.05, 1.0);
     //DrawPath(Y_axis_pub, Y_axis_marker_points, Y_axis_marker_id, -1, 0, 0, 100, 0.05, 1.0);
   }
-  if(DEBUG_ON_) {ROS_INFO("GenerateIdealPaths() : Finished :4b");}
+  if(DEBUG_ON_)
+  {
+    ROS_INFO("GenerateIdealPaths() : Finished :4b");
+  }
 }
 
 /** @brief serves as the callback for the occupancy grid containing the lanes and obstacles
  *  @param msg is a pointer to the OccupancyGrid object
- *  @return NONE
  */
 void PathPlanner::ProcessMap(const nav_msgs::OccupancyGrid::ConstPtr& msg) {
-  if(DEBUG_ON_) {ROS_INFO("ProcessMap() : Called: started");}
-  // Exit if not enabled
-  
-  if (DEBUG_ON_) {ROS_INFO("PATH PLANNER: ProcessMap: Start location (%d, %d)", X_START_,Y_START_);}
-  map_ = msg;
-  if(enable.data==0) {
-    ROS_WARN("PathPlanner: ProcessMap: Enable is 0. No data Processing!!");
-    return;
+  if(DEBUG_ON_) 
+  {
+    ROS_INFO("ProcessMap() : Called: started");
   }
+  
+  if (DEBUG_ON_)
+  {
+    ROS_INFO("PATH PLANNER: ProcessMap: Start location (%d, %d)", X_START_,Y_START_);
+  }
+  map_ = msg;
   GenerateRealPaths();
 }
 
 /** @brief score each path based on it's obstacle free length, 
- *  @return NONE
  */
 void PathPlanner::GenerateRealPaths() {
   //generating realtime path, avoiding obstacles
@@ -294,21 +296,31 @@ void PathPlanner::GenerateRealPaths() {
   }
   selected_path_index = NUM_PATHS_ - selected_path_index - 1;
   ROS_INFO("PATH PLANNER: GenerateRealPaths: Selected path = %d, Longest Distance = %f, selected Angle = %f", selected_path_index,selected_path_distance,selected_path_angle);
-  velMsg = Velocity(selected_path_distance,selected_path_angle);
+  double wheel_speed = Velocity(selected_path_distance, selected_path_angle);
 
-  if(DRAG_MODE_) {
-    ros::Duration diff = ros::Time::now() - start_time_;
-    //if(start_line_detected_) {velMsg.data = 0.0;}
-    if(diff > drag_duration_) {
-      //stop the car
-      velMsg.data = 0.0;
-    }
-  }
-  ROS_INFO("PATH PLANNER: VelMsg is  %f", velMsg.data);
+  // if(DRAG_MODE_) {
+  //   ros::Duration diff = ros::Time::now() - start_time_;
+  //   //if(start_line_detected_) {velMsg.data = 0.0;}
+  //   if(diff > drag_duration_) {
+  //     //stop the car
+  //     vel_cmd_.linear.x = 0.0;
+  //     vel_cmd_.linear.y = 0.0;
+  //     vel_cmd_.angular.z = 0.0;
+  //   }
+  // }
+  ROS_INFO("PATH PLANNER: VelMsg is  %f", GetVelocityMagnitude(vel_cmd_));
+  double lf = wheel_to_wheel_dist_ / 2.0;
+  double lr = lf;
+  double beta = atan2(lr * tan(selected_path_angle), lf + lr);
+
+  //since we don't have access to the current orientation of the car use 45 degrees as a placeholder
+  //TODO(oluwatoni) change this?
+  vel_cmd_.linear.x = wheel_speed * cos(0.7071 + beta);
+  vel_cmd_.linear.y = wheel_speed * sin(0.7071 + beta);
+  vel_cmd_.angular.z = (wheel_speed / lr) * sin(beta);
+
   //Publish vel_level, steer_cmd,
-  vel_pub.publish(velMsg);
-  steerMsg.data = selected_path_angle;
-  steer_pub.publish(steerMsg);
+  cmd_pub_.publish(vel_cmd_);
   //Publish for VISUALIZATION_: selected_path based on index_of_longest_path
   if(VISUALIZATION_) {
     DrawPath(selected_path_pub_, trajectory_marker_vector_[selected_path_index], selected_path_marker_id_, index_of_longest_path, 0, 0, 50, 0.05, 1);
@@ -361,7 +373,6 @@ bool PathPlanner::IsCellOccupied(int index) {
  * @param B the blue value of the markers 
  * @param scale the scale of the markers
  * @param alpha the transparency of the markers
- * @return NONE
  */
 void PathPlanner::DrawPath(ros::Publisher& pub, visualization_msgs::Marker& points,int id, int index, int R, int G, int B, float scale, float alpha) {
   points.header.frame_id = "/map";
@@ -416,7 +427,10 @@ std::vector<geometry_msgs::Point> PathPlanner::rayTrace(double x0, double y0, do
   int x_inc, y_inc;
   double error;
 
-  if(DEBUG_ON_) {ROS_INFO("rayTrace() : mid :5a");}
+  if(DEBUG_ON_)
+  {
+    ROS_INFO("rayTrace() : mid :5a");
+  }
 
   if (dx == 0)
   {
@@ -436,7 +450,10 @@ std::vector<geometry_msgs::Point> PathPlanner::rayTrace(double x0, double y0, do
     error = (x0 - floor(x0)) * dy;
   }
 
-  if(DEBUG_ON_) {ROS_INFO("rayTrace() : mid :5b");}
+  if(DEBUG_ON_)
+  {
+    ROS_INFO("rayTrace() : mid :5b");
+  }
 
   if (dy == 0)
   {
@@ -479,7 +496,10 @@ std::vector<geometry_msgs::Point> PathPlanner::rayTrace(double x0, double y0, do
       error += dy;
     }
   }
-  if(DEBUG_ON_) {ROS_INFO("rayTrace() : Finished :5d");}
+  if(DEBUG_ON_)
+  {
+    ROS_INFO("rayTrace() : Finished :5d");
+  }
   return new_list;
 }
 
@@ -490,26 +510,17 @@ std::vector<geometry_msgs::Point> PathPlanner::rayTrace(double x0, double y0, do
  * @param steer the steering angle selected
  * @return std_msgs::Float32 the goal velocity 
  */
-std_msgs::Float32 PathPlanner::Velocity(double dist, double steer) {
-  std_msgs::Float32 vel;
+double PathPlanner::Velocity(double dist, double steer) {
+  double vel;
   if((dist <= StopDistFromVel(last_velMsg.data)) || (dist <=MIN_STOPPING_DIST_)) {
-    vel.data=0.0;
+    vel = 0.0;
   }
   else {
      //turning radius break point at
-    vel.data = std::min(STRAIGHT_SPEED_/(1+abs(steer)),STRAIGHT_SPEED_);
-    ROS_INFO("PathPlanner: Velocity(: vel=%f",vel.data);
+    vel = std::min(STRAIGHT_SPEED_/(1+abs(steer)),STRAIGHT_SPEED_);
+    ROS_INFO("PathPlanner: Velocity(: vel=%f", vel);
   }
   return vel;
-}
-
-/**
- * @brief sets the enable flag to the value of the msg
- * 
- * @param msg the enable message
- */
-void PathPlanner::EnableCallBack(const std_msgs::Int8::ConstPtr& msg) {
-  enable = *msg;
 }
 
 /**

@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<package>
+  <name>rr_2018</name>
+  <version>0.0.0</version>
+  <description>RobotRacing metapackage</description>
+  
+  <author>University of Waterloo Robotics Team</author>
+
+  <maintainer email="ooogunma@edu.uwaterloo.ca">
+    Oluwatoni Ogunmade
+  </maintainer>
+
+  <license>BSD</license>
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <run_depend>rr_gazebo</run_depend>
+  <run_depend>rr_description</run_depend>
+  <run_depend>rr_path_planner</run_depend>
+  <run_depend>rr_traffic_light</run_depend>
+  <run_depend>rr_lane_detection</run_depend>
+  <run_depend>rr_mapper</run_depend>
+  <run_depend>rr_endline_detection</run_depend>
+
+  <export>
+    <metapackage />
+  </export>
+
+</package>

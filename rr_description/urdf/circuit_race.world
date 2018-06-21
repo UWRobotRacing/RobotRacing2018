@@ -1,0 +1,29 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <world name="default">
+    <scene>
+      <sky>
+        <clouds>
+          <speed>12</speed>
+        </clouds>
+      </sky>
+      <ambient>1.0 1.0 1.0 1.0</ambient>
+      <shadows>true</shadows>
+    </scene>
+
+    <!-- A global light source -->
+    <include>
+      <uri>model://urdf/models/sun</uri>
+    </include>
+    <include>
+      <name>track</name>
+      <uri>model://urdf/models/circuit_race_track</uri>
+      <pose>0 -30 0.001 0 0 0</pose>
+    </include>
+    <include>
+      <name>asphalt_ground</name>
+      <uri>model://urdf/models/asphalt_ground</uri>
+      <pose>0 0 0 0 0 0</pose>
+    </include>
+  </world>
+</sdf>
