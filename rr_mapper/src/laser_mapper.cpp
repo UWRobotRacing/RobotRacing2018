@@ -115,7 +115,6 @@ void LaserMapper::DetectRightLane(const nav_msgs::OccupancyGrid::ConstPtr& msg)
 void LaserMapper::InitMap()
 {
   belief_map_.resize(map_W_*map_H_, UNKNOWN_);
-  ROS_INFO("Map Initialization Done. Size(%d,%d).", map_H_,map_W_);
 }
 
 /** @brief empties the underlying vector of the map
@@ -313,10 +312,10 @@ void LaserMapper::ProcessMap()
   occu_msg_.info.resolution = map_res_;
   occu_msg_.info.width = map_W_;
   occu_msg_.info.height = map_H_;
-  occu_msg_.info.origin.position.x = map_W_/2*map_res_;//-map_W_/2*map_res_; //map_W_/2*map_res_
-  occu_msg_.info.origin.position.y = map_H_/2*map_res_;//-map_H_/2*map_res_; //map_H_*map_res_
+  occu_msg_.info.origin.position.x = map_W_/2*map_res_;
+  occu_msg_.info.origin.position.y = 0;
   occu_msg_.info.origin.orientation =
-             tf::createQuaternionMsgFromRollPitchYaw(M_PI, -1*M_PI, 0);
+             tf::createQuaternionMsgFromRollPitchYaw(0.0, 0.0, M_PI);
   occu_msg_.data.resize(map_W_*map_H_);
 
   for (int i = 0; i < map_W_*map_H_; i++)
@@ -332,8 +331,8 @@ void LaserMapper::ProcessMap()
   if (ready2Map_ && ready2Maplane_detectionLeft_ && ready2Maplane_detectionRight_)
   {
     // ROS_INFO("Joining maps");
-    JoinOccupancyGrid(occu_msg_, lane_detection_left_msg_, offset_height_left_, offset_width_left_);
-    JoinOccupancyGrid(occu_msg_, lane_detection_right_msg_, offset_height_right_, offset_width_right_);
+    // JoinOccupancyGrid(occu_msg_, lane_detection_left_msg_, offset_height_left_, offset_width_left_);
+    // JoinOccupancyGrid(occu_msg_, lane_detection_right_msg_, offset_height_right_, offset_width_right_);
   }
 
   map_pub_.publish(occu_msg_);

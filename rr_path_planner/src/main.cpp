@@ -19,16 +19,6 @@
 #include <path_planner.h>
 
 ros::Subscriber enable_sub;
-bool enable;
-
-/** @brief handles the enable signal
- *  @param enable_msg the enable signal
- *  @return NONE
- */
-void enable_cb(const std_msgs::Bool& enable_msg)
-{
-    enable = enable_msg.data;
-}
 
 /** @brief starts the path_planner node
  *  This node doesn't act until it gets the enable signal
@@ -41,12 +31,6 @@ int main(int argc, char **argv)
   ros::NodeHandle n;
   ROS_INFO("trajectories Generation Initalized");
 
-  ros::Rate loop_rate(25);  //** frequency should be get using GetParams for Synchronization
-  enable = false;
-
-  // Debug Code
-  // enable = true;
-
   PathPlanner TrajectoryGenerator;
 
   ros::spin();
@@ -54,4 +38,3 @@ int main(int argc, char **argv)
   ROS_INFO("Trajectories Generation Completed");
   return 0;
 }
-

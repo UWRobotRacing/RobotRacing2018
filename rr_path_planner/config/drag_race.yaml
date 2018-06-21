@@ -4,10 +4,6 @@
 # @author Toni Ogunmade(oluwatoni)
 # @competition IARRC 2018
 
-#TrajRoll/DRAG_MODE:           true
-# In Nano Seconds
-TrajRoll/DRAG_DURATION:       90.0
-
 #Map Size
 TrajRoll/MAP_WIDTH:            1100
 TrajRoll/MAP_HEIGHT:           700
@@ -22,20 +18,12 @@ TrajRoll/OBS_THRESHOLD:        0
 TrajRoll/MIN_STOPPING_DIST:    0.2
 TrajRoll/STOPPING_FACTOR:      0.15
 
-#Desired Path Setup
-TrajRoll/ANGLE_WEIGHT:         0     # More angle weight, more cost
-TrajRoll/DISTANCE_WEIGHT:      1     # More distance weight, less cost
-TrajRoll/ANGLE_WEIGHT_DIFF:    0     # for PID only
-TrajRoll/K_heading:            1
-
 #Desired Velocity Setup
-TrajRoll/UX_DESIRED:           0.7
-TrajRoll/MIN_ACCELERATION_ANGLE:  0.20
-TrajRoll/STRAIGHT_SPEED:       3.0
+TrajRoll/STRAIGHT_SPEED:       2.5
 
 #Vehicle Parameters
-TrajRoll/MAX_STEERING_ANGLE:   0.2
-TrajRoll/CAR_WIDTH:            0.2
+TrajRoll/MAX_STEERING_ANGLE:   0.3
+TrajRoll/CAR_WIDTH:            0.3
 TrajRoll/DIST_COST_FACTOR:     10.0
 TrajRoll/MIN_OFFSET_DIST:      0.05
 
