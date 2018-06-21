@@ -12,13 +12,12 @@
 
 
 //creating message objects
-std_msgs::Float32MultiArray imu_msg;
-sensory_msgs::MagneticField magnetic_msg;
+
 
 
 
 //ROS publisher commands
-ros::Publisher imu_pub("/arduino/X",&imu_msg);
+ros::Publisher imu_pub(&imu_msg);
 ros::Publisher magnetic_pub(&magnetic_msg);
 
 
@@ -64,11 +63,19 @@ void imu_readings()
   //Get current time
   ros::Time current_time=ros::Time::now();
   //assigning values for imu message
-  imu_orientation=[event.orientation.x,event.orientation.y,event.orientation.z];
-  imu_acceleration=[acc.x,acc.y,acc.z];
-  imu_gyroscope=[gyro.x,gyro.y,gyro.z];
-  //imu message is a multiarray
-  imu_msg.data=[imu_orientation,imu_acceleration,imu_gyroscope];
+  imu_msg.orientation.x=event.orientation.x;
+  imu_msg.orientation.y=event.orientation.y;
+  imu_msg.orientation.z=event.orientation.z;
+
+  imu_msg.linear_acceleration.x=acc.x;
+  imu_msg.linear_acceleration.y=acc.y;
+  imu_msg.linear_acceleration.z=acc.z;
+
+  imu_msg.angular_velocity.x=gyro.x;
+  imu_msg.angular_velocity.y=gyro.y;
+  imu_msg.angular_velocity.z=gyro.z;
+
+  imu_msg.header.stamp=current_time;
   imu_pub.publish(&imu_msg);
   //assigning values for magnetic field message
   magnetic_msg.header.stamp=current_time;
@@ -88,35 +95,35 @@ void loop()
   imu::Vector<3> mag= bno.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
 /* Display the floating point data */
   Serial.print("XA: ");
-  Serial.print(acc.x());
+  Serial.print(acc.x, 4);
   Serial.print(" YA: ");
-  Serial.print(acc.y());
+  Serial.print(acc.y, 4);
   Serial.print(" ZA: ");
-  Serial.print(acc.z());
+  Serial.print(acc.z, 4);
   Serial.println("\n");
 
   
 /* Display the floating point data */
   Serial.print(" GX: ");
-  Serial.print(gyro.x());
+  Serial.print(gyro.x, 4);
   Serial.print(" GY: ");
-  Serial.print(gyro.y());
+  Serial.print(gyro.y, 4);
   Serial.print(" GZ: ");
-  Serial.print(gyro.z());
+  Serial.print(gyro.z, 4);
   Serial.println("\n");
 
   Serial.print(" MX: ");
-  Serial.print(mag.x());
+  Serial.print(mag.x, 4);
   Serial.print(" MY: ");
-  Serial.print(mag.y());
+  Serial.print(mag.y, 4);
   Serial.print(" MZ: ");
-  Serial.print(mag.z());
+  Serial.print(mag.z, 4);
   Serial.println("\n");
   
   
   
   /* Display the floating point data */
-  Serial.print("X: ");
+  Serial.print(" X: ");
   Serial.print(event.orientation.x, 4);
   Serial.print("\tY: ");
   Serial.print(event.orientation.y, 4);
