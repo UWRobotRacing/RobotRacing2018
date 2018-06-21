@@ -68,11 +68,10 @@ std_msgs::Float32 actual_velocity_msg;
 std_msgs::Float32 debug;
 std_msgs::Float32 velDebug;
 std_msgs::Int8 battery_percentage_msg;
+sensory_msgs::Imu imu_msg;
+sensory_msgs::MagneticField magnetic_msg;
 
-// Callback functions used by subscriber
-void cmd_velocity_callback(const std_msgs::Float32 & cmd_vel_msg);
-void cmd_steering_callback(const std_msgs::Float32 & cmd_str_msg);
-void throttle_PID_array_callback(const std_msgs::Float32MultiArray & array);
+
 
 // ROS publisher and subscriber commands
 
