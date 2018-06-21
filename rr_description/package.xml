@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<package>
+  <name>rr_description</name>
+  <version>0.1.0</version>
+  <description>
+    rr_description contains the description (3D model,
+    kinematics, mass, etc.) of a vehicle with Ackermann steering.
+    It is based on the work from  the Wunderkammer Laboratory (see Copyright below)
+    The model has been enhanced with sensors (stereo camera), IMU, etc.
+  </description>
+  <maintainer email="ooogunma@edu.uwaterloo.ca">
+    Oluwatoni Ogunmade
+  </maintainer>
+  <license>Apache 2.0</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <run_depend>joint_state_publisher</run_depend>
+  <run_depend>robot_state_publisher</run_depend>
+  <run_depend>rviz</run_depend>
+  <run_depend>xacro</run_depend>
+
+  <export>
+  </export>
+</package>

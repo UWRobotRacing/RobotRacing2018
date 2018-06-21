@@ -65,8 +65,8 @@ void lane_detection_processor::PrintParams()
 {
   //nav_msgs::MapMetaData meta_data_;
   std::stringstream ss;
-  ss << "Map Width: " << meta_data_.width << std::endl
-     << "Map Hieght: " << meta_data_.height << std::endl
+  ss << "Map Width: " << meta_data_.width << "\n"
+     << "Map Hieght: " << meta_data_.height << "\n"
      << "Map Resolution: " << meta_data_.resolution << std::endl
      << "Occ Grid Topic Out: " << point_vec_out_ << std::endl
      << "Binary Output Topic: " << binary_out_im_ << std::endl
@@ -134,8 +134,8 @@ void lane_detection_processor::FindLanes(const sensor_msgs::Image::ConstPtr &msg
 
     // find mask_
     //Copy to output bridge
-    out.copyTo(cv_output_bridge_.image);
-    cv_output_bridge_.encoding = "mono8";
+    Im1_HSV_warped_.copyTo(cv_output_bridge_.image);
+    cv_output_bridge_.encoding = "rgb8";
 
     //Input Image has been processed and published
     image_pub_.publish(cv_output_bridge_.toImageMsg());

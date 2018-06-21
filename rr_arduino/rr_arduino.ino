@@ -73,6 +73,7 @@ sensory_msgs::MagneticField magnetic_msg;
 
 
 
+
 // ROS publisher and subscriber commands
 
 ros::Publisher state_pub("/arduino/vehicle_state", &state_msg);
@@ -92,6 +93,7 @@ int ROS_watchdog = 0;
  *@param no input
  *@returns void
  */
+
 void setup() {
 #ifdef TEST_OUTPUT
   Serial.begin(ROS_BAUD_RATE);
