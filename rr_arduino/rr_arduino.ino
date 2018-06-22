@@ -25,6 +25,8 @@
 #include <Adafruit_BNO055.h>
 #include <utility/imumaths.h>
 #include <PID_v1.h>
+#include <sensor_msgs/MagneticField.h>
+#include <sensor_msgs/Imu.h>
 
 
 //Serial, velocity and battery monitoring defines respectively
@@ -76,8 +78,8 @@ std_msgs::Int8 battery_percentage_msg;
 
 
 //creating IMU data message objects
-sensory_msgs::Imu imu_msg;
-sensory_msgs::MagneticField magnetic_msg;
+sensor_msgs::Imu imu_msg;
+sensor_msgs::MagneticField magnetic_msg;
 
 
 
