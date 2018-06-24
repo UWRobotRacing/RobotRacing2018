@@ -13,12 +13,6 @@
 
 #include "endline_detection.hpp"
 
-/** @brief Endline counter constructor
- *  @param nh_ node
- *  @param col The address to which the current cursor
- *         column will be written.
- *  @return Void.
- */
 EndlineCounter::EndlineCounter (ros::NodeHandle nh_) : it_(nh_) 
 {
   GetParam();
