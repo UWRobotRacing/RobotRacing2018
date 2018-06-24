@@ -13,13 +13,27 @@
 
 #include "endline_detection.hpp"
 
-//constructor
+/** @brief Endline counter constructor
+ *  @param nh_ node
+ *  @param col The address to which the current cursor
+ *         column will be written.
+ *  @return Void.
+ */
 EndlineCounter::EndlineCounter (ros::NodeHandle nh_) : it_(nh_) 
 {
+  GetParam();
   detection_status_ = false;
   hysteresis_counter_ = 0;
   hysteresis_constant_ = 2;
   client_ = nh_.serviceClient<std_srvs::Trigger>("/Supervisor/count_lap", true);
+}
+
+void EndlineCounter::GetParam() 
+{
+  nh_.param<int>("EndlineCounter/detection_status_", detection_status_, 2);
+  nh_.param<int>("EndlineCounter/hysteresis_counter_", hysteresis_counter_, 0);
+  nh_.param<int>("EndlineCounter/hysteresis_constant_", hysteresis_constant_, false);
+
 }
 
 //callback to handle detection

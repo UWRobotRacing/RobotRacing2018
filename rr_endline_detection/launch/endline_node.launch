@@ -1,5 +1,5 @@
 <launch>
-    
+    <rosparam file="$(find rr_endline_detection)/launch/rr_endline_detection.yaml"/>
 
     <node pkg="rr_endline_detection" type="endline_detection" name="endline_detection_node" output="screen" required="true">
     </node>

@@ -29,6 +29,7 @@ class EndlineCounter {
     EndlineCounter(ros::NodeHandle);
     void ImgCb(const sensor_msgs::ImageConstPtr&);
     bool BlobDetector(cv::Mat);
+    void GetParam();
 };
 
 #endif /*ENDLINE_DETECTION_HPP*/
