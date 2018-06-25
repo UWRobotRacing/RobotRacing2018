@@ -50,7 +50,7 @@ Adafruit_BNO055 bno = Adafruit_BNO055(55);
  *@param current_time 
  *@returns void
  */
-void get_battery_state(long current_time);
+void GetBatteryState(long current_time);
 
 Car robot_racer;
 
@@ -91,8 +91,8 @@ ros::Publisher encoder_pub("/arduino/enc_vel", &actual_velocity_msg);
 ros::Publisher debugger_pub ("/arduino/debug", &debug);
 ros::Publisher velDebugger_pub ("/arduino/velDebug", &velDebug);
 ros::Publisher battery_pub("/arduino/battery_state", &battery_percentage_msg);
-ros::Publisher imu_pub("/arduino/imu_data"&imu_msg);
-ros::Publisher magnetic_pub("/arduino/mag_data"&magnetic_msg);
+ros::Publisher imu_pub("/arduino/imu_data", &imu_msg);
+ros::Publisher magnetic_pub("/arduino/mag_data", &magnetic_msg);
 ros::Subscriber <std_msgs::Float32> velocity_sub ("/PathPlanner/vel_level", cmd_velocity_callback);
 ros::Subscriber <std_msgs::Float32> steering_sub ("/PathPlanner/steer_cmd", cmd_steering_callback);
 
@@ -194,7 +194,7 @@ void loop() {
   state_msg.data = robot_racer.GetState();
   state_pub.publish(&state_msg);
 
-  get_battery_state(current_time);
+  GetBatteryState(current_time);
   // Get a new sensor event 
   imu::Vector<3> acc  = bno.getVector(Adafruit_BNO055::VECTOR_LINEARACCEL);
   imu::Vector<3> gyro = bno.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
@@ -245,14 +245,14 @@ void loop() {
   
   delay(1000);
   //call function to publish imu_readings
-  imu_readings();
+  ImuReadings();
 }
 /*
 *@brief publishes battery percentage at a specified BATTERY_FREQUENCY
 *@param current time
 *@returns void
 */
-void get_battery_state(long current_time){
+void GetBatteryState(long current_time){
   static long prev_time = 0;
   if ((current_time - prev_time) * BATTERY_FREQUENCY >= 1000){
     long battery_value = analogRead(BATTERY_PIN);

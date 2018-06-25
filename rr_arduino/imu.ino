@@ -5,7 +5,7 @@
  *@param none
  *@returns void
  */ 
-void imu_readings()
+void ImuReadings()
 {
   //Get a new sensor event
   sensors_event_t event; 
