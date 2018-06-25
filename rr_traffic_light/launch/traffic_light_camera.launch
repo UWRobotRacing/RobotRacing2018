@@ -1,5 +1,9 @@
+<!--@file rr_traffic_light_camera.launch
+ -  @author Toni Ogunmade(oluwatoni)
+ -  @competition IARRC 2018
+ -->
 <launch>
-  <param name="device" command="$(find rr_traffic_light)/src/camera_parameters_tl.sh"/>
+  <param name="device" command="$(find rr_traffic_light)/scripts/camera_parameters_tl.sh"/>
 
   <node ns ="traffic_light" name="usb_cam_traffic_light" pkg="usb_cam" type="usb_cam_node" output="screen" >
     <param name="video_device" value="/dev/video3" />
@@ -11,7 +15,7 @@
     <!-- param name="gain_automatic" value="true" /-->
   </node>
 
-  <rosparam file="$(find rr_traffic_light)/launch/traff_param.yaml"/>
+  <rosparam file="$(find rr_traffic_light)/launch/rr_traffic_light.yaml"/>
 
   <!-- node ns ="traffic_light" name="output_video_cam_traffic_light" pkg="image_view" type="image_view" respawn="false" output="screen">
        <remap from="image" to="/traffic_light/usb_cam_traffic_light/image_raw" />

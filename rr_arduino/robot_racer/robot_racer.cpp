@@ -57,7 +57,7 @@ void Car::SetState(CarState set)
 void Car::Estop()
 {
 #ifdef TEST_OUTPUT
-  Serial.println("ESTOP MODE");
+	Serial.println("EStop");
 #endif    
   while (throttle_ >= NEUTRAL) //!< Slow down gradually until stationary
   {
@@ -117,6 +117,7 @@ void Car::RC_read()
             else {
               RC_signal_data     += incoming_byte;
               RC_signal_[RC_signal_ch]   = RC_signal_data;
+              SetPreviousTime(millis());
             }
           }
         }
@@ -128,11 +129,15 @@ void Car::RC_read()
   {
     car_state_ = ESTOP; //!< EStop is on, stop car
   }
-  else if (RC_signal_[0] < 1500) {
+  else if (RC_signal_[5] < 650) {
    car_state_ = RC; //!< RC control
   }
   else {
    car_state_ = AUTO; //!< Autonomous mode
+  }
+  // Serial.println(millis()-GetPreviousTime());
+  if ((millis() - GetPreviousTime()) > DELAY){ // shut down if not receiving messages
+  	car_state_ = ESTOP;
   }
   #ifdef TEST_OUTPUT
   Serial.print("RX Data: ");
@@ -191,7 +196,7 @@ min 306, when the joy stick is pushed to the rightmost.
   int steering_read = RC_signal_[3];  //!<left-right joystick
 
 //! Give range for steering so that it stays neutral through fluctuations in RC values
-  if (steering_read >= 960 && steering_read <= 1020)
+  if (steering_read >= 950 && steering_read <= 1020)
   {
     steering_rc_ = STEER_NEUTRAL;
     //! steering_rc_ = round(-1*(steering_read-960)/1.308)+NEUTRAL;
@@ -224,4 +229,12 @@ void Car::WriteToServos()
 #endif
   //delay(10); //!<CONSIDER OTHER DELAYS?
   //prev_steering_ = steering_;
+}
+
+long Car::GetPreviousTime(){
+	return previous_;
+}
+
+void Car::SetPreviousTime(long time){
+	previous_ = time;
 }

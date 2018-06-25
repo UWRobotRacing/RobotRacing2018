@@ -1,0 +1,25 @@
+Remote Control Documentation
+
+1.  Receiver connection
+    Right row of pins: signal
+    Middle row of pins: power
+    Left row of pins: ground
+    Connect one wire to power and one wire to ground
+2.  Binding(if the controller is behaving strangely)
+    Turn off remote controller and receiver
+    Use a wire to short signal and ground on data/binding row on the receiver
+    Turn on receiver, should see two orange lights blinking, one on the remote receiver, and one on the main receiver
+    Turn on remote controller with the Trainer switch turned backwards
+    Controller should be beeping, orange lights should eventually become steady
+    Turn off everything, turn the trainer switch forward, remove the wire shorting signal and ground on the data/binding row on the receiver
+3.  Make sure the remote controller is in airplane mode. To change mode:
+    Click slider
+    Scroll to the bottom and click SETUP LIST
+    Scroll to and click MODEL TYPE
+    Click on the airplane(ACRO)
+4.  If flap switch doesn't work:
+    Click slider
+    Scroll down and select FLAPS
+    Click on the top left number
+    Use the slider to change the number to 100
+    Click again
