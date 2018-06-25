@@ -20,24 +20,15 @@
 #include <std_msgs/Int8.h>
 #include <std_msgs/Float32.h>
 #include <std_msgs/Float32MultiArray.h>
-#include <Wire.h>
-#include <Adafruit_Sensor.h>
-#include <Adafruit_BNO055.h>
-#include <utility/imumaths.h>
 #include <PID_v1.h>
-#include <sensor_msgs/MagneticField.h>
-#include <sensor_msgs/Imu.h>
+
 
 
 //Serial, velocity and battery monitoring defines respectively
 #define ROS_BAUD_RATE         57600
-#define IMU_BAUD_RATE         38400
-
 
 //I2C address for encoder counter 
 #define SLAVE_ADDRESS 0x07
-
-Adafruit_BNO055 bno = Adafruit_BNO055(55);
 
 //Battery monitoring defines
 #define BATTERY_FREQUENCY     2
@@ -50,7 +41,7 @@ Adafruit_BNO055 bno = Adafruit_BNO055(55);
  *@param current_time 
  *@returns void
  */
-void get_battery_state(long current_time);
+void GetBatteryState(long current_time);
 
 Car robot_racer;
 
@@ -77,13 +68,6 @@ std_msgs::Float32 debug;
 std_msgs::Float32 velDebug;
 std_msgs::Int8 battery_percentage_msg;
 
-//creating IMU data message objects
-sensor_msgs::Imu imu_msg;
-sensor_msgs::MagneticField magnetic_msg;
-
-
-
-
 // ROS publisher and subscriber commands
 
 ros::Publisher state_pub("/arduino/vehicle_state", &state_msg);
@@ -91,8 +75,6 @@ ros::Publisher encoder_pub("/arduino/enc_vel", &actual_velocity_msg);
 ros::Publisher debugger_pub ("/arduino/debug", &debug);
 ros::Publisher velDebugger_pub ("/arduino/velDebug", &velDebug);
 ros::Publisher battery_pub("/arduino/battery_state", &battery_percentage_msg);
-ros::Publisher imu_pub("/arduino/imu_data"&imu_msg);
-ros::Publisher magnetic_pub("/arduino/mag_data"&magnetic_msg);
 ros::Subscriber <std_msgs::Float32> velocity_sub ("/PathPlanner/vel_level", cmd_velocity_callback);
 ros::Subscriber <std_msgs::Float32> steering_sub ("/PathPlanner/steer_cmd", cmd_steering_callback);
 
@@ -110,20 +92,7 @@ void setup() {
 #ifdef TEST_OUTPUT
   Serial.begin(ROS_BAUD_RATE);
 #endif
-  Serial.begin(IMU_BAUD_RATE);
   
-  //Initialise the BNO055 sensor
-  if(!bno.begin())
-  {
-    //Detecting BNOO55
-    Serial.print("Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!");
-    while(1);
-  }
-  
-  delay(1000);
-    
-  bno.setExtCrystalUse(true);
-
 /*
  *ROS Node Handler setup
  *@param specified topics
@@ -135,8 +104,6 @@ void setup() {
   nh.advertise(debugger_pub);
   nh.advertise(velDebugger_pub);
   nh.advertise(battery_pub);
-  nh.advertise(imu_pub);
-  nh.advertise(magnetic_pub);
   nh.subscribe(velocity_sub);
   nh.subscribe(steering_sub);
 
@@ -163,12 +130,7 @@ void loop() {
   nh.spinOnce();
   long current_time = millis();
   long double time_diff = (current_time - previous_time)/1000.0;
-  /*if(Encoder.updateSpeed(time_diff,(float &) rr_velocity))
-  {
-    previous_time = millis();
-    actual_velocity_msg.data = rr_velocity;
-    encoder.publish(&actual_velocity_msg);
-  }*/
+  
   switch (robot_racer.GetState()) {
 //case for emergency stop
     case ESTOP:
@@ -194,65 +156,14 @@ void loop() {
   state_msg.data = robot_racer.GetState();
   state_pub.publish(&state_msg);
 
-  get_battery_state(current_time);
-  // Get a new sensor event 
-  imu::Vector<3> acc  = bno.getVector(Adafruit_BNO055::VECTOR_LINEARACCEL);
-  imu::Vector<3> gyro = bno.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
-  imu::Vector<3> euler= bno.getVector(Adafruit_BNO055::VECTOR_EULER);
-  imu::Vector<3> mag  = bno.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
-  
-/* Display the floating point data */
-  Serial.print("XA: ");
-  Serial.print(acc.x());
-  Serial.print(" YA: ");
-  Serial.print(acc.y());
-  Serial.print(" ZA: ");
-  Serial.print(acc.z());
-  Serial.println("\n");
-
-  
-/* Display the floating point data */
-  Serial.print(" GX: ");
-  Serial.print(gyro.x());
-  Serial.print(" GY: ");
-  Serial.print(gyro.y());
-  Serial.print(" GZ: ");
-  Serial.print(gyro.z());
-  Serial.println("\n");
-
-
- /* Display the floating point data */
-  Serial.print(" X: ");
-  Serial.print(euler.x());
-  Serial.print("\tY: ");
-  Serial.print(euler.y());
-  Serial.print("\tZ: ");
-  Serial.print(euler.z());
-  Serial.print("\n");
-  
-
-  Serial.print(" MX: ");
-  Serial.print(mag.x());
-  Serial.print(" MY: ");
-  Serial.print(mag.y());
-  Serial.print(" MZ: ");
-  Serial.print(mag.z());
-  Serial.println("\n");
-  
-  
-  
- 
-  
-  delay(1000);
-  //call function to publish imu_readings
-  imu_readings();
+  GetBatteryState(current_time);
 }
 /*
 *@brief publishes battery percentage at a specified BATTERY_FREQUENCY
 *@param current time
 *@returns void
 */
-void get_battery_state(long current_time){
+void GetBatteryState(long current_time){
   static long prev_time = 0;
   if ((current_time - prev_time) * BATTERY_FREQUENCY >= 1000){
     long battery_value = analogRead(BATTERY_PIN);
