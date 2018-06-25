@@ -11,7 +11,7 @@ LaserMapper/Laser_Scan_Name:                "/rr_vehicle/laserscan"
 
 #Obstacle#
 LaserMapper/NO_OBS:                         0
-LaserMapper/OBS:                            400
+LaserMapper/OBS:                            100
 LaserMapper/UNKNOWN:                        -1
 LaserMapper/OBS_SCALE:                      1
 LaserMapper/INFLATE_OBS:                    8

@@ -13,6 +13,7 @@
 #include <math.h>
 #include <vector>
 #include <string>
+#include <algorithm>
 
 // ROS headers
 #include <ros/ros.h>
@@ -21,6 +22,7 @@
 #include <nav_msgs/OccupancyGrid.h>
 #include <sensor_msgs/LaserScan.h>
 #include <tf/transform_datatypes.h>
+#include "occupancy_grid_utils.hpp"
 
 /*
  *  Callback Class for laser to Occumpancy Grid Format/OpenCV Format
@@ -52,6 +54,7 @@ class LaserMapper
 
     // Map Variables
     std::vector<double> belief_map_;
+    // std::vector<nav_msgs::OccupancyGrid::ConstPtr> maps_to_be_combined_;
     nav_msgs::OccupancyGrid occu_msg_;
     nav_msgs::OccupancyGrid lane_detection_left_msg_;
     nav_msgs::OccupancyGrid lane_detection_right_msg_;

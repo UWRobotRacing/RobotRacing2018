@@ -20,7 +20,7 @@ lane_detection_processor::lane_detection_processor(ros::NodeHandle nh) : it_(nh)
   nh.param<int>("Adaptive_HSV_Min_V", adapt_hsv_V_, -40);
   bounds_ = cv::Scalar(adapt_hsv_S_, adapt_hsv_V_);
   nh.param<int>("Adaptive_HSV_MPatch_Size", adapt_hsv_patch_size_, 25);
-  nh.param<bool>("PointListOut", point_out_, false);
+  nh.param<bool>("PointListOut", point_out_, true);
 
   // Output image stream, binarized and perspective-adjusted
   nh.param<std::string>("Output_Image_topic", binary_out_im_, "/output_video");
@@ -118,7 +118,7 @@ void lane_detection_processor::FindLanes(const sensor_msgs::Image::ConstPtr &msg
 
     //find mask_
     //Copy to output bridge
-    mask_.copyTo(cv_output_bridge_.image);
+    out.copyTo(cv_output_bridge_.image);
     cv_output_bridge_.encoding = "mono8";
 
     //Input Image has been processed and published
@@ -130,20 +130,17 @@ void lane_detection_processor::FindLanes(const sensor_msgs::Image::ConstPtr &msg
       occupancy_.reserve(out.cols * out.rows);
 
       data_pointer_ = out.data;
-      for (int i_row = 0; i_row < out.rows; i_row++)
+      for (int i = 0; i < out.rows * out.cols; i++)
       {
-        for (int i_col = 0; i_col < out.cols; i_col++)
+        value1_ = *data_pointer_;
+        data_pointer_++;
+        if (value1_ == 0)
         {
-          value1_ = *data_pointer_;
-          data_pointer_++;
-          if (value1_ == 0)
-          {
-            occupancy_.push_back(-1);
-          }
-          else
-          {
-            occupancy_.push_back(100);
-          }
+          occupancy_.push_back(-1);
+        }
+        else
+        {
+          occupancy_.push_back(100);
         }
       }
       grid_msg_.data = occupancy_;

@@ -5,20 +5,6 @@
  */
 
 #include "laser_mapper.hpp"
-#include <occupancy_grid_utils.hpp>
-#include <stdio.h>
-#include <math.h>
-#include <vector>
-#include <algorithm>
-#include <string>
-
-// OpenCV libraries
-#include <ros/ros.h>
-#include <std_msgs/Bool.h>
-#include <geometry_msgs/Pose2D.h>
-#include <nav_msgs/OccupancyGrid.h>
-#include <sensor_msgs/LaserScan.h>
-#include <tf/transform_datatypes.h>
 
 /**
  * @brief initiliazes the LaserMapper class
@@ -55,7 +41,7 @@ void LaserMapper::GetParam()
   nh_.param<std::string>("LaserMapper/Laser_Scan_Name", laser_scan_name_, "/scan");
 
   nh_.param<double>("LaserMapper/NO_OBS", NO_OBS_, 0);
-  nh_.param<double>("LaserMapper/OBS", OBS_, 200);
+  nh_.param<double>("LaserMapper/OBS", OBS_, 100);
   nh_.param<double>("LaserMapper/UNKNOWN", UNKNOWN_, -1);
   nh_.param<double>("LaserMapper/OBS_SCALE", OBS_SCALE_, 1);
   nh_.param<int>("LaserMapper/INFLATE_OBS", inflate_obstacle_, 2);
@@ -63,7 +49,6 @@ void LaserMapper::GetParam()
   nh_.param<double>("LaserMapper/map_res", map_res_, 0.01);
   nh_.param<int>("LaserMapper/map_W", map_W_, 800);
   nh_.param<int>("LaserMapper/map_H", map_H_, 300);
-  nh_.param<double>("LaserMapper/map_orientation", map_orientation_, M_PI);
   nh_.param<double>("LaserMapper/LASER_ORIENTATION", LASER_ORIENTATION_, -1);
 
   nh_.param<double>("LaserMapper/max_angle", max_angle_, 3.14/2.0);
@@ -313,9 +298,11 @@ void LaserMapper::ProcessMap()
   occu_msg_.info.width = map_W_;
   occu_msg_.info.height = map_H_;
   occu_msg_.info.origin.position.x = map_W_/2*map_res_;
-  occu_msg_.info.origin.position.y = 0;
+  occu_msg_.info.origin.position.y = map_H_*map_res_;
+  // The following orientation is to mirror the map
+  // TODO(oluwatoni) This should not be necessary
   occu_msg_.info.origin.orientation =
-             tf::createQuaternionMsgFromRollPitchYaw(0.0, 0.0, M_PI);
+    tf::createQuaternionMsgFromRollPitchYaw(0, 0, M_PI);
   occu_msg_.data.resize(map_W_*map_H_);
 
   for (int i = 0; i < map_W_*map_H_; i++)
@@ -324,7 +311,7 @@ void LaserMapper::ProcessMap()
     weight = std::max(0.0, weight);
 
     occu_msg_.data[i] =
-    std::max(static_cast<int>(weight), static_cast<int>(belief_map_[i]));
+      std::max(static_cast<int>(weight), static_cast<int>(belief_map_[i]));
   }
 
   // Join the lane_detection occupancy and the laser occupancy together.

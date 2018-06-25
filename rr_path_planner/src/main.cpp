@@ -18,8 +18,6 @@
 
 #include <path_planner.h>
 
-ros::Subscriber enable_sub;
-
 /** @brief starts the path_planner node
  *  This node doesn't act until it gets the enable signal
  *
@@ -30,9 +28,9 @@ int main(int argc, char **argv)
   ros::init(argc, argv, "trajectory_generation");
   ros::NodeHandle n;
   ROS_INFO("trajectories Generation Initalized");
-
   PathPlanner TrajectoryGenerator;
-
+  //TODO(oluwatoni) remove the delay
+  ros::Duration(4).sleep();
   ros::spin();
 
   ROS_INFO("Trajectories Generation Completed");
