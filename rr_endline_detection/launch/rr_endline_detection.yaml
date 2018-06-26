@@ -1,0 +1,12 @@
+# @file rr_endline_detection.yaml
+# @author Angela Gu (angegu)
+# @author Toni Ogunmade(oluwatoni)
+# @competition IARRC 2018
+
+#Obstacle#
+EndlineCounter/detection_status_:              0
+EndlineCounter/hysteresis_counter_:             2
+EndlineCounter/hysteresis_constant_:                false
+
+#Debugging#
+EndlineCounter/DEBUG_ON:                         false
