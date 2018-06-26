@@ -31,31 +31,31 @@
 Supervisor::Supervisor()
 {
   // Initialize variables
-  lap_count = 0;
-  speed_sum = 0.0;
-  twist_msg_count = 0;
-  nh_.param<std::string>("Launch/race_type", race_type, "drag");
-  bool_msg.data = true;
-  null_vector.x = 0.0; null_vector.y = 0.0; null_vector.z = 0.0;
-  twist_msg.linear = null_vector;
-  twist_msg.angular = null_vector;
+  lap_count_ = 0;
+  speed_sum_ = 0.0;
+  twist_msg_count_ = 0;
+  nh_.param<std::string>("Launch/race_type", race_type_, "drag");
+  bool_msg_.data = true;
+  null_vector_.x = 0.0; null_vector_.y = 0.0; null_vector_.z = 0.0;
+  twist_msg_.linear = null_vector_;
+  twist_msg_.angular = null_vector_;
 
   // Setup publishers for twist multiplexer
-  twist_pub = nh_.advertise<geometry_msgs::Twist>("/Supervisor/cmd", 1);
-  null_lock = nh_.advertise<std_msgs::Bool>("/Supervisor/no_movement", 1);
-  remove_null_lock = nh_.advertise<std_msgs::Bool>("/Supervisor/enable_movement", 1);
+  twist_pub_ = nh_.advertise<geometry_msgs::Twist>("/Supervisor/cmd", 1);
+  null_lock_ = nh_.advertise<std_msgs::Bool>("/Supervisor/no_movement", 1);
+  remove_null_lock_ = nh_.advertise<std_msgs::Bool>("/Supervisor/enable_movement", 1);
 
   // Setup subscribers to monitor battery and speed
-  cmd_sub = nh_.subscribe("/rr_vehicle/vel_cmd", 1, &Supervisor::TrackSpeed, this);
-  battery_sub = nh_.subscribe("/arduino/battery_state", 1, &Supervisor::MonitorBattery, this);
+  cmd_sub_ = nh_.subscribe("/rr_vehicle/vel_cmd", 1, &Supervisor::TrackSpeed, this);
+  battery_sub_ = nh_.subscribe("/arduino/battery_state", 1, &Supervisor::MonitorBattery, this);
 
   // Setup service servers
-  start_race_service = nh_.advertiseService("/Supervisor/start_race", &Supervisor::StartRace, this);
-  count_lap_service  = nh_.advertiseService("/Supervisor/count_lap", &Supervisor::CountLap, this);
+  start_race_service_ = nh_.advertiseService("/Supervisor/start_race", &Supervisor::StartRace, this);
+  count_lap_service_  = nh_.advertiseService("/Supervisor/count_lap", &Supervisor::CountLap, this);
 
   // Publish messages
-  twist_pub.publish(twist_msg);
-  null_lock.publish(bool_msg);
+  twist_pub_.publish(twist_msg_);
+  null_lock_.publish(bool_msg_);
 }
 
 /**
@@ -67,11 +67,11 @@ bool Supervisor::StartRace(std_srvs::Empty::Request &req, std_srvs::Empty::Respo
 {
   // Publish a bool that the twist multiplexer will pick up that will allow
   // allow path planner and joystick messages to be published
-  bool_msg.data = true;
-  remove_null_lock.publish(bool_msg);
+  bool_msg_.data = true;
+  remove_null_lock_.publish(bool_msg_);
 
   // Start timer in order to log race time
-  begin_time = clock();
+  begin_time_ = clock();
 
   return true;
 }
@@ -83,23 +83,29 @@ bool Supervisor::StartRace(std_srvs::Empty::Request &req, std_srvs::Empty::Respo
  */
 bool Supervisor::CountLap(std_srvs::Trigger::Request &req, std_srvs::Trigger::Response &res)
 {
-  if (race_type == "drag") {
-    lap_count += 1;
+  if (race_type_ == "drag")
+  {
+    lap_count_ += 1;
     res.success = true;
   }
-  else if (race_type == "circuit") {
-    if (lap_count < 3) {
-      lap_count += 1;
-      if (lap_count == 3) {
+  else if (race_type_ == "circuit")
+  {
+    if (lap_count_ < 3)
+    {
+      lap_count_ += 1;
+      if (lap_count_ == 3)
+      {
         res.success = true;
       }
-      else{
+      else
+      {
         res.success = false;
       }
     }
   }
 
-  if (res.success) {
+  if (res.success)
+  {
     this->FinishRace();
   }
   return true;
@@ -112,8 +118,8 @@ bool Supervisor::CountLap(std_srvs::Trigger::Request &req, std_srvs::Trigger::Re
  */
 void Supervisor::TrackSpeed(const geometry_msgs::TwistConstPtr& msg)
 {
-  twist_msg_count += 1;
-  speed_sum += sqrt(pow(msg->linear.x, 2) + pow(msg->linear.y, 2));
+  twist_msg_count_ += 1;
+  speed_sum_ += sqrt(pow(msg->linear.x, 2) + pow(msg->linear.y, 2));
 }
 
 /**
@@ -123,7 +129,8 @@ void Supervisor::TrackSpeed(const geometry_msgs::TwistConstPtr& msg)
  */
 void Supervisor::MonitorBattery(const std_msgs::Int8::ConstPtr& msg)
 {
-  if (msg->data <= 10) {
+  if (msg->data <= 10)
+  {
     ROS_INFO("Battery is less than 10 percent, ending race...");
     this->FinishRace();
   }
@@ -136,8 +143,8 @@ void Supervisor::MonitorBattery(const std_msgs::Int8::ConstPtr& msg)
 void Supervisor::FinishRace()
 {
   // Calculate average speed and elapsed time since start of race
-  average_speed = speed_sum / twist_msg_count;
-  race_time = float(clock() - begin_time) / CLOCKS_PER_SEC;
+  average_speed_ = speed_sum_ / twist_msg_count_;
+  race_time_ = float(clock() - begin_time_) / CLOCKS_PER_SEC;
 
   // Construct a timestamp with the following format:
   // Year_Month_day--Hours_minutes_seconds
@@ -151,22 +158,22 @@ void Supervisor::FinishRace()
   // Open a file to write to
   std::ofstream race_metrics_file;
   std::ostringstream file_name;
-  file_name << "~/" << race_type << "_" << date_string << ".txt";
+  file_name << "~/" << race_type_ << "_" << date_string << ".txt";
   race_metrics_file.open(file_name.str().c_str());
 
   // Write to file
   std::ostringstream metrics;
 
   metrics << "Date: " << date_string << "\n";
-  metrics << "Race type: " << race_type << "\n";
-  metrics << "Race time: " << race_time << "\n";
-  metrics << "Average speed: " << average_speed << "\n";
+  metrics << "Race type: " << race_type_ << "\n";
+  metrics << "Race time: " << race_time_ << "\n";
+  metrics << "Average speed: " << average_speed_ << "\n";
 
   race_metrics_file << metrics.str();
   race_metrics_file.close();
 
   // Publish null vector to twist multiplexer and lock out any other messages
   // from being published, which will stop the robot
-  twist_pub.publish(twist_msg);
-  null_lock.publish(bool_msg);
+  twist_pub_.publish(twist_msg_);
+  null_lock_.publish(bool_msg_);
 }
