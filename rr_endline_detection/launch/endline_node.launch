@@ -1,0 +1,6 @@
+<launch>
+    
+
+    <node pkg="rr_endline_detection" type="endline_detection" name="endline_detection_node" output="screen" required="true">
+    </node>
+</launch>

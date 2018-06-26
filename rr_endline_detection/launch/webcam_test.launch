@@ -1,0 +1,16 @@
+<!--@file webcam_test.launch
+ -  @brief get the endline code running with a webcam
+ -  @author Toni Ogunmade(oluwatoni)
+ -  @competition IARRC 2018
+ -->
+<launch>
+  <node ns ="robot_racing" name="forward_facing_cam" pkg="usb_cam" type="usb_cam_node" output="screen" >
+    <param name="video_device" value="/dev/video0" />
+    <param name="image_width" value="640" />
+    <param name="image_height" value="480" />
+    <param name="pixel_format" value="yuyv" />
+    <!-- param name="camera_frame_id" value="usb_cam_traffic_light" /-->
+    <!-- param name="io_method" value="mmap"/-->
+    <!-- param name="gain_automatic" value="true" /-->
+  </node>
+</launch>
