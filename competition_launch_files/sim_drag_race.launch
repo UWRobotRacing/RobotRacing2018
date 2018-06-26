@@ -1,12 +1,12 @@
 <launch>
   <!-- Simulated World -->
-  <include file="$(find rr_gazebo)/launch/rr_vehicle.launch" />
+  <include file="$(find rr_gazebo)/launch/rr_vehicle_teleop.launch" />
 
   <!-- land Detection System -->
-  <include file="$(find rr_lane_detection)/launch/sim_dual_cam_lane_detection.launch" />
+  <!-- <include file="$(find rr_lane_detection)/launch/sim_dual_cam_lane_detection.launch" /> -->
 
   <!-- Mapping System -->
-  <!-- <include file="$(find rr_mapper)/launch/mapper.launch" /> -->
+  <include file="$(find rr_mapper)/launch/mapper.launch" />
     
   <!-- path planner node -->
   <!-- <include file="$(find rr_path_planner)/launch/drag_race_planner.launch" /> -->	

@@ -46,14 +46,7 @@ int main(int argc, char **argv)
 
   ROS_INFO("Mapper: Laser Node Initialized");
 
-  // Debug Code
-#ifdef DEBUG
-  enable = true;
-#endif
-  while (ros::ok()) {
-    laserProcessor.PublishMap();
-    ros::spin();
-  }
+  ros::spin();
 
   return 0;
 }
