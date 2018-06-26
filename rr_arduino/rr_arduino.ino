@@ -30,8 +30,8 @@
 
 
 //Serial, velocity and battery monitoring defines respectively
-#define ROS_BAUD_RATE         57600
-#define IMU_BAUD_RATE         38400
+const int ROS_BAUD_RATE         57600
+const int IMU_BAUD_RATE         38400
 
 
 //I2C address for encoder counter 
@@ -40,9 +40,9 @@
 Adafruit_BNO055 bno = Adafruit_BNO055(55);
 
 //Battery monitoring defines
-#define BATTERY_FREQUENCY     2
-#define BATTERY_PIN           A0
-#define AVERAGING_SIZE        5
+const int    BATTERY_FREQUENCY     2
+const string BATTERY_PIN           A0
+const int    AVERAGING_SIZE        5
 
 /**
  *@brief function Call
@@ -95,6 +95,10 @@ ros::Publisher imu_pub("/arduino/imu_data", &imu_msg);
 ros::Publisher magnetic_pub("/arduino/mag_data", &magnetic_msg);
 ros::Subscriber <std_msgs::Float32> velocity_sub ("/PathPlanner/vel_level", cmd_velocity_callback);
 ros::Subscriber <std_msgs::Float32> steering_sub ("/PathPlanner/steer_cmd", cmd_steering_callback);
+
+//Callback functions for subscriber
+void CmdVelocityCallback(const std_msgs::Float32 & cmd_vel_msg);
+void CmdSteeringCallback(const std_msgs::Float32 & cmd_str_msg);
 
 int steering_angle = 1500;
 int ROS_watchdog = 0;
@@ -196,10 +200,10 @@ void loop() {
 
   GetBatteryState(current_time);
   // Get a new sensor event 
-  imu::Vector<3> acc  = bno.getVector(Adafruit_BNO055::VECTOR_LINEARACCEL);
-  imu::Vector<3> gyro = bno.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
-  imu::Vector<3> euler= bno.getVector(Adafruit_BNO055::VECTOR_EULER);
-  imu::Vector<3> mag  = bno.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
+  imu::Vector<3> acc   = bno.getVector(Adafruit_BNO055::VECTOR_LINEARACCEL);
+  imu::Vector<3> gyro  = bno.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
+  imu::Vector<3> euler = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
+  imu::Vector<3> mag   = bno.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
   
 /* Display the floating point data */
   Serial.print("XA: ");
