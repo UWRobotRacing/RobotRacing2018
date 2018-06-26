@@ -169,6 +169,7 @@ void LaserMapper::LidarCallback(const sensor_msgs::LaserScan::ConstPtr& msg) {
 
   laser_msg_ = *msg;
   lidar_msg_call_ = true;
+  PublishMap();
 }
 
 /**
@@ -309,7 +310,7 @@ void LaserMapper::ShiftMap(std::vector<int> prev_map) {
 
   } catch (tf::TransformException ex) {
       ROS_ERROR("%s",ex.what());
-      ros::Duration(1.0).sleep();
+      return;
   }
 
   // Assumes previous value is given
