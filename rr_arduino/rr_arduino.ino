@@ -25,15 +25,15 @@
 
 
 //Serial, velocity and battery monitoring defines respectively
-#define ROS_BAUD_RATE         57600
+const int ROS_BAUD_RATE         57600
 
 //I2C address for encoder counter 
 #define SLAVE_ADDRESS 0x07
 
 //Battery monitoring defines
-#define BATTERY_FREQUENCY     2
-#define BATTERY_PIN           A0
-#define AVERAGING_SIZE        5
+const int      BATTERY_FREQUENCY     2
+const string   BATTERY_PIN           A0
+const int      AVERAGING_SIZE        5
 
 /**
  *@brief function Call
@@ -77,6 +77,10 @@ ros::Publisher velDebugger_pub ("/arduino/velDebug", &velDebug);
 ros::Publisher battery_pub("/arduino/battery_state", &battery_percentage_msg);
 ros::Subscriber <std_msgs::Float32> velocity_sub ("/PathPlanner/vel_level", cmd_velocity_callback);
 ros::Subscriber <std_msgs::Float32> steering_sub ("/PathPlanner/steer_cmd", cmd_steering_callback);
+
+//Callback functions used by subscriber
+void cmd_velocity_callback(const std_msgs::Float32 & cmd_vel_msg);
+void cmd_steering_callback(const std_msgs::Float32 & cmd_str_msg);
 
 int steering_angle = 1500;
 int ROS_watchdog = 0;
