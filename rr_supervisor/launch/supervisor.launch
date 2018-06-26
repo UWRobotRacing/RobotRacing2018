@@ -1,10 +1,7 @@
 <launch>
+  <!-- Supervisor Node -->
+  <node pkg="rr_supervisor" type="supervisor" name="supervisor" output="screen" required="true"/>
 
-    <!-- Supervisor Node -->
-    <node pkg="rr_supervisor" type="supervisor" name="supervisor" output="screen" required="true">
-    </node>
-
-    <!-- Twist Multiplexer -->
-    <include file="$(find twist_mux)/launch/twist_mux.launch" />
-
+  <!-- Twist Multiplexer -->
+  <include file="$(find twist_mux)/launch/rr_twist_mux.launch"/>
 </launch>

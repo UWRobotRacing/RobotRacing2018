@@ -1,18 +1,22 @@
 /** @file comms.hpp
  *  @author Toni Ogunmade(oluwatoni)
  *  @competition IARRC 2018
+ *
+ *  @brief defines the topic and service names across the project
  */
 
 #ifndef __LANE_DETECTION_PROCESSOR_HPP
 #define __LANE_DETECTION_PROCESSOR_HPP
 
 #include <string.h>
+
 static std::string rr = "/rr_vehicle/";
+static std::string raw = "_cam/image_raw";
 
 namespace rr_sensor_topics{
-  static std::string left_cam = rr + "left";
-  static std::string front_cam = rr + "front";
-  static std::string right_cam = rr + "right";
+  static std::string left_cam = rr + "left" + raw;
+  static std::string front_cam = rr + "front" + raw;
+  static std::string right_cam = rr + "right" + raw;
   static std::string imu = rr + "imu";
   static std::string laser = rr + "laserscan";
   static std::string joint_states = rr + "joint_states";

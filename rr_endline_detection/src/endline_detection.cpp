@@ -19,7 +19,7 @@ EndlineCounter::EndlineCounter (ros::NodeHandle nh_) : it_(nh_)
   detection_status_ = false;
   hysteresis_counter_ = 0;
   hysteresis_constant_ = 2;
-  client_ = nh_.serviceClient<std_srvs::Trigger>("/Supervisor/count_lap", true);
+  client_ = nh_.serviceClient<std_srvs::Trigger>("/Supervisor/count_lap");
 }
 
 //callback to handle detection
@@ -54,16 +54,6 @@ void EndlineCounter::ImgCb(const sensor_msgs::ImageConstPtr& msg)
           hysteresis_counter_ = 0;
           detection_status_ = true;
           ROS_INFO("DETECTED");
-
-          //make service call
-          if(client_.call(srv))
-          {
-            if (srv.response.success)
-            {
-              ROS_INFO("SUCCESS");
-              //TODO: ros shutdown
-            }
-          }
         }
       }
       else
@@ -94,6 +84,16 @@ void EndlineCounter::ImgCb(const sensor_msgs::ImageConstPtr& msg)
           hysteresis_counter_ = 0;
           detection_status_ = false;
           ROS_INFO("NO LONGER DETECTED");
+
+          //make service call
+          if (client_.call(srv))
+          {
+            if (srv.response.success)
+            {
+              ROS_INFO("SUCCESS");
+              ros::shutdown();
+            }
+          }
         }
       }
     }

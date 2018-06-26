@@ -1,9 +1,15 @@
 <launch>
   <!-- Simulated World -->
-  <include file="$(find rr_gazebo)/launch/rr_vehicle.launch" />
+  <include file="$(find rr_gazebo)/launch/rr_vehicle_teleop.launch" />
 
-  <!-- land Detection System -->
-  <include file="$(find rr_lane_detection)/launch/sim_dual_cam_lane_detection.launch" />
+  <!-- Lane Detection System -->
+  <!-- <include file="$(find rr_lane_detection)/launch/sim_dual_cam_lane_detection.launch" /> -->
+
+  <!-- Endline Detection System -->
+  <include file="$(find rr_endline_detection)/launch/endline_node.launch" />
+
+  <!-- Supervisory System -->
+  <include file="$(find rr_supervisor)/launch/supervisor.launch" />
 
   <!-- Mapping System -->
   <!-- <include file="$(find rr_mapper)/launch/mapper.launch" /> -->

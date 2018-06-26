@@ -86,15 +86,18 @@ bool Supervisor::CountLap(std_srvs::Trigger::Request &req, std_srvs::Trigger::Re
   if (race_type == "drag") {
     lap_count += 1;
     res.success = true;
+    ROS_INFO("Drag race complete! shutting down");
   }
   else if (race_type == "circuit") {
     if (lap_count < 3) {
       lap_count += 1;
       if (lap_count == 3) {
         res.success = true;
+        ROS_INFO("Circuit race complete! shutting down");
       }
       else{
         res.success = false;
+        ROS_INFO("Lap %d of %d complete!", lap_count, 3);
       }
     }
   }

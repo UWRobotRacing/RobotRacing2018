@@ -17,7 +17,7 @@ topics:
   timeout : 0.5
   priority: 10
 -
-  name    : null
+  name    : stopped
   topic   : /Supervisor/cmd
   timeout : 0.5
   priority: 100

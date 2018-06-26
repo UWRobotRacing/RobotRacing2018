@@ -8,18 +8,17 @@
  * @author Toni Ogunmade (oluwatoni)
  */
 
-#include <ros/ros.h>
 #include "endline_detection.hpp"
 
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "endline_detection");
   ROS_INFO("Initializing endline_detection");	
-  std::string camera_source = "/rr_vehicle/front_facing_cam/image_raw";
-  ros::NodeHandle nh_;
-  image_transport::ImageTransport it_(nh_);
-  EndlineCounter ec(nh_);
-  image_transport::Subscriber sub_ = it_.subscribe(camera_source, 1, &EndlineCounter::ImgCb, &ec);
+  ros::NodeHandle nh;
+  image_transport::ImageTransport it(nh);
+  EndlineCounter ec(nh);
+  image_transport::Subscriber sub =
+    it.subscribe(rr_sensor_topics::front_cam, 1, &EndlineCounter::ImgCb, &ec);
   ros::spin();
   return 0;
 }
