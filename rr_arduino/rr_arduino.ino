@@ -93,8 +93,8 @@ ros::Publisher velDebugger_pub ("/arduino/velDebug", &velDebug);
 ros::Publisher battery_pub("/arduino/battery_state", &battery_percentage_msg);
 ros::Publisher imu_pub("/arduino/imu_data", &imu_msg);
 ros::Publisher magnetic_pub("/arduino/mag_data", &magnetic_msg);
-ros::Subscriber <std_msgs::Float32> velocity_sub ("/PathPlanner/vel_level", cmd_velocity_callback);
-ros::Subscriber <std_msgs::Float32> steering_sub ("/PathPlanner/steer_cmd", cmd_steering_callback);
+ros::Subscriber <std_msgs::Float32> velocity_sub ("/PathPlanner/vel_level", CmdVelocityCallback);
+ros::Subscriber <std_msgs::Float32> steering_sub ("/PathPlanner/steer_cmd", CmdSteeringCallback);
 
 //Callback functions for subscriber
 void CmdVelocityCallback(const std_msgs::Float32 & cmd_vel_msg);
