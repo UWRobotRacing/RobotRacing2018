@@ -382,4 +382,56 @@ void LaserMapper::ShiftMap(std::vector<int> prev_map) {
   prev_x_ = transform.getOrigin().x();
   prev_y_ = transform.getOrigin().y();
 
+  //Rotation
+  double diff_ang = transform.getRotation().getAngle() - prev_ang_;
+  prev_map = RotateMap(prev_map, diff_ang);
+  prev_ang_ = transform.getRotation().getAngle();
+}
+
+/**
+ * @name RotateMap
+ * @brief Rotates the map based on angular rotation
+ * @param[in] curr_map: current map to analyze
+ * @param[in] new_ang: angular difference from previous location
+ * @return rot_map: newly rotated map
+ */
+std::vector<int> LaserMapper::RotateMap(std::vector<int> curr_map, double new_ang){
+  std::vector<LaserMapper::CellEntity> cell_map;
+  std::vector<int> rot_map;
+  //Return a empty Cell Map if no value is input
+  if(curr_map.empty()){
+    ROS_ERROR("LaserMapper::RotateMap: Map is empty!");
+    return rot_map;
+  }
+
+  //Generate CellEntity Vector & Rotate
+  for(int i = 0; i < map_H_; i++){
+    for(int j = 1; j <= map_W_; j++){
+      int curr_x = j - map_W_/2;
+      int curr_y = map_H_ - i;
+      LaserMapper::CellEntity curr_en;
+      curr_en.val = curr_map.at(i*map_H_ + j - 1);
+      curr_en.length = sqrt(curr_x*curr_x +
+                        curr_y*curr_y);
+      curr_en.angle = atan2(curr_y, curr_y) + new_ang;
+      curr_en.xloc = rint(curr_en.length*cos(curr_en.angle));
+      curr_en.yloc = rint(curr_en.length*sin(curr_en.angle));
+      cell_map.push_back(curr_en);
+    }
+  }
+
+  //Generates a map of unknwons same size as the belief map
+  rot_map.resize(map_W_*map_H_, UNKNOWN_);
+
+  //Fills in values based on criteria  
+  for(int i = 0; i < rot_map.size(); i++){
+    LaserMapper::CellEntity curr_en = cell_map.at(i);
+    //Checks for bounds of x & y
+    if((curr_en.xloc >= 0 && curr_en.xloc <= map_W_) && 
+        (curr_en.yloc >= 0 && curr_en.yloc <= map_H_)){
+      rot_map[i] = curr_en.val;
+    }
+  }
+
+  return rot_map;
 }

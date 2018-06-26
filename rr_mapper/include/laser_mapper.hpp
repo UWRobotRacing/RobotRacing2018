@@ -38,7 +38,20 @@ class LaserMapper
     // Publishers 
     void PublishMap();
 
-  private:    
+  private:
+    struct CellEntity {
+      //Occupancy Grid Value (Subject to Change)
+      int val;
+      
+      //Cartesian Coordinates
+      double xloc;
+      double yloc;
+
+      //Polar Coordinates
+      double length;
+      double angle;
+    };    
+
     // Subscribers
     void LidarCallback(const sensor_msgs::LaserScan::ConstPtr& msg);
     void DetectLeftLaneCallback(const nav_msgs::OccupancyGrid::ConstPtr& msg);
@@ -51,6 +64,7 @@ class LaserMapper
     double CheckMap(const int& x, const int& y);
     void RayTracing(const float& angle, const float& range, const int& inflate_factor);
     void ShiftMap(std::vector<int> prev_map);
+    std::vector<int> RotateMap(std::vector<int> curr_map, double new_ang); 
 
     // ROS Variables
     ros::NodeHandle nh_;
@@ -103,14 +117,15 @@ class LaserMapper
 
     enum CellState {
         NO_OBS_ = 0,
-        OBS_ = 100,
+        OBS_ = 1,
         UNKNOWN_ = -1
     };
 
     //Storing values
     double prev_x_;
     double prev_y_;
-
+    double prev_ang_;
+    
 };
 
 #endif  // LASERMAPPER_H
