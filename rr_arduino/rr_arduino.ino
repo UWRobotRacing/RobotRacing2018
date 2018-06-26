@@ -75,12 +75,12 @@ ros::Publisher encoder_pub("/arduino/enc_vel", &actual_velocity_msg);
 ros::Publisher debugger_pub ("/arduino/debug", &debug);
 ros::Publisher velDebugger_pub ("/arduino/velDebug", &velDebug);
 ros::Publisher battery_pub("/arduino/battery_state", &battery_percentage_msg);
-ros::Subscriber <std_msgs::Float32> velocity_sub ("/PathPlanner/vel_level", cmd_velocity_callback);
-ros::Subscriber <std_msgs::Float32> steering_sub ("/PathPlanner/steer_cmd", cmd_steering_callback);
+ros::Subscriber <std_msgs::Float32> velocity_sub ("/PathPlanner/vel_level", CmdVelocityCallback);
+ros::Subscriber <std_msgs::Float32> steering_sub ("/PathPlanner/steer_cmd", CmdSteeringCallback);
 
 //Callback functions used by subscriber
-void cmd_velocity_callback(const std_msgs::Float32 & cmd_vel_msg);
-void cmd_steering_callback(const std_msgs::Float32 & cmd_str_msg);
+void CmdVelocityCallback(const std_msgs::Float32 & cmd_vel_msg);
+void CmdSteeringCallback(const std_msgs::Float32 & cmd_str_msg);
 
 int steering_angle = 1500;
 int ROS_watchdog = 0;
