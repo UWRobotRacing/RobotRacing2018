@@ -25,15 +25,15 @@
 
 
 //Serial, velocity and battery monitoring defines respectively
-const int ROS_BAUD_RATE         57600
+const int ROS_BAUD_RATE = 57600
 
 //I2C address for encoder counter 
 const int SLAVE_ADDRESS 07
 
 //Battery monitoring defines
-const int      BATTERY_FREQUENCY     2
-const int      BATTERY_PIN           A0
-const int      AVERAGING_SIZE        5
+const int      BATTERY_FREQUENCY = 2
+const int      BATTERY_PIN       = A0
+const int      AVERAGING_SIZE    = 5
 
 /**
  *@brief function Call
@@ -79,8 +79,8 @@ ros::Subscriber <std_msgs::Float32> velocity_sub ("/PathPlanner/vel_level", CmdV
 ros::Subscriber <std_msgs::Float32> steering_sub ("/PathPlanner/steer_cmd", CmdSteeringCallback);
 
 //Callback functions used by subscriber
-void CmdVelocityCallback(const std_msgs::Float32 & cmd_vel_msg);
-void CmdSteeringCallback(const std_msgs::Float32 & cmd_str_msg);
+void CmdVelocityCallback(const std_msgs::Float32 &cmd_vel_msg);
+void CmdSteeringCallback(const std_msgs::Float32 &cmd_str_msg);
 
 int steering_angle = 1500;
 int ROS_watchdog = 0;

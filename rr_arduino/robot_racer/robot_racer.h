@@ -8,29 +8,29 @@
 #define TEST_OUTPUT 1
 
 // servo defines
-const int SERVO_THROTTLE_PIN    10
-const int SERVO_STEER_PIN       11
-const int SERVO_BRAKE_PIN       12
-const int MANUAL_MAX            1575
-const int MANUAL_REV_MAX        1375
-const int THROTTLE_MAX          1675  //< 1675 is 10 m/s, max. is 2000
-const int THROTTLE_REV_MAX      1300  //< Under 1300 is too fast, min. is 1000
-const int MAX_RC_VAL            1738
-const int MIN_RC_VAL            304
-const int REST_RC_VAL           874
-const int MAX_RC_STEER_VAL      1726
-const int MIN_RC_STEER_VAL      306
-const int REST_STEER_VAL        982
-const int MAX_STEERING          2000
-const int MIN_STEERING          1000
-const int NEUTRAL               1500
-const int STEER_NEUTRAL         1460
-const float MAX_STEERING_ANGLE  0.5236
-const float MIN_STEERING_ANGLE  (-0.5236)
-const int THROTTLE_REDUCTION    25
-const int BRAKE_DELAY           100  //< Reducing this quickens the vehicle braking
-const int RC_CHANNELS           8
-const int DELAY                 250 // Time in milliseconds for estop to trigger when r/c disconnects
+const int SERVO_THROTTLE_PIN   = 10
+const int SERVO_STEER_PIN      = 11
+const int SERVO_BRAKE_PIN      = 12
+const int MANUAL_MAX           = 1575
+const int MANUAL_REV_MAX       = 1375
+const int THROTTLE_MAX         = 1675  //< 1675 is 10 m/s, max. is 2000
+const int THROTTLE_REV_MAX     = 1300  //< Under 1300 is too fast, min. is 1000
+const int MAX_RC_VAL           = 1738
+const int MIN_RC_VAL           = 304
+const int REST_RC_VAL          = 874
+const int MAX_RC_STEER_VAL     = 1726
+const int MIN_RC_STEER_VAL     = 306
+const int REST_STEER_VAL       = 982
+const int MAX_STEERING         = 2000
+const int MIN_STEERING         = 1000
+const int NEUTRAL              = 1500
+const int STEER_NEUTRAL        = 1460
+const float MAX_STEERING_ANGLE = 0.5236
+const float MIN_STEERING_ANGLE = (-0.5236)
+const int THROTTLE_REDUCTION   = 25
+const int BRAKE_DELAY          = 100  //< Reducing this quickens the vehicle braking
+const int RC_CHANNELS          = 8
+const int DELAY                = 250 // Time in milliseconds for estop to trigger when r/c disconnects
 
 // States for eStop, RC, and Auto
 enum CarState
