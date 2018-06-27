@@ -63,7 +63,7 @@ class LaserMapper
     void UpdateLaserMap(const int& x, const int& y, const double& value);
     double CheckMap(const int& x, const int& y);
     void RayTracing(const float& angle, const float& range, const int& inflate_factor);
-    void ShiftMap(std::vector<int> prev_map);
+    std::vector<int> ShiftMap(std::vector<int> prev_map);
     std::vector<int> RotateMap(std::vector<int> curr_map, double new_ang); 
 
     // ROS Variables

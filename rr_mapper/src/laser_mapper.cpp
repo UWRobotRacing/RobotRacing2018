@@ -86,24 +86,24 @@ void LaserMapper::GetParam() {
 /**
  * @name PublishMap
  * @brief Joins the entire map together
- *        & Publishes the full_map_
+ *        & Publishes the full_map
  * @return NONE
  */
 void LaserMapper::PublishMap() {
-  nav_msgs::OccupancyGrid full_map_;
+  nav_msgs::OccupancyGrid full_map;
 
-  full_map_.header.frame_id = "/map";
-  full_map_.info.resolution = map_res_;
-  full_map_.info.width = map_W_;
-  full_map_.info.height = map_H_;
-  full_map_.info.origin.position.x = map_W_/2*map_res_;//-map_W_/2*map_res_; //map_W_/2*map_res_
-  full_map_.info.origin.position.y = 0;//-map_H_/2*map_res_; //map_H_*map_res_
-  full_map_.info.origin.orientation =
+  full_map.header.frame_id = "/map";
+  full_map.info.resolution = map_res_;
+  full_map.info.width = map_W_;
+  full_map.info.height = map_H_;
+  full_map.info.origin.position.x = map_W_/2*map_res_;//-map_W_/2*map_res_; //map_W_/2*map_res_
+  full_map.info.origin.position.y = 0;//-map_H_/2*map_res_; //map_H_*map_res_
+  full_map.info.origin.orientation =
              tf::createQuaternionMsgFromRollPitchYaw(M_PI, -1*M_PI, 0);
-  full_map_.data.resize(map_W_*map_H_);
+  full_map.data.resize(map_W_*map_H_);
 
   //Deletes Values based on new position
-  ShiftMap(belief_map_);
+  belief_map_ = ShiftMap(belief_map_);
 
   //Checks for lidar msg
   if(lidar_msg_call_){
@@ -125,7 +125,7 @@ void LaserMapper::PublishMap() {
       double weight = std::min(100.0, OBS_SCALE_*belief_map_[i]);
       weight = std::max(0.0, weight);
 
-      full_map_.data[i] =
+      full_map.data[i] =
       std::max(static_cast<int>(weight), static_cast<int>(belief_map_[i]));
     }
     lidar_msg_call_ = false;
@@ -133,7 +133,7 @@ void LaserMapper::PublishMap() {
 
   //Checks for left lane msg
   if (left_msg_call_) {
-    JoinOccupancyGrid(full_map_, lane_detection_left_msg_, 
+    JoinOccupancyGrid(full_map, lane_detection_left_msg_, 
                       offset_height_left_, offset_width_left_);
     left_msg_call_ = false;
   }
@@ -142,14 +142,14 @@ void LaserMapper::PublishMap() {
 
   //Checks for right lane msg
   if (right_msg_call_) {
-    JoinOccupancyGrid(full_map_, lane_detection_right_msg_,
+    JoinOccupancyGrid(full_map, lane_detection_right_msg_,
                       offset_height_right_, offset_width_right_);
     right_msg_call_ = false;
   } 
   else
     ROS_WARN("No Right Lane Data Detected");
   
-  map_pub_.publish(full_map_);
+  map_pub_.publish(full_map);
 }
 
 /**
@@ -180,7 +180,6 @@ void LaserMapper::LidarCallback(const sensor_msgs::LaserScan::ConstPtr& msg) {
  */
 void LaserMapper::DetectLeftLaneCallback(const nav_msgs::OccupancyGrid::ConstPtr& msg) {
   lane_detection_left_msg_ = *msg;
-  ROS_INFO("Left Data Received!");
   left_msg_call_ = true;
 }
 
@@ -192,7 +191,6 @@ void LaserMapper::DetectLeftLaneCallback(const nav_msgs::OccupancyGrid::ConstPtr
  */
 void LaserMapper::DetectRightLaneCallback(const nav_msgs::OccupancyGrid::ConstPtr& msg) {
   lane_detection_right_msg_ = *msg;
-  ROS_INFO("Right Data Receieved!");
   right_msg_call_ = true;
 }
 
@@ -206,7 +204,6 @@ void LaserMapper::DetectRightLaneCallback(const nav_msgs::OccupancyGrid::ConstPt
  * @return NONE
  */
 void LaserMapper::UpdateLaserMap(const int& x, const int& y, const double& value) {
-  ROS_INFO("Center Data Received!");
   if (abs(x) < map_W_/2 && y < map_H_ && y > 0) {
     int map_index = (map_W_/2 - x) + (map_H_ - y)*map_W_;
     belief_map_[map_index] = value;
@@ -302,7 +299,16 @@ void LaserMapper::RayTracing(const float& angle, const float& range, const int& 
  * @param[in] prev_map: map that needs to be updated
  * @return Updates the prev_map with shifting map
  */
-void LaserMapper::ShiftMap(std::vector<int> prev_map) {
+std::vector<int> LaserMapper::ShiftMap(std::vector<int> prev_map) {
+  std::vector<int> shift_map(map_W_*map_H_);
+  if(prev_map.empty()){
+    ROS_ERROR("There is no map to shift!");
+    return shift_map;
+  } 
+  else {
+    shift_map = prev_map;
+  }
+  
   tf::StampedTransform transform;
   try {
     position_listener_.lookupTransform("/odom", "/base_link",
@@ -310,7 +316,7 @@ void LaserMapper::ShiftMap(std::vector<int> prev_map) {
 
   } catch (tf::TransformException ex) {
       ROS_ERROR("%s",ex.what());
-      return;
+      return shift_map;
   }
 
   // Assumes previous value is given
@@ -326,16 +332,16 @@ void LaserMapper::ShiftMap(std::vector<int> prev_map) {
     if (diff_x > 0) {
       for(int i = 0; i < map_H_; i++) {
         std::vector<int> temp(map_W_);
-        std::copy(prev_map.begin(), prev_map.begin()+map_W_, temp.begin());
+        std::copy(shift_map.begin(), shift_map.begin()+map_W_, temp.begin());
         std::rotate(temp.begin(), temp.begin()+abs(diff_x), temp.end());
         std::fill(temp.rbegin(), temp.rbegin()+abs(diff_x), UNKNOWN_);
-        std::copy(temp.begin(), temp.end(), prev_map.begin());
+        std::copy(temp.begin(), temp.end(), shift_map.begin());
       }
 
       // Replaces functionality with std::fill()
       // for(int i = 1; i <= map_H_; i++) {
       //   for(int j = 1; j <= abs(diff_x); j++) {
-      //     prev_map[(j*i)-1] = UNKNOWN_;
+      //     shift_map[(j*i)-1] = UNKNOWN_;
       //   }
       // }
 
@@ -343,16 +349,16 @@ void LaserMapper::ShiftMap(std::vector<int> prev_map) {
     else {
       for(int i = 0; i < map_H_; i++) {
         std::vector<int> temp(map_W_);
-        std::copy(prev_map.begin(), prev_map.begin()+map_W_, temp.begin());
+        std::copy(shift_map.begin(), shift_map.begin()+map_W_, temp.begin());
         std::rotate(temp.begin(), temp.begin()+abs(diff_x), temp.end());
         std::fill(temp.begin(), temp.begin()+abs(diff_x), UNKNOWN_);
-        std::copy(temp.begin(), temp.end(), prev_map.begin());
+        std::copy(temp.begin(), temp.end(), shift_map.begin());
       }
 
       // Replaces functionality with std::fill()
       // for(int i = map_H_; i >= 1; i--) {
       //   for(int j = abs(diff_x); j >= 1; j--) {
-      //     prev_map[(j*i)-1] = UNKNOWN_;
+      //     shift_map[(j*i)-1] = UNKNOWN_;
       //   }
       // }
     }
@@ -361,21 +367,21 @@ void LaserMapper::ShiftMap(std::vector<int> prev_map) {
     if (diff_y > 0) {
       //'Rotates' the map dragging all values 
       //By abs(diff_y)*map_W_ amount
-      std::rotate(prev_map.begin(), 
-          prev_map.begin()+(abs(diff_y)*map_W_), 
-          prev_map.end());
+      std::rotate(shift_map.begin(), 
+          shift_map.begin()+(abs(diff_y)*map_W_), 
+          shift_map.end());
 
       for(int i = 0; i < abs(diff_y)*map_W_; i++) {
-        prev_map[i] = UNKNOWN_;
+        shift_map[i] = UNKNOWN_;
       }
     }
     else {
-      std::rotate(prev_map.rbegin(), 
-          prev_map.rbegin()+(abs(diff_y)*map_W_), 
-          prev_map.rend());
+      std::rotate(shift_map.rbegin(), 
+          shift_map.rbegin()+(abs(diff_y)*map_W_), 
+          shift_map.rend());
 
       for(int i = (abs(diff_y)*map_W_)-1; i >= 0; i--) {
-        prev_map[i] = UNKNOWN_;
+        shift_map[i] = UNKNOWN_;
       }
     }
   }
@@ -385,8 +391,9 @@ void LaserMapper::ShiftMap(std::vector<int> prev_map) {
 
   //Rotation
   double diff_ang = transform.getRotation().getAngle() - prev_ang_;
-  prev_map = RotateMap(prev_map, diff_ang);
+  shift_map = RotateMap(shift_map, diff_ang);
   prev_ang_ = transform.getRotation().getAngle();
+  return shift_map;
 }
 
 /**
