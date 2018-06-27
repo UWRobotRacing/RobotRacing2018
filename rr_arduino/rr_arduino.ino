@@ -28,7 +28,7 @@
 const int ROS_BAUD_RATE = 57600
 
 //I2C address for encoder counter 
-const int SLAVE_ADDRESS 07
+const int SLAVE_ADDRESS = 07
 
 //Battery monitoring defines
 const int      BATTERY_FREQUENCY = 2
