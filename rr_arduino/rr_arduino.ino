@@ -35,13 +35,13 @@ const int IMU_BAUD_RATE         38400
 
 
 //I2C address for encoder counter 
-#define SLAVE_ADDRESS 0x07
+const int SLAVE_ADDRESS 07
 
 Adafruit_BNO055 bno = Adafruit_BNO055(55);
 
 //Battery monitoring defines
 const int    BATTERY_FREQUENCY     2
-const string BATTERY_PIN           A0
+const int BATTERY_PIN           A0
 const int    AVERAGING_SIZE        5
 
 /**
