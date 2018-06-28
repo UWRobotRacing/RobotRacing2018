@@ -21,18 +21,9 @@
 
 #define CAMERA_FRAMERATE 15
 
-
 /**
- * @Requirements
- * TODO (Adrian): 
- * - Refactor main function to depend on darknet_ros node to retrieve the TL state instead of polling
- * - Remove all unnecesarry comments
- * - Configure launch files to start up darknet node
- */
-
-/**
- * @brief initializes and starts the traffic light detection node 
- * @return int 
+ * @brief initializes and starts the traffic light detection node
+ * @return int
  */
 int main(int argc, char **argv)
 {
@@ -40,15 +31,14 @@ int main(int argc, char **argv)
   ros::init(argc, argv, "trafficLightNode");
   ros::NodeHandle nh_;
   std::cout << "Starting trafficLightNode\n";
-  
+
   std::string camera_source;
   nh_.param<std::string>("Camera_Source_Topic", camera_source, "/traffic_light/image_raw");
   int testmode;
   nh_.param<int>("Testmode", testmode, 0);
-  
+
   image_transport::ImageTransport it_(nh_);
   TrafficLightProcessor tlproc(nh_);
-  // image_transport::Subscriber image_sub_ = it_.subscribe(camera_source, 1, &TrafficLightProcessor::imageCallback, &tlproc);
 
   ROS_INFO("Traffic Light Node: Exposure Delay Ended. Ready for Detection.");
 

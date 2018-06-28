@@ -9,7 +9,7 @@
 
 #include "rr_traffic_light.hpp"
 
-/**@name TrafficLightDetector 
+/**@name TrafficLightDetector
  * @brief Constructor
  */
 TrafficLightProcessor::TrafficLightProcessor(ros::NodeHandle nh) : nh_(nh) {
@@ -18,7 +18,7 @@ TrafficLightProcessor::TrafficLightProcessor(ros::NodeHandle nh) : nh_(nh) {
   Initialize();
 }
 
-/**@name Initialize 
+/**@name Initialize
  * @brief Invokes necessary functions
  */
 void TrafficLightProcessor::Initialize() {
@@ -28,10 +28,10 @@ void TrafficLightProcessor::Initialize() {
   traffic_light_state_ = NO_TRAFFIC_LIGHT;
 
   // Service
-  client_ = nh_.serviceClient<std_srvs::Empty>("/Supervisor/start_race", true);
+  client_ = nh_.serviceClient<std_srvs::Empty>("/Supervisor/start_race");
 }
 
-/**@name InitializePubsAndSubs 
+/**@name InitializePubsAndSubs
  * @brief Initializes the publishers and subscribers of traffic_light_detector
  */
 void TrafficLightProcessor::InitializePubsAndSubs() {
@@ -43,7 +43,7 @@ void TrafficLightProcessor::InitializePubsAndSubs() {
               &TrafficLightProcessor::TrafficLightImageCallback, this);
 }
 
-/**@name TrafficLightImageCallback 
+/**@name TrafficLightImageCallback
  * @brief Retrieves the cropped traffic light image of the object from YOLO to be parsed
  * @param msg: Message contents of the subscriber
  */
@@ -53,7 +53,7 @@ void TrafficLightProcessor::TrafficLightImageCallback(const sensor_msgs::ImageCo
   cv_bridge::CvImageConstPtr cv_ptr;
   try {
     cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
-  } 
+  }
   catch (cv_bridge::Exception& e) {
     ROS_ERROR("cv_bridge exception: %s", e.what());
     return;
@@ -72,7 +72,7 @@ bool TrafficLightProcessor::FindTrafficLightColorState(const cv::Mat& traffic_li
   // Dimensions
   cv::Size image_size = traffic_light_image.size();
   int image_height = image_size.height, image_width = image_size.width;
-  
+
   // Service Call
   std_srvs::Empty srv;
 
@@ -80,20 +80,20 @@ bool TrafficLightProcessor::FindTrafficLightColorState(const cv::Mat& traffic_li
 
   // Detect Red Light
   cv::Mat red_hsv;
-    cvtColor(traffic_light_image, red_hsv, cv::COLOR_BGR2HSV);
+  cvtColor(traffic_light_image, red_hsv, cv::COLOR_BGR2HSV);
 
   cv::Mat red_mask1, red_mask2;
   cv::inRange(red_hsv, cv::Scalar(0, 70, 50), cv::Scalar(10, 255, 255), red_mask1);
-    cv::inRange(red_hsv, cv::Scalar(170, 70, 50), cv::Scalar(180, 255, 255), red_mask2);
+  cv::inRange(red_hsv, cv::Scalar(170, 70, 50), cv::Scalar(180, 255, 255), red_mask2);
   cv::Mat red_mask = red_mask1 | red_mask2;
   int red_pixel_count = cv::countNonZero(red_mask);
 
   // Detect Green Light
   cv::Mat green_hsv;
-    cvtColor(traffic_light_image, green_hsv, cv::COLOR_BGR2HSV);
+  cvtColor(traffic_light_image, green_hsv, cv::COLOR_BGR2HSV);
   cv::Mat green_mask;
-    cv::inRange(green_hsv, cv::Scalar((2/12.0) * 255, (2/20.0) * 255,(6.5/10.0) * 255), cv::Scalar((8/12.0) * 255, 255, 255), green_mask);
-    int green_pixel_count = cv::countNonZero(green_mask);
+  cv::inRange(green_hsv, cv::Scalar((2/12.0) * 255, (2/20.0) * 255,(6.5/10.0) * 255), cv::Scalar((8/12.0) * 255, 255, 255), green_mask);
+  int green_pixel_count = cv::countNonZero(green_mask);
 
   // Make number of pixels as a function of the size of the detected image
   int green_pixel_threshold = (1.0/6) * image_height * image_width;
