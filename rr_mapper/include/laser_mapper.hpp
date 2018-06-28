@@ -81,9 +81,9 @@ class LaserMapper
     sensor_msgs::LaserScan laser_msg_;
 
     // Callback Toggle
-    bool left_msg_call_ = false;
-    bool right_msg_call_ = false;
-    bool lidar_msg_call_ = false;
+    // bool left_msg_call_ = false;
+    // bool right_msg_call_ = false;
+    // bool lidar_msg_call_ = false;
 
     std::string occupancy_grid_name_;
     std::string laser_scan_name_ = "/rr_vehicle/laserscan";

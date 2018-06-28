@@ -62,11 +62,12 @@ void LaserMapper::GetParam() {
   nh_.param<std::string>("LaserMapper/Occupancy_Grid_Name", occupancy_grid_name_, "/map");
   nh_.param<std::string>("LaserMapper/Laser_Scan_Name", laser_scan_name_, "/scan");
 
-  nh_.param<double>("LaserMapper/map_res", map_res_, 0.01);
+  nh_.param<double>("LaserMapper/map_res", map_res_, 1);
   nh_.param<int>("LaserMapper/map_W", map_W_, 800);
   nh_.param<int>("LaserMapper/map_H", map_H_, 300);
   nh_.param<double>("LaserMapper/map_orientation", map_orientation_, M_PI);
   nh_.param<double>("LaserMapper/LASER_ORIENTATION", LASER_ORIENTATION_, -1);
+  nh_.param<int>("LaserMapper/INFLATE_OBS", inflate_obstacle_, 2);
 
   nh_.param<double>("LaserMapper/max_angle", max_angle_, 3.14/2.0);
   nh_.param<double>("LaserMapper/min_angle", min_angle_, -3.14/2.0);
@@ -92,6 +93,21 @@ void LaserMapper::GetParam() {
 void LaserMapper::PublishMap() {
   nav_msgs::OccupancyGrid full_map;
 
+  //Checks for lidar msg
+  int n = floor(abs(min_angle_-laser_msg_.angle_min)/laser_msg_.angle_increment)+mech_offset_;    
+  double increment = (samplerate_)*laser_msg_.angle_increment;
+
+  if (prev_header_.seq != laser_msg_.header.seq) {
+    for (double i = min_angle_; i < max_angle_; i+= increment) {
+      // Check for NaN ranges
+      if (std::isnan (laser_msg_.ranges[n]) == false) {
+        RayTracing(i, laser_msg_.ranges[n], inflate_obstacle_);
+      }
+      n += samplerate_;
+    }
+    prev_header_ = laser_msg_.header;
+  }
+
   full_map.header.frame_id = "/map";
   full_map.info.resolution = map_res_;
   full_map.info.width = map_W_;
@@ -103,53 +119,68 @@ void LaserMapper::PublishMap() {
   full_map.data.resize(map_W_*map_H_);
 
   //Deletes Values based on new position
-  belief_map_ = ShiftMap(belief_map_);
+  //belief_map_ = ShiftMap(belief_map_);
 
-  //Checks for lidar msg
-  if(lidar_msg_call_){
-    int n = floor(abs(min_angle_-laser_msg_.angle_min)/laser_msg_.angle_increment)+mech_offset_;    
-    double increment = (samplerate_)*laser_msg_.angle_increment;
 
-    if (prev_header_.seq != laser_msg_.header.seq) {
-      for (double i = min_angle_; i < max_angle_; i+= increment) {
-        // Check for NaN ranges
-        if (std::isnan (laser_msg_.ranges[n]) == false) {
-          RayTracing(i, laser_msg_.ranges[n], 0);
-        }
-        n += samplerate_;
-      }
-      prev_header_ = laser_msg_.header;
-    }
+  for (int i = 0; i < map_W_*map_H_; i++) {
+    double weight = std::min(100.0, OBS_SCALE_*belief_map_[i]);
+    weight = std::max(0.0, weight);
 
-    for (int i = 0; i < map_W_*map_H_; i++) {
-      double weight = std::min(100.0, OBS_SCALE_*belief_map_[i]);
-      weight = std::max(0.0, weight);
-
-      full_map.data[i] =
-      std::max(static_cast<int>(weight), static_cast<int>(belief_map_[i]));
-    }
-    lidar_msg_call_ = false;
+    full_map.data[i] =
+    std::max(static_cast<int>(weight), static_cast<int>(belief_map_[i]));
   }
 
+  // if(lidar_msg_call_){
+  //   int n = floor(abs(min_angle_-laser_msg_.angle_min)/laser_msg_.angle_increment)+mech_offset_;    
+  //   double increment = (samplerate_)*laser_msg_.angle_increment;
+
+  //   if (prev_header_.seq != laser_msg_.header.seq) {
+  //     for (double i = min_angle_; i < max_angle_; i+= increment) {
+  //       // Check for NaN ranges
+  //       if (std::isnan (laser_msg_.ranges[n]) == false) {
+  //         RayTracing(i, laser_msg_.ranges[n], 0);
+  //       }
+  //       n += samplerate_;
+  //     }
+  //     prev_header_ = laser_msg_.header;
+  //   }
+
+  //   for (int i = 0; i < map_W_*map_H_; i++) {
+  //     double weight = std::min(100.0, OBS_SCALE_*belief_map_[i]);
+  //     weight = std::max(0.0, weight);
+
+  //     full_map.data[i] =
+  //     std::max(static_cast<int>(weight), static_cast<int>(belief_map_[i]));
+  //   }
+  //   lidar_msg_call_ = false;
+  // }
+
+  JoinOccupancyGrid(full_map, lane_detection_left_msg_, 
+                    offset_height_left_, offset_width_left_);
+  
   //Checks for left lane msg
-  if (left_msg_call_) {
-    JoinOccupancyGrid(full_map, lane_detection_left_msg_, 
-                      offset_height_left_, offset_width_left_);
-    left_msg_call_ = false;
-  }
-  else 
-    ROS_WARN("No Left Name Data Detected");
+  // if (left_msg_call_) {
+  //   JoinOccupancyGrid(full_map, lane_detection_left_msg_, 
+  //                     offset_height_left_, offset_width_left_);
+  //   left_msg_call_ = false;
+  // }
+  // else 
+  //   ROS_WARN("No Left Name Data Detected");
 
+  JoinOccupancyGrid(full_map, lane_detection_right_msg_,
+                    offset_height_right_, offset_width_right_);
   //Checks for right lane msg
-  if (right_msg_call_) {
-    JoinOccupancyGrid(full_map, lane_detection_right_msg_,
-                      offset_height_right_, offset_width_right_);
-    right_msg_call_ = false;
-  } 
-  else
-    ROS_WARN("No Right Lane Data Detected");
+  // if (right_msg_call_) {
+  //   JoinOccupancyGrid(full_map, lane_detection_right_msg_,
+  //                     offset_height_right_, offset_width_right_);
+  //   right_msg_call_ = false;
+  // } 
+  // else
+  //   ROS_WARN("No Right Lane Data Detected");
   
   map_pub_.publish(full_map);
+  belief_map_.clear();
+  belief_map_.resize(map_W_*map_H_);
 }
 
 /**
@@ -168,7 +199,7 @@ void LaserMapper::LidarCallback(const sensor_msgs::LaserScan::ConstPtr& msg) {
   */
 
   laser_msg_ = *msg;
-  lidar_msg_call_ = true;
+  // lidar_msg_call_ = true;
   PublishMap();
 }
 
@@ -180,7 +211,7 @@ void LaserMapper::LidarCallback(const sensor_msgs::LaserScan::ConstPtr& msg) {
  */
 void LaserMapper::DetectLeftLaneCallback(const nav_msgs::OccupancyGrid::ConstPtr& msg) {
   lane_detection_left_msg_ = *msg;
-  left_msg_call_ = true;
+  // left_msg_call_ = true;
 }
 
 /**
@@ -191,7 +222,7 @@ void LaserMapper::DetectLeftLaneCallback(const nav_msgs::OccupancyGrid::ConstPtr
  */
 void LaserMapper::DetectRightLaneCallback(const nav_msgs::OccupancyGrid::ConstPtr& msg) {
   lane_detection_right_msg_ = *msg;
-  right_msg_call_ = true;
+  // right_msg_call_ = true;
 }
 
 /**
