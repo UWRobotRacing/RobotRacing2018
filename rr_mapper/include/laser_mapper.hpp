@@ -117,7 +117,7 @@ class LaserMapper
 
     enum CellState {
         NO_OBS_ = 0,
-        OBS_ = 1,
+        OBS_ = 100,
         UNKNOWN_ = -1
     };
 
