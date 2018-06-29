@@ -30,19 +30,19 @@
 
 
 //Serial, velocity and battery monitoring defines respectively
-const int ROS_BAUD_RATE  =  57600
-const int IMU_BAUD_RATE  =  38400
+const float ROS_BAUD_RATE  =  57600;
+const float IMU_BAUD_RATE  =  38400;
 
 
 //I2C address for encoder counter 
-const int SLAVE_ADDRESS = 07
+const int SLAVE_ADDRESS = 07;
 
 Adafruit_BNO055 bno = Adafruit_BNO055(55);
 
 //Battery monitoring defines
-const int      BATTERY_FREQUENCY = 2
-const int      BATTERY_PIN       = A0
-const int      AVERAGING_SIZE    = 5
+const int      BATTERY_FREQUENCY = 2;
+const int      BATTERY_PIN       = A0;
+const int      AVERAGING_SIZE    = 5;
 
 /**
  *@brief function Call
@@ -81,6 +81,9 @@ std_msgs::Int8 battery_percentage_msg;
 sensor_msgs::Imu imu_msg;
 sensor_msgs::MagneticField magnetic_msg;
 
+//Callback functions for subscriber
+void CmdVelocityCallback(const std_msgs::Float32 &cmd_vel_msg);
+void CmdSteeringCallback(const std_msgs::Float32 &cmd_str_msg);
 
 
 
@@ -96,9 +99,6 @@ ros::Publisher magnetic_pub("/arduino/mag_data", &magnetic_msg);
 ros::Subscriber <std_msgs::Float32> velocity_sub ("/PathPlanner/vel_level", CmdVelocityCallback);
 ros::Subscriber <std_msgs::Float32> steering_sub ("/PathPlanner/steer_cmd", CmdSteeringCallback);
 
-//Callback functions for subscriber
-void CmdVelocityCallback(const std_msgs::Float32 &cmd_vel_msg);
-void CmdSteeringCallback(const std_msgs::Float32 &cmd_str_msg);
 
 int steering_angle = 1500;
 int ROS_watchdog = 0;
