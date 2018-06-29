@@ -6,7 +6,7 @@ void CmdVelocityCallback(const std_msgs::Float32 &cmd_vel_msg)
   autonomous_throttle = cmd_vel_msg.data > 0 ? cmd_vel_msg.data* 21.5 + 1530: 1500;
   autonomous_throttle = constrain(autonomous_throttle, 1300, 1650);
   velDebug.data = autonomous_throttle;
-  velDebugger.publish(&velDebug);
+  velDebugger_pub.publish(&velDebug);
 }
 
 void CmdSteeringCallback(const std_msgs::Float32 &cmd_str_msg)
@@ -15,6 +15,6 @@ void CmdSteeringCallback(const std_msgs::Float32 &cmd_str_msg)
     steering_angle = ((((-1*cmd_str_msg.data)+ 0.5236)/(2* 0.5236))*(2000-1000))+ 960;
     steering_angle = constrain(steering_angle,980,2000);
     debug.data = steering_angle;
-    debugger.publish(&debug);
+    debugger_pub.publish(&debug);
 }
 

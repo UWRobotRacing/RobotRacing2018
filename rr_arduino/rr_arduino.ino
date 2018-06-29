@@ -25,7 +25,7 @@
 
 
 //Serial, velocity and battery monitoring defines respectively
-const int ROS_BAUD_RATE = 57600
+const float ROS_BAUD_RATE = 57600
 
 //I2C address for encoder counter 
 const int SLAVE_ADDRESS = 07
@@ -68,6 +68,10 @@ std_msgs::Float32 debug;
 std_msgs::Float32 velDebug;
 std_msgs::Int8 battery_percentage_msg;
 
+//Callback functions used by subscriber
+void CmdVelocityCallback(const std_msgs::Float32 &cmd_vel_msg);
+void CmdSteeringCallback(const std_msgs::Float32 &cmd_str_msg);
+
 // ROS publisher and subscriber commands
 
 ros::Publisher state_pub("/arduino/vehicle_state", &state_msg);
@@ -78,9 +82,7 @@ ros::Publisher battery_pub("/arduino/battery_state", &battery_percentage_msg);
 ros::Subscriber <std_msgs::Float32> velocity_sub ("/PathPlanner/vel_level", CmdVelocityCallback);
 ros::Subscriber <std_msgs::Float32> steering_sub ("/PathPlanner/steer_cmd", CmdSteeringCallback);
 
-//Callback functions used by subscriber
-void CmdVelocityCallback(const std_msgs::Float32 &cmd_vel_msg);
-void CmdSteeringCallback(const std_msgs::Float32 &cmd_str_msg);
+
 
 int steering_angle = 1500;
 int ROS_watchdog = 0;
