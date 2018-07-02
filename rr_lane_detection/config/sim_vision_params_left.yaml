@@ -14,7 +14,7 @@ bev_width: 1100
 bev_height: 700
 bev_resolution: 0.01
 grid_offset_y: 0
-grid_offset_x: 0 #0.24
+grid_offset_x: 0
 
 # 4 point coordinates in image plane. Note: OpenCV Image coordinates are in [x,y], where X is a column index (0 left, positive rightwards), and Y is a row index (0 top, positive downwards)
 # image_coords: [[0, 0], [640, 0], [0, 480], [640, 480]]
