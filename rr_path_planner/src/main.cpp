@@ -30,7 +30,7 @@ int main(int argc, char **argv)
   ROS_INFO("trajectories Generation Initalized");
   PathPlanner TrajectoryGenerator;
   //TODO(oluwatoni) remove the delay
-  ros::Duration(4).sleep();
+  ros::Duration(6).sleep();
   ros::spin();
 
   ROS_INFO("Trajectories Generation Completed");

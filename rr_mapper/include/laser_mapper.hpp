@@ -40,19 +40,6 @@ class LaserMapper
     void PublishMap();
 
   private:
-    struct CellEntity {
-      //Occupancy Grid Value (Subject to Change)
-      int val;
-      
-      //Cartesian Coordinates
-      double xloc;
-      double yloc;
-
-      //Polar Coordinates
-      double length;
-      double angle;
-    };    
-
     // Subscribers
     void LidarCallback(const sensor_msgs::LaserScan::ConstPtr& msg);
     void DetectLeftLaneCallback(const nav_msgs::OccupancyGrid::ConstPtr& msg);
@@ -64,8 +51,6 @@ class LaserMapper
     void UpdateLaserMap(const int& x, const int& y, const double& value);
     double CheckMap(const int& x, const int& y);
     void RayTracing(const float& angle, const float& range, const int& inflate_factor);
-    std::vector<int> ShiftMap(std::vector<int> prev_map);
-    std::vector<int> RotateMap(std::vector<int> curr_map, double new_ang); 
 
     // ROS Variables
     ros::NodeHandle nh_;
@@ -82,9 +67,8 @@ class LaserMapper
     sensor_msgs::LaserScan laser_msg_;
 
     // Callback Toggle
-    // bool left_msg_call_ = false;
-    // bool right_msg_call_ = false;
-    // bool lidar_msg_call_ = false;
+    bool left_msg_call_ = false;
+    bool right_msg_call_ = false;
 
     std::string occupancy_grid_name_;
     std::string laser_scan_name_ = "/rr_vehicle/laserscan";
@@ -93,8 +77,8 @@ class LaserMapper
     // Map Parameters
     double map_res_;
     double map_orientation_;
-    int map_W_;
-    int map_H_;
+    int map_width_;
+    int map_height_;
 
     // Scan Parameters
     double max_angle_;
@@ -126,7 +110,6 @@ class LaserMapper
     double prev_x_;
     double prev_y_;
     double prev_ang_;
-    
 };
 
 #endif  // LASERMAPPER_H

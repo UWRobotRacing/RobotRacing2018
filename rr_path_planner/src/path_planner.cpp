@@ -50,16 +50,20 @@ void PathPlanner::Init()
 {
   GetParams();
   // debug parameters
-  all_path_marker_id_=0; //id for the selected path marker
-  selected_path_marker_id_=1;
-  trajectory_marker_rayTrace_id_=4;
+  all_path_marker_id_ = 0; //id for the selected path marker
+  selected_path_marker_id_ = 1;
+  trajectory_marker_rayTrace_id_ = 4;
   trajectory_marker_rayTrace_.resize(NUM_PATHS_);
-  X_axis_marker_id=2;
-  Y_axis_marker_id=3;
-  geometry_msgs::Point p1,p2;
-  for(int i=0;i<200;i++) {
-    p1.x=i*resolution_;p1.y=0;
-    p2.x=0;p2.y=i*resolution_;
+  X_axis_marker_id = 2;
+  Y_axis_marker_id = 3;
+  geometry_msgs::Point p1, p2;
+
+  for ( int i = 0; i < 200; i++)
+  {
+    p1.x = i * resolution_;
+    p1.y = 0;
+    p2.x = 0;
+    p2.y = i * resolution_;
     X_axis_marker_points.points.push_back(p1);
     Y_axis_marker_points.points.push_back(p2);
   }
@@ -70,6 +74,7 @@ void PathPlanner::Init()
   angles_and_weights.resize(NUM_PATHS_, std::vector<double>(2, 0.0));
   path_distance.resize(NUM_PATHS_, std::vector<double>(TRAJECTORY_STEPS_, 0.0));
   trajectory.resize(NUM_PATHS_);
+
   for(int i=0;i<NUM_PATHS_;i++)
   {
     trajectory[i].resize(TRAJECTORY_STEPS_);
@@ -165,7 +170,7 @@ void PathPlanner::GenerateIdealPaths()
     double theta = 0.0;
     double dist = 0.0;
 
-    for(int j=0;j<TRAJECTORY_STEPS_;j++)
+    for(int j = 0; j < TRAJECTORY_STEPS_; j++)
     {
       x += PLANNER_VELOCITY_*sin(-theta)*dt_; //** robot dx as calculated by motion model
       y += PLANNER_VELOCITY_*cos(-theta)*dt_; //** -theta flips the Y axis. theta is measured around Y_axis
@@ -181,17 +186,17 @@ void PathPlanner::GenerateIdealPaths()
       std::vector<geometry_msgs::Point> new_point_list = rayTrace(x0, y0, x1, y1);
       for (int k = 0; k < new_point_list.size(); k++)
       {
-        int tmp_index = xyToMapIndex(new_point_list[k].x,new_point_list[k].y);
+        int tmp_index = xyToMapIndex(new_point_list[k].x, new_point_list[k].y);
         trajectory[i][j].push_back(tmp_index);
       }
-      if(VISUALIZATION_)
+      if (VISUALIZATION_)
       {
         geometry_msgs::Point p;
         p.x = x;
         p.y = y;
         trajectory_marker_vector_[i].points.push_back(p);
         trajectory_points_.points.push_back(p);
-        for(std::vector<geometry_msgs::Point>::iterator it = new_point_list.begin();it<new_point_list.end();it++)
+        for(std::vector<geometry_msgs::Point>::iterator it = new_point_list.begin(); it<new_point_list.end(); it++)
         {
           trajectory_marker_rayTrace_[i].points.push_back(*it);
         }
@@ -252,11 +257,11 @@ void PathPlanner::GenerateRealPaths()
   double selected_path_angle;
   double selected_path_distance;
 
-  for(int i=0; i<NUM_PATHS_;i++)
+  for (int i = 0; i < NUM_PATHS_; i++)
   {
     int index_on_path = CheckLength(i);
     dist = path_distance[i][index_on_path];
-    dist_cost = DIST_COST_FACTOR_*dist; //(PLANNER_VELOCITY_*TRAJECTORY_STEPS_*dt_);
+    dist_cost = DIST_COST_FACTOR_ * dist; //(PLANNER_VELOCITY_*TRAJECTORY_STEPS_*dt_);
     angle_cost = angles_and_weights[i][1];
     cost = dist_cost + angle_cost;
     if (DEBUG_ON_)
@@ -273,7 +278,7 @@ void PathPlanner::GenerateRealPaths()
       index_of_longest_path = index_on_path;
       selected_path_index = i;
     }
-    if(highest_cost < cost)
+    if (highest_cost < cost)
     {
       highest_cost = cost;
       selected_path_index = i;
@@ -288,7 +293,7 @@ void PathPlanner::GenerateRealPaths()
   ROS_INFO("PATH PLANNER: GenerateRealPaths: selected Angle = %f", selected_path_angle);
 
   selected_path_index = NUM_PATHS_ - selected_path_index - 1;
-  double wheel_speed = 0;//Velocity(selected_path_distance, selected_path_angle);
+  double wheel_speed = Velocity(selected_path_distance, selected_path_angle);
 
   double lf = wheel_to_wheel_dist_ / 2.0;
   double lr = lf;
@@ -317,25 +322,22 @@ void PathPlanner::GenerateRealPaths()
  */
 int PathPlanner::CheckLength(int angle_index)
 {
-  int index_longest_path=0;
-  for(int j=0;j<TRAJECTORY_STEPS_;j++)
+  for (int j = 0; j < TRAJECTORY_STEPS_; j++)
   {
-    if(path_distance[angle_index][j] >= min_offset_dist_)
+    if (path_distance[angle_index][j] >= min_offset_dist_)
     {
       int spine_length = trajectory[angle_index][j].size();
-      for(int k=0;k<spine_length;k++)
+      for (int k = 0; k < spine_length; k++)
       {
-        if(IsCellOccupied(trajectory[angle_index][j][k]))
+        if (IsCellOccupied(trajectory[angle_index][j][k]))
         {
           //obstacle detected in the cell
-          index_longest_path=j;
-          return index_longest_path;
+          return j;
         }
       }
     }
-    index_longest_path=j;
   }
-  return index_longest_path;
+  return TRAJECTORY_STEPS_ - 1;
 }
 
 /** @brief returns if a cell is occupied or not
@@ -344,7 +346,7 @@ int PathPlanner::CheckLength(int angle_index)
  */
 bool PathPlanner::IsCellOccupied(int index)
 {
-  if(map_->data[index] != 0)
+  if(map_-> data[index] != 0)
   {
     return true;
   }
@@ -365,7 +367,7 @@ bool PathPlanner::IsCellOccupied(int index)
  * @param alpha the transparency of the markers
  */
 void PathPlanner::DrawPath(ros::Publisher& pub, visualization_msgs::Marker& points,int id, int index, int R, int G, int B, float scale, float alpha) {
-  points.header.frame_id = "/map";
+  points.header.frame_id = "/base_link";
   points.header.stamp = ros::Time::now();
   points.ns = "Path Points";
   points.action = visualization_msgs::Marker::ADD;
@@ -526,7 +528,7 @@ int PathPlanner::xyToMapIndex(double x, double y)
 
   // Convert [pixel] in car coordinate to [pixel] in image frame
   double map_x  = grid_x + round( map_W_/2 );
-  double map_y  = -1*grid_y + round( map_H_/2 );
+  double map_y  = -grid_y + map_H_;
 
   // Convert [pixel] in image frame to index in occupancy grid format
   int Map_index = (map_x-1)+(map_y-1)*map_W_;   //**map index starts from 0,0 from top left
