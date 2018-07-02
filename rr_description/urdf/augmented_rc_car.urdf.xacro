@@ -360,7 +360,7 @@
 
   <!-- Sensors -->
   <!-- Lidar -->
-  <!-- <link name="hokuyo_link">
+  <link name="hokuyo_link">
     <inertial>
       <mass value="1e-5" />
       <origin xyz="0 0 0" rpy="0 0 0"/>
@@ -371,7 +371,7 @@
     <origin xyz="0.26 0.0 0.03" rpy="0.0 0.0 0.0"/>
     <parent link="chassis"/>
     <child link="hokuyo_link"/>
-  </joint> -->
+  </joint>
 
   <!-- ULM-30LX Hokuyo Laser Range Finder -->
   <gazebo reference="hokuyo_link">

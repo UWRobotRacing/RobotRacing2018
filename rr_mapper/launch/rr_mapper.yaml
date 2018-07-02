@@ -7,7 +7,7 @@
 
 #Names#
 LaserMapper/Occupancy_Grid_Name:            "/map"
-LaserMapper/Laser_Scan_Name:                "/scan"
+LaserMapper/Laser_Scan_Name:                "/rr_vehicle/laserscan"
 
 #Obstacle#
 LaserMapper/NO_OBS:                         0

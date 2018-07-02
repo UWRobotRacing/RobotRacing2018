@@ -2,6 +2,7 @@
  *  @author Sirui Song
  *  @author Jungwook Lee
  *  @author Raymond Kuo
+ *  @author Andrew Jin (DongJunJin)
  *  @author Toni Ogunmade(oluwatoni)
  *  @competition IARRC 2018
  */
@@ -9,6 +10,7 @@
 #ifndef LASERMAPPER_H
 #define LASERMAPPER_H
 
+// CPP
 #include <stdio.h>
 #include <math.h>
 #include <vector>
@@ -22,7 +24,7 @@
 #include <nav_msgs/OccupancyGrid.h>
 #include <sensor_msgs/LaserScan.h>
 #include <tf/transform_datatypes.h>
-#include "occupancy_grid_utils.hpp"
+#include <tf/transform_listener.h>
 
 /*
  *  Callback Class for laser to Occumpancy Grid Format/OpenCV Format
@@ -32,18 +34,38 @@ class LaserMapper
 {
   public:
     LaserMapper();
-    void ProcessMap();
+    ~LaserMapper();
+
+    // Publishers 
+    void PublishMap();
+
   private:
+    struct CellEntity {
+      //Occupancy Grid Value (Subject to Change)
+      int val;
+      
+      //Cartesian Coordinates
+      double xloc;
+      double yloc;
+
+      //Polar Coordinates
+      double length;
+      double angle;
+    };    
+
+    // Subscribers
+    void LidarCallback(const sensor_msgs::LaserScan::ConstPtr& msg);
+    void DetectLeftLaneCallback(const nav_msgs::OccupancyGrid::ConstPtr& msg);
+    void DetectRightLaneCallback(const nav_msgs::OccupancyGrid::ConstPtr& msg);
+
     // Methods
-    void CallBack(const sensor_msgs::LaserScan::ConstPtr& msg);
-    void DetectLeftLane(const nav_msgs::OccupancyGrid::ConstPtr& msg);
-    void DetectRightLane(const nav_msgs::OccupancyGrid::ConstPtr& msg);
-    void GetParam();
     void InitMap();
-    void DeleteMap();
-    void UpdateLaserMap(int x, int y, double value);
-    double CheckMap(int x, int y);
-    void RayTracing(float angle, float range, int inflate_factor);
+    void GetParam();
+    void UpdateLaserMap(const int& x, const int& y, const double& value);
+    double CheckMap(const int& x, const int& y);
+    void RayTracing(const float& angle, const float& range, const int& inflate_factor);
+    std::vector<int> ShiftMap(std::vector<int> prev_map);
+    std::vector<int> RotateMap(std::vector<int> curr_map, double new_ang); 
 
     // ROS Variables
     ros::NodeHandle nh_;
@@ -51,17 +73,21 @@ class LaserMapper
     ros::Subscriber scan_sub_;
     ros::Subscriber lane_detection_left_sub_;
     ros::Subscriber lane_detection_right_sub_;
+    tf::TransformListener position_listener_;
 
     // Map Variables
-    std::vector<double> belief_map_;
-    // std::vector<nav_msgs::OccupancyGrid::ConstPtr> maps_to_be_combined_;
-    nav_msgs::OccupancyGrid occu_msg_;
+    std::vector<int> belief_map_;
     nav_msgs::OccupancyGrid lane_detection_left_msg_;
     nav_msgs::OccupancyGrid lane_detection_right_msg_;
     sensor_msgs::LaserScan laser_msg_;
 
+    // Callback Toggle
+    // bool left_msg_call_ = false;
+    // bool right_msg_call_ = false;
+    // bool lidar_msg_call_ = false;
+
     std::string occupancy_grid_name_;
-    std::string laser_scan_name_;
+    std::string laser_scan_name_ = "/rr_vehicle/laserscan";
     std_msgs::Header prev_header_;
 
     // Map Parameters
@@ -73,8 +99,8 @@ class LaserMapper
     // Scan Parameters
     double max_angle_;
     double min_angle_;
-    double minrange_;
-    double maxrange_;
+    double min_range_;
+    double max_range_;
     int samplerate_;
     int inflate_obstacle_;
     int scan_subsample_;
@@ -82,10 +108,7 @@ class LaserMapper
     double LASER_ORIENTATION_;
 
     // Map Values
-    double NO_OBS_;
-    double OBS_;
-    double UNKNOWN_;
-    double OBS_SCALE_;
+    const double OBS_SCALE_ = 1;
 
     // lane_detection Map Values
     int offset_height_left_;
@@ -93,12 +116,17 @@ class LaserMapper
     int offset_width_left_;
     int offset_width_right_;
 
-    // Debug Purposes
-    bool DEBUG_;
-    bool ready2Map_;
-    bool ready2Maplane_detectionLeft_;
-    bool ready2Maplane_detectionRight_;
+    enum CellState {
+        NO_OBS_ = 0,
+        OBS_ = 100,
+        UNKNOWN_ = -1
+    };
 
+    //Storing values
+    double prev_x_;
+    double prev_y_;
+    double prev_ang_;
+    
 };
 
 #endif  // LASERMAPPER_H
