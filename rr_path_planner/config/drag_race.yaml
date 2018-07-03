@@ -19,7 +19,7 @@ TrajRoll/MIN_STOPPING_DIST:    0.2
 TrajRoll/STOPPING_FACTOR:      0.15
 
 #Desired Velocity Setup
-TrajRoll/STRAIGHT_SPEED:       0.5
+TrajRoll/STRAIGHT_SPEED:       1.5
 
 #Vehicle Parameters
 TrajRoll/MAX_STEERING_ANGLE:   0.7
