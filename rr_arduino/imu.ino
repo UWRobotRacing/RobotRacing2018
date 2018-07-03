@@ -16,7 +16,7 @@ void ImuReadings()
   imu::Vector<3> mag  = bno.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
 
   //Get current time
-  ros::Time current_time=ros::Time::now();
+  //ros::Time current_time=ros::Time::now();
   //assigning values for imu message
 
   imu_msg.linear_acceleration.x=acc.x();
@@ -31,10 +31,10 @@ void ImuReadings()
   imu_msg.orientation.y=euler.y();
   imu_msg.orientation.z=euler.z();
 
-  imu_msg.header.stamp=current_time;
+  //imu_msg.header.stamp=current_time;
   imu_pub.publish(&imu_msg);
   //assigning values for magnetic field message
-  magnetic_msg.header.stamp=current_time;
+ // magnetic_msg.header.stamp=current_time;
   magnetic_msg.magnetic_field.x=mag.x();
   magnetic_msg.magnetic_field.y=mag.y();
   magnetic_msg.magnetic_field.z=mag.z();

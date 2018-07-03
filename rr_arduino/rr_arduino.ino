@@ -31,8 +31,8 @@
 
 //Serial, velocity and battery monitoring defines respectively
 const float ROS_BAUD_RATE  =  57600;
-const float IMU_BAUD_RATE  =  38400;
-
+const float IMU_BAUD_RATE  =  9600;
+const float RC_BAUD_RATE   =  115200;
 
 //I2C address for encoder counter 
 const int SLAVE_ADDRESS = 07;
@@ -115,7 +115,7 @@ void setup() {
   Serial.begin(ROS_BAUD_RATE);
 #endif
   Serial.begin(IMU_BAUD_RATE);
-  
+  Serial2.begin(RC_BAUD_RATE);
   //Initialise the BNO055 sensor
   if(!bno.begin())
   {
@@ -246,8 +246,8 @@ void loop() {
   
   
  
-  
-  delay(1000);
+  //remove comment on delay to read data on serial monitor
+  //delay(1000);
   //call function to publish imu_readings
   ImuReadings();
 }

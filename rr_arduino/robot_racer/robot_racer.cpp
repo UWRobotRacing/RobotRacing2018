@@ -11,14 +11,14 @@
  */
 Car::Car()
 {
-  car_state_  = RC;
+  car_state_      = RC;
   throttle_rc_    = NEUTRAL;
   steering_rc_    = NEUTRAL;
   brake_rc_       = NEUTRAL;
   throttle_       = NEUTRAL;
   steering_       = NEUTRAL;
   brake_          = NEUTRAL;
-  prev_steering_ = NEUTRAL;
+  prev_steering_  = NEUTRAL;
   reverse_throttle_multiplier_ = (MIN_RC_VAL - REST_RC_VAL) / (float)(MANUAL_REV_MAX - NEUTRAL);
   forward_throttle_multiplier_ = (MAX_RC_VAL - REST_RC_VAL) / (float)(MANUAL_MAX - NEUTRAL);
   left_steering_multiplier_ = (MAX_RC_STEER_VAL - REST_STEER_VAL) / (float)(MAX_STEERING - STEER_NEUTRAL);

@@ -8,7 +8,7 @@
 #define TEST_OUTPUT 1
 
 // servo defines
-const int   SERVO_THROTTLE_PIN = 10;
+const int   SERVO_THROTTLE_PIN = 9;
 const int   SERVO_STEER_PIN    = 11;
 const int   SERVO_BRAKE_PIN    = 12;
 const int   MANUAL_MAX         = 1575;
@@ -28,9 +28,9 @@ const int   STEER_NEUTRAL      = 1460;
 const float MAX_STEERING_ANGLE = 0.5236;
 const float MIN_STEERING_ANGLE = (-0.5236);
 const int   THROTTLE_REDUCTION = 25;
-const int   BRAKE_DELAY        = 100;  //< Reducing this quickens the vehicle braking
+const int   BRAKE_DELAY        = 100;  //< Reducing this quickens the vehicle   braking
 const int   RC_CHANNELS        = 8;
-const int   DELAY              = 250; // Time in milliseconds for estop to trigger when r/c disconnects
+const int   DELAY              = 750; // Time in milliseconds for estop to trigger when r/c disconnect
 
 // States for eStop, RC, and Auto
 enum CarState
