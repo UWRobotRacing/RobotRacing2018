@@ -643,13 +643,7 @@ First, to detect shadows, the algorithm calculates the mean value of each plane 
 \label{Shadow1}
 \end{figure}
 
-To prepare for shadow removal, the shadow mask is dilated – to smooth out holes and sharp edges – and then separated into shadow regions. For each shadow region, the algorithm calculates the ratio of red, green, and blue values between the area inside the mask and the area just outside the mask. To remove shadows, the shadow region's RGB values are multiplied by these ratios. The results can be seen in Figure ~\ref{Shadow2}.
-
-\begin{figure}[ht]
-\centerline{\includegraphics[width=0.9\columnwidth]{X2.png}}
-\caption{Shadow Removal Using RGB Ratios}
-\label{Shadow2}
-\end{figure}
+To prepare for shadow removal, the shadow mask is dilated – to smooth out holes and sharp edges – and then separated into shadow regions. For each shadow region, the algorithm calculates the ratio of red, green, and blue values between the area inside the mask and the area just outside the mask. To remove shadows, the shadow region's RGB values are multiplied by these ratios.
 
 The last, and slowest, step is to correct for over-illuminated edges in the shadow regions, since the outer edges of shadows tend to be brighter than the inner region. To do this, a median filter is applied on the edges of each shadow region. Figure ~\ref{Shadow3} shows this process.
 
@@ -659,19 +653,7 @@ The last, and slowest, step is to correct for over-illuminated edges in the shad
 \label{Shadow3}
 \end{figure}
 
-There were two issues the team encountered with this shadow detection and removal approach. The first was that the over-illumination correction took the most time to run, but often blurred out lane lines through its median filter, especially if the shadow was spotty and had edges in its interior. However, the team did not expect to encounter this situation in competition and the resulting images were often more useful for line tracking than the originals. An alternative method to correct for over-illumination could be considered in the future. Second, since the shadow detection relies on a mean value for the lightness (L) over the entire image, a frame with extreme highlights can cause the algorithm to misidentify shadows and over-illuminate entire regions. Again, this was not expected to be seen in competition since this issue was most common with a blown-out sky region and the robot's cameras are directed towards the ground. These two issues are shown in Figure ~\ref{Shadow4} and ~\ref{Shadow5}.
-
-\begin{figure}[ht]
-\centerline{\includegraphics[width=0.9\columnwidth]{X4.png}}
-\caption{Over-illumination Correction on Shadows with Inner Edges}
-\label{Shadow4}
-\end{figure}
-
-\begin{figure}[ht]
-\centerline{\includegraphics[width=0.9\columnwidth]{X5.png}}
-\caption{Final Result of Shadow Removal on an Overexposed Image}
-\label{Shadow5}
-\end{figure}
+There were two issues the team encountered with this shadow detection and removal approach. The first was that the over-illumination correction took the most time to run, but often blurred out lane lines through its median filter, especially if the shadow was spotty and had edges in its interior. However, the team did not expect to encounter this situation in competition and the resulting images were often more useful for line tracking than the originals. An alternative method to correct for over-illumination could be considered in the future. Second, since the shadow detection relies on a mean value for the lightness (L) over the entire image, a frame with extreme highlights can cause the algorithm to misidentify shadows and over-illuminate entire regions. Again, this was not expected to be seen in competition since this issue was most common with a blown-out sky region and the robot's cameras are directed towards the ground.
 
 Figure ~\ref{Shadow6} displays the final result, showing the lane detection before and after the shadow removal pre-processing step for a test image.
 
