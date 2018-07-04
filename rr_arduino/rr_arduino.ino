@@ -44,7 +44,7 @@ Encoder Encoder(ENCODER_PIN, encoder_counts_to_meters, ENCODER_FREQUENCY);
 // double throttle_PID_val[3] = {0, 0, 0};
 double rr_velocity = 0.0f , goal_velocity = 0.0f, autonomous_throttle = 1500.0f;
 // Initial position of the robot
-double x = 0.0, y = 0.0, theta = 0;
+double x = 0.0, y = 0.0, theta = 0.0;
 
 //!PID initialization
 // PID ThrottlePID(&rr_velocity, &autonomous_throttle, &goal_velocity,
@@ -183,8 +183,8 @@ void get_battery_state(long current_time){
 }
 
 void RawToOdom(double vel, double str_angle) {
-  // FIX ME: Get length of the car
-  double L = 0;
+  // Length of the car is 0.335 m
+  double L = 0.335;
   long current_time = millis();
   long time_diff = current_time - prev_time;
   // If the robot is at the origin, calculate the position using steering angle and the velocity
