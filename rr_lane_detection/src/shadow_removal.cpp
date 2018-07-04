@@ -18,6 +18,7 @@
 void RemoveShadows(const cv::Mat &input_image, cv::Mat &output_image) {
 	// Configurable constants
     const double THRESHOLD_TOLERANCE = 0.8;
+	const double MORPH_KERNEL_SIZE = 3;
     const double MIN_SHADOW_AREA = 30;
     const double MASK_DILATION = 6;
     const double EXPANDED_SHADOW_MASK_DILATION = 10;
@@ -47,4 +48,11 @@ void RemoveShadows(const cv::Mat &input_image, cv::Mat &output_image) {
 		cv::inRange(shadow_lab_image, cv::Scalar(0, 0, 0), cv::Scalar(1, 1, shadow_threshold), mask_b);
 		shadow_pixels_mask = mask_l | mask_b;
 	}
+
+	// Morphological operations to clean up misclassified pixels
+	cv::Mat shadow_mask_open, shadow_mask_close;
+	cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(MORPH_KERNEL_SIZE, MORPH_KERNEL_SIZE));
+
+	cv::morphologyEx(shadow_pixels_mask, shadow_mask_open, cv::MORPH_OPEN, kernel);
+	cv::morphologyEx(shadow_mask_open, shadow_mask_close, cv::MORPH_CLOSE, kernel);
 }
