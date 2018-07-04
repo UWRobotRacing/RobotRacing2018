@@ -25,12 +25,26 @@ void RemoveShadows(const cv::Mat &input_image, cv::Mat &output_image) {
     const double MED_FILTER_KERNEL_SIZE = 15;
 
 	// Get the mean of L, a, b planes
-	cv::Mat shadow_lab;
-	cvtColor(input_image, shadow_lab, CV_BGR2Lab, 0);
+	cv::Mat shadow_lab_image;
+	cvtColor(input_image, shadow_lab_image, CV_BGR2Lab, 0);
 
 	std::vector<cv::Mat> channels;
-	split(shadow_lab, channels);
-	cv::Scalar mean_l = mean(channels[0]);
+	split(shadow_lab_image, channels);
+	cv::Scalar mean_l, stdev_l;
+	meanStdDev(channels[0], mean_l, stdev_l);
 	cv::Scalar mean_a = mean(channels[1]);
 	cv::Scalar mean_b = mean(channels[2]);
+
+	// Extract shadows using best method based on mean values
+	cv::Mat shadow_pixels_mask;
+	double shadow_threshold = mean_l[0] - (stdev_l[0] / THRESHOLD_TOLERANCE);
+
+	if (mean_a[0] + mean_b[0] > 256) {
+		cv::inRange(shadow_lab_image, cv::Scalar(0, 0, 0), cv::Scalar(shadow_threshold, 1, 1), shadow_pixels_mask);
+	} else {
+		cv::Mat mask_l, mask_b;
+		cv::inRange(shadow_lab_image, cv::Scalar(0, 0, 0), cv::Scalar(shadow_threshold, 1, 1), mask_l);
+		cv::inRange(shadow_lab_image, cv::Scalar(0, 0, 0), cv::Scalar(1, 1, shadow_threshold), mask_b);
+		shadow_pixels_mask = mask_l | mask_b;
+	}
 }
