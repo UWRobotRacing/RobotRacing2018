@@ -182,28 +182,42 @@ void get_battery_state(long current_time){
   }
 }
 
-void raw_to_odom(double vel, int str_angle) {
-    long current_time = millis();
-    long time_diff = current_time - prev_time;
-    // If the robot is at the origin, calculate the position using steering angle and the velocity
-    if (str_angle != 1500 && x == 0.0 && y == 0.0) {
-        // Mapping str_angle integer to angle in degrees
-        theta = (str_angle - 1000) / (2000 - 1000) * 60 - 30;
-        x = vel * cos(theta * M_PI / 180.0) * time_diff;
-        y = vel * sin(theta * M_PI / 180.0) * time_diff;
+void RawToOdom(double vel, double str_angle) {
+  // FIX ME: Get length of the car
+  double L = 0;
+  long current_time = millis();
+  long time_diff = current_time - prev_time;
+  // If the robot is at the origin, calculate the position using steering angle and the velocity
+  if (str_angle != 0.0 && x == 0.0 && y == 0.0) {
+    // store str_angle in radians
+    theta = str_angle * M_PI / 180.0;
+    x = vel * cos(theta) * time_diff;
+    y = vel * sin(theta) * time_diff;
 
-        geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(theta);
+  } else {
+    // Kinematic equations used: https://nabinsharma.wordpress.com/2014/01/02/kinematics-of-a-robot-bicycle-model/
+    // Calculate turning angle beta
+    double d = vel * time_diff;
+    double R = L / tan(str_angle);
+    double beta = d / R;
+    double xc = x - R * sin(theta);
+    double yc = y + R * cos(theta);
 
-        odom_trans.header.stamp = current_time;
-        odom_trams.transform.translation.x = x;
-        odom_trams.transform.translation.y = y;
-        odom_trams.transform.translation.z = 0.0;
-        odom_trams.transform.rotation = odom_quat;
+    x = xc + R * sin(theta + beta);
+    y = yc - R * cos(theta + beta);
+    theta = (theta + beta) % (2 * M_PI);
+  }
 
-        odom.pose.pose.position.x = x;
-        odom.pose.pose.position.y = y;
-        odom.pose.pose.position.z = 0.0;
-        odom.pose.pose.orientation = odom_quat;
-    }
+  geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(theta);
 
+  odom_trans.header.stamp = current_time;
+  odom_trams.transform.translation.x = x;
+  odom_trams.transform.translation.y = y;
+  odom_trams.transform.translation.z = 0.0;
+  odom_trams.transform.rotation = odom_quat;
+
+  odom.pose.pose.position.x = x;
+  odom.pose.pose.position.y = y;
+  odom.pose.pose.position.z = 0.0;
+  odom.pose.pose.orientation = odom_quat;
 }
