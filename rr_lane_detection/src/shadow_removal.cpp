@@ -50,9 +50,21 @@ void RemoveShadows(const cv::Mat &input_image, cv::Mat &output_image) {
 	}
 
 	// Morphological operations to clean up misclassified pixels
-	cv::Mat shadow_mask_open, shadow_mask_close;
+	cv::Mat shadow_mask_morph;
 	cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(MORPH_KERNEL_SIZE, MORPH_KERNEL_SIZE));
 
-	cv::morphologyEx(shadow_pixels_mask, shadow_mask_open, cv::MORPH_OPEN, kernel);
-	cv::morphologyEx(shadow_mask_open, shadow_mask_close, cv::MORPH_CLOSE, kernel);
+	cv::morphologyEx(shadow_pixels_mask, shadow_mask_morph, cv::MORPH_OPEN, kernel);
+	cv::morphologyEx(shadow_mask_morph, shadow_mask_morph, cv::MORPH_CLOSE, kernel);
+
+	std::vector<std::vector<cv::Point> > contours;
+	cv::findContours(shadow_mask_morph, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
+
+	for (int i = 0; i < contours.size(); i++) {
+		double area = cv::contourArea(contours[i]);
+
+		// Fill in contours with area smaller than min. shadow area
+		if (area < MIN_SHADOW_AREA) {
+			cv::drawContours(shadow_mask_morph, contours, i, CV_RGB(0, 0, 0), CV_FILLED);
+		}
+	}
 }
