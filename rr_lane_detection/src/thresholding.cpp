@@ -6,10 +6,6 @@
 
 #include "thresholding.hpp"
 
-#include <opencv2/opencv.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/highgui/highgui.hpp>
-
 /** @brief This function is intended to work in the same fashion as CV::inRange
  *         but allows for a cv::Matrix of min and max ranges to be passed, with 
  *         channel wrapping supported
