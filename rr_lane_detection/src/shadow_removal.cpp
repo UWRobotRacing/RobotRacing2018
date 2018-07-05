@@ -70,4 +70,13 @@ void RemoveShadows(const cv::Mat &input_image, cv::Mat &output_image) {
 
 	kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(MASK_DILATION, MASK_DILATION));
 	cv::dilate(shadow_mask_morph, shadow_mask_morph, kernel);
+
+	// Shadow regions
+	cv::Mat connected_components;
+	cv::connectedComponents(shadow_mask_morph, connected_components);
+
+	// Shadow removal
+	cv::Mat corrected_image = input_image.clone();
+
+	
 }
