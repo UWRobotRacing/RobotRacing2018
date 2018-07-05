@@ -1,12 +1,12 @@
 /*
- * @file Robot Racer Controller                                                       
+ * @file Robot Racer Controller
  * @author Tom Meredith
- * @author Noah Abradjian 
- * @author Toni Ogunmade  
- * @author Abhi Srikantharajah 
+ * @author Noah Abradjian
+ * @author Toni Ogunmade
+ * @author Abhi Srikantharajah
  * @author Brian Kibazohi
  * @competition IARRC 2018
- * Last Updated: June 24, 2018                                                   
+ * Last Updated: June 24, 2018
  */
 
 //#define TEST_OUTPUT
@@ -27,14 +27,16 @@
 #include <PID_v1.h>
 #include <sensor_msgs/MagneticField.h>
 #include <sensor_msgs/Imu.h>
-
+#include <tf/transform_broadcaster.h>
+#include <nav_msgs/Odometry.h>
+#include <math.h>
 
 //Serial, velocity and battery monitoring defines respectively
 const float ROS_BAUD_RATE  =  57600;
 const float IMU_BAUD_RATE  =  9600;
 const float RC_BAUD_RATE   =  115200;
 
-//I2C address for encoder counter 
+//I2C address for encoder counter
 const int SLAVE_ADDRESS = 07;
 
 Adafruit_BNO055 bno = Adafruit_BNO055(55);
@@ -47,7 +49,7 @@ const int      AVERAGING_SIZE    = 5;
 /**
  *@brief function Call
  *publishes actual velocity & average battery value
- *@param current_time 
+ *@param current_time
  *@returns void
  */
 void GetBatteryState(long current_time);
@@ -57,6 +59,8 @@ Car robot_racer;
 //PID tuning parameter
 //double throttle_PID_val[3] = {0, 0, 0};
 double rr_velocity = 0.0f , goal_velocity = 0.0f, autonomous_throttle = 1500.0f;
+// Initial position of the robot
+double x = 0.0, y = 0.0, theta = 0.0;
 
 //PID initialization
 // PID ThrottlePID(&rr_velocity, &autonomous_throttle, &goal_velocity,
@@ -65,7 +69,7 @@ double rr_velocity = 0.0f , goal_velocity = 0.0f, autonomous_throttle = 1500.0f;
 //brief ROS communication setup begins
 
 //node initialization
- 
+
 ros::NodeHandle nh;
 
 // message objects created
@@ -76,6 +80,10 @@ std_msgs::Float32 actual_velocity_msg;
 std_msgs::Float32 debug;
 std_msgs::Float32 velDebug;
 std_msgs::Int8 battery_percentage_msg;
+nav_msgs::Odometry odom;
+geometry_msgs::TransformStamped odom_trans;
+odom_trans.header.frame_id = "odom";
+odom_trans.child_frame_id = "base_link";
 
 //creating IMU data message objects
 sensor_msgs::Imu imu_msg;
@@ -123,9 +131,9 @@ void setup() {
     Serial.print("Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!");
     while(1);
   }
-  
+
   delay(1000);
-    
+
   bno.setExtCrystalUse(true);
 
 /*
@@ -186,7 +194,7 @@ void loop() {
 
 
 //case for autonomous mode
- 
+
     case AUTO:
       // ThrottlePID.Compute();
       robot_racer.SetThrottle((int)autonomous_throttle);
@@ -199,12 +207,12 @@ void loop() {
   state_pub.publish(&state_msg);
 
   GetBatteryState(current_time);
-  // Get a new sensor event 
+  // Get a new sensor event
   imu::Vector<3> acc   = bno.getVector(Adafruit_BNO055::VECTOR_LINEARACCEL);
   imu::Vector<3> gyro  = bno.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
   imu::Vector<3> euler = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
   imu::Vector<3> mag   = bno.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
-  
+
 /* Display the floating point data */
   Serial.print("XA: ");
   Serial.print(acc.x());
@@ -214,7 +222,7 @@ void loop() {
   Serial.print(acc.z());
   Serial.println("\n");
 
-  
+
 /* Display the floating point data */
   Serial.print(" GX: ");
   Serial.print(gyro.x());
@@ -233,7 +241,7 @@ void loop() {
   Serial.print("\tZ: ");
   Serial.print(euler.z());
   Serial.print("\n");
-  
+
 
   Serial.print(" MX: ");
   Serial.print(mag.x());
@@ -242,10 +250,10 @@ void loop() {
   Serial.print(" MZ: ");
   Serial.print(mag.z());
   Serial.println("\n");
-  
-  
-  
- 
+
+
+
+
   //remove comment on delay to read data on serial monitor
   //delay(1000);
   //call function to publish imu_readings
@@ -263,7 +271,7 @@ void GetBatteryState(long current_time){
     int battery_percentage = 100 * battery_value / 1024;
 
 //Set up array for low pass averaging at first time
- 
+
     static int percentages[AVERAGING_SIZE];
     if (prev_time == 0){
       for (int i = 0; i < AVERAGING_SIZE; i++){
@@ -272,7 +280,7 @@ void GetBatteryState(long current_time){
     }
 
 // update array, calculate sum
- 
+
     int sum = 0;
     for (int i = AVERAGING_SIZE - 1; i > 0; --i){
       percentages[i] = percentages[i - 1];
@@ -287,4 +295,44 @@ void GetBatteryState(long current_time){
 
     prev_time = millis();
   }
+}
+
+void RawToOdom(double vel, double str_angle) {
+  // Length of the car is 0.335 m
+  double L = 0.335;
+  long current_time = millis();
+  long time_diff = current_time - previous_time;
+  // If the robot is at the origin, calculate the position using steering angle and the velocity
+  if (str_angle != 0.0 && x == 0.0 && y == 0.0) {
+    // store str_angle in radians
+    theta = str_angle * M_PI / 180.0;
+    x = vel * cos(theta) * time_diff;
+    y = vel * sin(theta) * time_diff;
+
+  } else {
+    // Kinematic equations used: https://nabinsharma.wordpress.com/2014/01/02/kinematics-of-a-robot-bicycle-model/
+    // Calculate turning angle beta
+    double d = vel * time_diff;
+    double R = L / tan(str_angle);
+    double beta = d / R;
+    double xc = x - R * sin(theta);
+    double yc = y + R * cos(theta);
+
+    x = xc + R * sin(theta + beta);
+    y = yc - R * cos(theta + beta);
+    theta = (theta + beta) % (2 * M_PI);
+  }
+
+  geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(theta);
+
+  odom_trans.header.stamp = current_time;
+  odom_trams.transform.translation.x = x;
+  odom_trams.transform.translation.y = y;
+  odom_trams.transform.translation.z = 0.0;
+  odom_trams.transform.rotation = odom_quat;
+
+  odom.pose.pose.position.x = x;
+  odom.pose.pose.position.y = y;
+  odom.pose.pose.position.z = 0.0;
+  odom.pose.pose.orientation = odom_quat;
 }
