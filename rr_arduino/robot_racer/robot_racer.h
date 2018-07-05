@@ -3,6 +3,8 @@
 
 #include "Servo.h"
 #include "Arduino.h"
+#include <nav_msgs/Odometry.h>
+#include <geometry_msgs/TransformStamped.h>
 
 // #define BRAKE
 #define TEST_OUTPUT 1
@@ -45,7 +47,7 @@ class Car
 {
   private:
     int RC_signal_[RC_CHANNELS];
-    CarState car_state_;    
+    CarState car_state_;
     unsigned int steering_auto_;
     unsigned int throttle_rc_;
     unsigned int steering_rc_;
@@ -59,7 +61,12 @@ class Car
     float left_steering_multiplier_;
     float right_steering_multiplier_;
     long previous_;
-    
+    float x_;
+    float y_;
+    float theta_;
+    geometry_msgs::TransformStamped odom_trans_;
+    nav_msgs::Odometry odom_;
+
     Servo ThrottleServo_, SteerServo_;
 #ifdef BRAKE
     Servo BrakeServo_;//< brakeServo not used?
@@ -78,5 +85,8 @@ class Car
     void WriteToServos();
     long GetPreviousTime();
     void SetPreviousTime(long time);
+    void GetOdomTrans();
+    void GetOdomMsg();
+    void RawToOdom(float vel, float str_angle);
 };
 #endif
