@@ -329,13 +329,13 @@ void Car::RawToOdom(float vel, float str_angle) {
   geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(theta_);
 
   odom_trans_.header.stamp = current_time;
-  odom_trams_.transform.translation.x = x;
-  odom_trams_.transform.translation.y = y;
+  odom_trams_.transform.translation.x = x_;
+  odom_trams_.transform.translation.y = y_;
   odom_trams_.transform.translation.z = 0.0;
   odom_trams_.transform.rotation = odom_quat;
 
-  odom_.pose.pose.position.x = x;
-  odom_.pose.pose.position.y = y;
+  odom_.pose.pose.position.x = x_;
+  odom_.pose.pose.position.y = y_;
   odom_.pose.pose.position.z = 0.0;
   odom_.pose.pose.orientation = odom_quat;
 }
