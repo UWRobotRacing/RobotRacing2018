@@ -67,4 +67,7 @@ void RemoveShadows(const cv::Mat &input_image, cv::Mat &output_image) {
 			cv::drawContours(shadow_mask_morph, contours, i, CV_RGB(0, 0, 0), CV_FILLED);
 		}
 	}
+
+	kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(MASK_DILATION, MASK_DILATION));
+	cv::dilate(shadow_mask_morph, shadow_mask_morph, kernel);
 }
