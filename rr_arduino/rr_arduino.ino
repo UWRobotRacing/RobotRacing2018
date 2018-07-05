@@ -31,7 +31,6 @@
 
 //Serial, velocity and battery monitoring defines respectively
 const float ROS_BAUD_RATE  =  57600;
-const float IMU_BAUD_RATE  =  9600;
 const float RC_BAUD_RATE   =  115200;
 
 //I2C address for encoder counter 
@@ -114,19 +113,7 @@ void setup() {
 #ifdef TEST_OUTPUT
   Serial.begin(ROS_BAUD_RATE);
 #endif
-  Serial.begin(IMU_BAUD_RATE);
   Serial2.begin(RC_BAUD_RATE);
-  //Initialise the BNO055 sensor
-  if(!bno.begin())
-  {
-    //Detecting BNOO55
-    Serial.print("Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!");
-    while(1);
-  }
-  
-  delay(1000);
-    
-  bno.setExtCrystalUse(true);
 
 /*
  *ROS Node Handler setup
@@ -199,55 +186,7 @@ void loop() {
   state_pub.publish(&state_msg);
 
   GetBatteryState(current_time);
-  // Get a new sensor event 
-  imu::Vector<3> acc   = bno.getVector(Adafruit_BNO055::VECTOR_LINEARACCEL);
-  imu::Vector<3> gyro  = bno.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
-  imu::Vector<3> euler = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
-  imu::Vector<3> mag   = bno.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
-  
-/* Display the floating point data */
-  Serial.print("XA: ");
-  Serial.print(acc.x());
-  Serial.print(" YA: ");
-  Serial.print(acc.y());
-  Serial.print(" ZA: ");
-  Serial.print(acc.z());
-  Serial.println("\n");
-
-  
-/* Display the floating point data */
-  Serial.print(" GX: ");
-  Serial.print(gyro.x());
-  Serial.print(" GY: ");
-  Serial.print(gyro.y());
-  Serial.print(" GZ: ");
-  Serial.print(gyro.z());
-  Serial.println("\n");
-
-
- /* Display the floating point data */
-  Serial.print(" X: ");
-  Serial.print(euler.x());
-  Serial.print("\tY: ");
-  Serial.print(euler.y());
-  Serial.print("\tZ: ");
-  Serial.print(euler.z());
-  Serial.print("\n");
-  
-
-  Serial.print(" MX: ");
-  Serial.print(mag.x());
-  Serial.print(" MY: ");
-  Serial.print(mag.y());
-  Serial.print(" MZ: ");
-  Serial.print(mag.z());
-  Serial.println("\n");
-  
-  
-  
  
-  //remove comment on delay to read data on serial monitor
-  //delay(1000);
   //call function to publish imu_readings
   ImuReadings();
 }
