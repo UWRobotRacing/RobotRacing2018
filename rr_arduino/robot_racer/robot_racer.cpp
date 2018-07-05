@@ -4,6 +4,8 @@
  */
 
 #include "robot_racer.h"
+#include <nav_msgs/Odometry.h>
+#include <math.h>
 
 /*
  * @brief Constructs Car and assigns values to attributes
@@ -23,6 +25,11 @@ Car::Car()
   forward_throttle_multiplier_ = (MAX_RC_VAL - REST_RC_VAL) / (float)(MANUAL_MAX - NEUTRAL);
   left_steering_multiplier_ = (MAX_RC_STEER_VAL - REST_STEER_VAL) / (float)(MAX_STEERING - STEER_NEUTRAL);
   right_steering_multiplier_ = (MIN_RC_STEER_VAL - REST_STEER_VAL) / (float)(MIN_STEERING - STEER_NEUTRAL);
+  x_ = 0.0;
+  y_ = 0.0;
+  theta_ = 0.0;
+  odom_trans.header.frame_id = "odom";
+  odom_trans.child_frame_id = "base_link";
 }
 /*
  *@brief assigns pin values
@@ -280,6 +287,55 @@ void Car::WriteToServos()
 void Car::SetPreviousTime(long time){
 	previous_ = time;
 }
+
 long Car::GetPreviousTime(){
 	return previous_;
+}
+
+void Car::GetOdomTrans() {
+  return odom_trans_;
+}
+
+void Car::GetOdomMsg() {
+  return odom_;
+}
+
+void Car::RawToOdom(float vel, float str_angle) {
+  // Length of the car is 0.335 m
+  double L = 0.335;
+  long current_time = millis();
+  long time_diff = current_time - GetPreviousTime();
+  // If the robot is at the origin, calculate the position using steering angle and the velocity
+  if (str_angle != 0.0 && x_ == 0.0 && y_ == 0.0) {
+    // store str_angle in radians
+    theta_ = str_angle * M_PI / 180.0;
+    x_ = vel * cos(theta_) * time_diff;
+    y_ = vel * sin(theta_) * time_diff;
+
+  } else {
+    // Kinematic equations used: https://nabinsharma.wordpress.com/2014/01/02/kinematics-of-a-robot-bicycle-model/
+    // Calculate turning angle beta
+    double d = vel * time_diff;
+    double R = L / tan(str_angle);
+    double beta = d / R;
+    double xc = x_ - R * sin(theta_);
+    double yc = y_ + R * cos(theta_);
+
+    x_ = xc + R * sin(theta_ + beta);
+    y_ = yc - R * cos(theta_ + beta);
+    theta_ = fmod((theta_ + beta),(2 * M_PI));
+  }
+
+  geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(theta_);
+
+  odom_trans_.header.stamp = current_time;
+  odom_trams_.transform.translation.x = x;
+  odom_trams_.transform.translation.y = y;
+  odom_trams_.transform.translation.z = 0.0;
+  odom_trams_.transform.rotation = odom_quat;
+
+  odom_.pose.pose.position.x = x;
+  odom_.pose.pose.position.y = y;
+  odom_.pose.pose.position.z = 0.0;
+  odom_.pose.pose.orientation = odom_quat;
 }
