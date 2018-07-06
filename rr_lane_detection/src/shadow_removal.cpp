@@ -73,10 +73,42 @@ void RemoveShadows(const cv::Mat &input_image, cv::Mat &output_image) {
 
 	// Shadow regions
 	cv::Mat connected_components;
-	cv::connectedComponents(shadow_mask_morph, connected_components);
+	int num_components = cv::connectedComponents(shadow_mask_morph, connected_components, 4);
 
 	// Shadow removal
 	cv::Mat corrected_image = input_image.clone();
 
-	
+	for (int i = 1; i <= num_components; i++) {
+		cv::Mat component_mask;
+		cv::inRange(connected_components, cv::Scalar(i), cv::Scalar(i), component_mask);
+
+		cv::Mat dilated_component_mask;
+		kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(EXPANDED_SHADOW_MASK_DILATION, EXPANDED_SHADOW_MASK_DILATION));
+		cv::dilate(component_mask, dilated_component_mask, kernel);
+		cv::bitwise_not(dilated_component_mask, component_mask, dilated_component_mask);
+
+		// Get mean RGB in masks
+		cv::Scalar outer_mean_rgb = mean(corrected_image, dilated_component_mask);
+		cv::Scalar inner_mean_rgb = mean(corrected_image, component_mask);
+
+		cv::Scalar rgb_ratios(outer_mean_rgb[0] / inner_mean_rgb[0],
+							outer_mean_rgb[1] / inner_mean_rgb[1],
+							outer_mean_rgb[2] / inner_mean_rgb[2]);
+
+		if (std::isinf(rgb_ratios[0])) {
+			rgb_ratios[0] = 1;
+		}
+		if (std::isinf(rgb_ratios[1])) {
+			rgb_ratios[1] = 1;
+		}
+		if (std::isinf(rgb_ratios[2])) {
+			rgb_ratios[2] = 1;
+		}
+
+		// Multiply shadow region by ratios to remove shadow
+		cv::Mat component_region;
+		corrected_image.copyTo(component_region, component_mask);
+		component_region = component_region.mul(rgb_ratios);
+		component_region.copyTo(corrected_image, component_mask);
+	}
 }
