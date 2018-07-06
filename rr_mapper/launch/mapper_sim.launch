@@ -1,0 +1,13 @@
+<!--@file mapper.launch
+ -  @author Sirui Song
+ -  @author Jungwook Lee
+ -  @author Raymond Kuo
+ -  @author Toni Ogunmade(oluwatoni)
+ -  @competition IARRC 2018
+ -->
+<launch>    
+  <rosparam file="$(find rr_mapper)/config/rr_mapper_sim.yaml"/>
+
+  <node pkg="rr_mapper" name="rr_mapper" type="rr_mapper" output="screen">
+  </node>   
+</launch>

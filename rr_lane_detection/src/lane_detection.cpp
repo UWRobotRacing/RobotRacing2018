@@ -30,7 +30,7 @@ int main(int argc, char** argv)
   std::string camera_source;
   ros::NodeHandle nh;
   image_transport::ImageTransport it(nh);
-  nh.param<std::string>("Camera_Source_Topic", camera_source, "/usb_cam/image_raw");
+  nh.param<std::string>("Camera_Source_Topic", camera_source, "/rr_vehicle/front_facing_cam/image_raw");
   ROS_INFO("Starting lane detection");
   lane_detection_processor lane_detection_proc(nh);
   image_transport::Subscriber image_sub_ = 

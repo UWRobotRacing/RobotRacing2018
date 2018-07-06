@@ -8,7 +8,7 @@
 #define TEST_OUTPUT 1
 
 //! servo defines
-#define SERVO_THROTTLE_PIN    10
+#define SERVO_THROTTLE_PIN    9
 #define SERVO_STEER_PIN       11
 #define SERVO_BRAKE_PIN       12
 #define MANUAL_MAX            1575
@@ -73,7 +73,8 @@ class Car
     void SetSteering(int newSteering);
     void SetState(CarState set);
     void Estop();
-    void RC_read();
+    void CheckController();
+    void RC_read(int *incoming_bytes);
     void RCMode();
     void WriteToServos();
     long GetPreviousTime();

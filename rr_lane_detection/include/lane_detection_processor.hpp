@@ -15,7 +15,10 @@
 
 //OPENCV includes
 #include <opencv2/opencv.hpp>
-#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/highgui.hpp>
+#include <opencv2/imgproc.hpp>
+
+#include <iostream>
 
 class lane_detection_processor
 {
@@ -59,6 +62,7 @@ class lane_detection_processor
     cv::Size BEV_size_;
     double grid_resolution_;
 
+    bool simulation_;
     // I/O behavioural params
     bool point_out_;
   public:

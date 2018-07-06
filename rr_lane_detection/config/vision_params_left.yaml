@@ -10,11 +10,12 @@
 # @competition IARRC 2018
 
 #Size of Bird's Eye View grid
-bev_width: 270
-bev_height: 314
+bev_width: 320
+bev_height: 490
 bev_resolution: 0.01
 grid_offset_y: 0
 grid_offset_x: 0
+simulation: false
 
 # 4 point coordinates in image plane. Note: OpenCV Image coordinates are in [x,y], where X is a column index (0 left, positive rightwards), and Y is a row index (0 top, positive downwards)
 # image_coords: [[0, 0], [640, 0], [0, 480], [640, 480]]
@@ -30,7 +31,7 @@ world_coords: !!opencv-matrix
    rows: 4
    cols: 2
    dt: f
-   data: [ 0., 170., 240., 0., 186., 314., 240., 291.]
+   data: [ 0., 321., 310., 0., 264., 490., 320., 464.]
 
 multibounds: !!opencv-matrix
    rows: 3

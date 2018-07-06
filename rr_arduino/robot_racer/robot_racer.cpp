@@ -20,6 +20,8 @@ void Car::setup()
 {
   ThrottleServo_.attach(SERVO_THROTTLE_PIN);
   SteerServo_.attach(SERVO_STEER_PIN);
+  SetThrottle(NEUTRAL);
+  SetSteering(STEER_NEUTRAL);
 #ifdef BRAKE
   BrakeServo_.attach(SERVO_BRAKE_PIN);
 #endif
@@ -73,56 +75,42 @@ void Car::Estop()
   //! TODO Reset Integrator
 }
 
+//Checks if any any data has been recieved by the the arduino from the controller
+// switches to estop mode if no data has been recieved
+void Car::CheckController(){
+  if ((millis() - GetPreviousTime()) > DELAY){ // shut down if not receiving messages
+    car_state_ = ESTOP;
+  }
+}
+
 //! For RC reading
-void Car::RC_read()
+void Car::RC_read(int *incoming_bytes)
 {
+  int RC_signal_data  = 0;
+  int RC_signal_ch    = 0;
 
-  if (Serial2.available() > 0) { //!< starts serial connection
-    int buffer_size   = 0;
-    byte incoming_byte  = 0;
-
-    //! TODO understand why 50 and what this does
-    for (byte i = 0; i < 50; i) {
-      //! throw away extra bytes, reads bytes from 17-49
-      if (Serial2.available() > 16) {
-        incoming_byte = Serial2.read();
-        i = 0;
-      }
-      else {
-        i++;
-      }
-
-      //! wait for a full transmition
-      if (Serial2.available() != buffer_size)
-        i = 0;
-
-      //! make sure we are at the end of a transmition
-      buffer_size = Serial2.available();
-    }
-
-    if (Serial2.available() == 16) {
-      int RC_signal_data  = 0;
-      int RC_signal_ch    = 0;
-      for (unsigned int i = 0; i < 16; i++) {
-        incoming_byte = Serial2.read();
-        if (i >= 2) {
-          if (i % 2 == 0) {
-            RC_signal_ch        = (incoming_byte >> 3);
-            incoming_byte -= (RC_signal_ch << 3);
-            //RC_signal_data      = (incoming_byte << 8);
-            RC_signal_data = (incoming_byte<< 8);//!< changed from above
-
-            if (RC_signal_ch > 7) break;
-            }
-            else {
-              RC_signal_data     += incoming_byte;
-              RC_signal_[RC_signal_ch]   = RC_signal_data;
-              SetPreviousTime(millis());
-            }
-          }
+  for (unsigned int i = 0; i < 16; i++) 
+  {
+    if (i >= 2) 
+    {
+      if (i % 2 == 0) 
+      {
+        //incoming_bytes[i+1] is done to align the data buffer orders 
+        RC_signal_ch = (incoming_bytes[i+1] >> 3);
+        RC_signal_data = ((incoming_bytes[i+1] & 7) << 8);//!< changed from above
+        //Serial.println(RC_signal_data);
+        if (RC_signal_ch > 7)
+        {
+          break;
         }
       }
+      else 
+      {
+        RC_signal_data     += incoming_bytes[i];
+        RC_signal_[RC_signal_ch] = RC_signal_data;
+      }
     }
+  }
 
 
   if (RC_signal_[4] < 700)
@@ -135,11 +123,11 @@ void Car::RC_read()
   else {
    car_state_ = AUTO; //!< Autonomous mode
   }
+  //Serial.println("");
   // Serial.println(millis()-GetPreviousTime());
-  if ((millis() - GetPreviousTime()) > DELAY){ // shut down if not receiving messages
-  	car_state_ = ESTOP;
-  }
-  #ifdef TEST_OUTPUT
+  SetPreviousTime(millis());
+  //#ifdef TEST_OUTPUT
+  /*
   Serial.print("RX Data: ");
   Serial.print(RC_signal_[0], DEC); // throttle
   Serial.print(",");
@@ -155,9 +143,11 @@ void Car::RC_read()
   Serial.print(",");
   Serial.print(RC_signal_[6], DEC); // ch 7
   Serial.print("\n");
-#endif
+  */
+//#endif
   
 }
+
 
 //! For RC MODE
 void Car::RCMode()

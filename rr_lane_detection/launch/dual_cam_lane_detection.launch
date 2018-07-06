@@ -7,29 +7,29 @@
  -  @competition IARRC 2018
  -->
 <launch>
-  <param name="device" command="$(find lane_detection)/scripts/camera_parameters.sh"/>
+  <param name="device" command="$(find rr_lane_detection)/scripts/camera_parameters.sh"/>
 
-  <node ns ="left" name="usb_cam_left" pkg="usb_cam" type="usb_cam_node" output="screen" >
-    <param name="video_device" value="/dev/cam_left" />
+  <node ns ="rr_vehicle" name="left_cam" pkg="usb_cam" type="usb_cam_node" output="screen" >
+    <param name="video_device" value="/dev/video0" />
     <param name="image_width" value="640" />
     <param name="image_height" value="480" />
     <param name="pixel_format" value="mjpeg" />
-    <param name="camera_frame_id" value="usb_cam_left" />
+    <param name="camera_frame_id" value="left_cam" />
     <param name="io_method" value="mmap"/>
     <param name="gain_automatic" value="false" />
     
     <param name="auto_white_balance" value="false" />
     <param name="contrast" value="64" />
-    <param name="sharpness" value="233" />
+    <param name="sharpness" value="223" />
   
   </node>
 
-  <node ns ="right" name="usb_cam_right" pkg="usb_cam" type="usb_cam_node" output="screen" >
-    <param name="video_device" value="/dev/cam_right" />
+  <node ns ="rr_vehicle" name="right_cam" pkg="usb_cam" type="usb_cam_node" output="screen" >
+    <param name="video_device" value="/dev/video1" />
     <param name="image_width" value="640" />
     <param name="image_height" value="480" />
     <param name="pixel_format" value="mjpeg" />
-    <param name="camera_frame_id" value="usb_cam_right" />
+    <param name="camera_frame_id" value="right_cam" />
     <param name="io_method" value="mmap"/>
     <param name="gain_automatic" value="false" />
 
@@ -38,17 +38,12 @@
     <param name="sharpness" value="20" />
   </node>
 
-<!-- Output the camera streams
-  <node ns ="left" name="output_video_cam_left" pkg="image_view" type="image_view" respawn="false" output="screen">
-       <remap from="image" to="/left/usb_cam_left/image_raw" />
-       <param name="autosize" value="true" />
-   </node>
-
-   <node ns ="right" name="output_video_cam_right" pkg="image_view" type="image_view" respawn="false" output="screen">
-       <remap from="image" to="/right/usb_cam_right/image_raw" />
-       <param name="autosize" value="true" />
-   </node>
--->
-   <include ns ="left" file="$(find lane_detection)/launch/lane_detection_left_cam.launch" />
-   <include ns ="right" file="$(find lane_detection)/launch/lane_detection_right_cam.launch" />
+  <include file="$(find rr_lane_detection)/launch/lane_detection_cam.launch">
+    <arg name="config_file" default="$(find rr_lane_detection)/config/vision_params_left.yaml"/>
+    <arg name="camera" default="left_cam"/>
+  </include>
+  <include file="$(find rr_lane_detection)/launch/lane_detection_cam.launch">
+    <arg name="config_file" default="$(find rr_lane_detection)/config/vision_params_right.yaml"/>
+    <arg name="camera" default="right_cam"/>
+  </include>
 </launch>
