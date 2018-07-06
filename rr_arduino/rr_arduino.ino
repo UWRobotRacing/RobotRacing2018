@@ -28,7 +28,6 @@
 #include <sensor_msgs/MagneticField.h>
 #include <sensor_msgs/Imu.h>
 
-
 //Serial, velocity and battery monitoring defines respectively
 const float ROS_BAUD_RATE  =  57600;
 const float RC_BAUD_RATE   =  115200;
@@ -64,7 +63,7 @@ double rr_velocity = 0.0f , goal_velocity = 0.0f, autonomous_throttle = 1500.0f;
 //brief ROS communication setup begins
 
 //node initialization
- 
+
 ros::NodeHandle nh;
 
 // message objects created
@@ -85,7 +84,6 @@ void CmdVelocityCallback(const std_msgs::Float32 &cmd_vel_msg);
 void CmdSteeringCallback(const std_msgs::Float32 &cmd_str_msg);
 
 
-
 // ROS publisher and subscriber commands
 
 ros::Publisher state_pub("/arduino/vehicle_state", &state_msg);
@@ -97,7 +95,6 @@ ros::Publisher imu_pub("/arduino/imu_data", &imu_msg);
 ros::Publisher magnetic_pub("/arduino/mag_data", &magnetic_msg);
 ros::Subscriber <std_msgs::Float32> velocity_sub ("/PathPlanner/vel_level", CmdVelocityCallback);
 ros::Subscriber <std_msgs::Float32> steering_sub ("/PathPlanner/steer_cmd", CmdSteeringCallback);
-
 
 int steering_angle = 1500;
 int ROS_watchdog = 0;
@@ -119,7 +116,6 @@ void setup() {
  *ROS Node Handler setup
  *@param specified topics
  */
-  nh.getHardware()->setBaud(ROS_BAUD_RATE);
   nh.initNode();
   nh.advertise(state_pub);
   nh.advertise(encoder_pub);
@@ -131,7 +127,6 @@ void setup() {
   nh.subscribe(velocity_sub);
   nh.subscribe(steering_sub);
 
-
   robot_racer.setup();
 /**
  *PID setup
@@ -140,7 +135,18 @@ void setup() {
  *ThrottlePID.SetSampleTime(20); //<PID algorithm evaluates every 50ms
  *ThrottlePID.SetTunings(333, 0,0.0);
  */
-  pinMode(13,OUTPUT);
+   pinMode(13,OUTPUT);
+   digitalWrite (13, LOW);
+   //if the imu isn't set up properly the LED should come on
+  if(!bno.begin())
+  {
+    /* There was a problem detecting the BNO055 ... check your connections */
+    digitalWrite(13, HIGH);
+  }
+
+  delay(1000);
+
+  bno.setExtCrystalUse(true);
 }
 
 /**
@@ -149,17 +155,20 @@ void setup() {
  *@returns void
  */
 long previous_time = 0; //<for update encoder speed loop
-void loop() {
-  robot_racer.RC_read(); //<get RC controller values
+void loop() 
+{
+  //robot_racer.RC_read(); //<get RC controller values
   nh.spinOnce();
+
   long current_time = millis();
   long double time_diff = (current_time - previous_time)/1000.0;
   /*if(Encoder.updateSpeed(time_diff,(float &) rr_velocity))
   {
     previous_time = millis();
     actual_velocity_msg.data = rr_velocity;
-    encoder.publish(&actual_velocity_msg);
+    encoder.publish(&actual_velocity_msg);`
   }*/
+
   switch (robot_racer.GetState()) {
 //case for emergency stop
     case ESTOP:
@@ -170,7 +179,6 @@ void loop() {
     case RC:
       robot_racer.RCMode();
       break;
-
 
 //case for autonomous mode
  
@@ -186,7 +194,7 @@ void loop() {
   state_pub.publish(&state_msg);
 
   GetBatteryState(current_time);
- 
+
   //call function to publish imu_readings
   ImuReadings();
 }
@@ -202,7 +210,7 @@ void GetBatteryState(long current_time){
     int battery_percentage = 100 * battery_value / 1024;
 
 //Set up array for low pass averaging at first time
- 
+
     static int percentages[AVERAGING_SIZE];
     if (prev_time == 0){
       for (int i = 0; i < AVERAGING_SIZE; i++){
@@ -211,7 +219,7 @@ void GetBatteryState(long current_time){
     }
 
 // update array, calculate sum
- 
+
     int sum = 0;
     for (int i = AVERAGING_SIZE - 1; i > 0; --i){
       percentages[i] = percentages[i - 1];

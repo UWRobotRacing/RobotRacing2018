@@ -38,6 +38,5 @@ void ImuReadings()
   magnetic_msg.magnetic_field.x=mag.x();
   magnetic_msg.magnetic_field.y=mag.y();
   magnetic_msg.magnetic_field.z=mag.z();
-  magnetic_pub(&magnetic_msg);
-  
+  magnetic_pub.publish(&magnetic_msg);
 }
