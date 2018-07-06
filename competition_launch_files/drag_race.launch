@@ -11,7 +11,7 @@
   <include file="$(find rr_traffic_light)/launch/rr_traffic_light.launch" />
 
   <!-- Camera -->
-  <include file="$(find lane_detection)/launch/dual_cam_lane_detection.launch" />
+  <include file="$(find rr_lane_detection)/launch/dual_cam_lane_detection.launch" />
 
   <!-- Laser Mapper -->
   <include file="$(find rr_mapper)/launch/mapper.launch" />

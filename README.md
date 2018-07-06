@@ -55,6 +55,7 @@ This code base should be integrated with the overall UWRobotics code such that m
 * Andrew Jin
 * Waleed Ahmed
 * Brian Kibazohi
+* Jun-Ha Jung
 
 ### Past Contributers (2014-2017):
 * Matthew Post(Software Lead)
