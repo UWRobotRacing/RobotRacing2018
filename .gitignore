@@ -63,5 +63,9 @@ Temporary Items
 
 #Rosbags because they are too big
 *.bag
+
+#YOLO weights
+*.weights
+
 .vscode/settings.json
 .vscode/c_cpp_properties.json
