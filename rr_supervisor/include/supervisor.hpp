@@ -29,12 +29,14 @@ class Supervisor
     void TrackSpeed(const geometry_msgs::TwistConstPtr& msg);
     void MonitorBattery(const std_msgs::Int8::ConstPtr& msg);
     void FinishRace();
+
+    void IdleRobot();
+    bool raceStarted;
   private:
     // ROS Variables
     ros::NodeHandle nh_;
     ros::Publisher twist_pub_;
     ros::Publisher null_lock_;
-    ros::Publisher remove_null_lock_;
     ros::Subscriber cmd_sub_;
     ros::Subscriber battery_sub_;
     ros::ServiceServer start_race_service_;
