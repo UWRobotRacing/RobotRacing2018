@@ -7,6 +7,7 @@
 #define __THRESHOLDING_HPP
 
 // includes
+using namespace std;
 #include <opencv2/opencv.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
