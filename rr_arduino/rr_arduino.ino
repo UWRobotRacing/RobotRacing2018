@@ -42,6 +42,17 @@ const int      BATTERY_FREQUENCY = 2;
 const int      BATTERY_PIN       = A0;
 const int      AVERAGING_SIZE    = 5;
 
+//parameters for RC data buffer 
+const int buffer_max = 10;
+const int data_max = 16;
+volatile long last_time = 0;
+volatile int ready_to_separate = -1;
+
+volatile int incoming_buffer[buffer_max][16] = {};
+volatile int index_in_buffer = 0;
+volatile int buffer_index = 0;
+volatile int old_buffer_size = 0;
+
 /**
  *@brief function Call
  *publishes actual velocity & average battery value
@@ -145,7 +156,7 @@ void setup() {
   }
 
   delay(1000);
-
+  sei();
   bno.setExtCrystalUse(true);
 }
 
@@ -157,7 +168,14 @@ void setup() {
 long previous_time = 0; //<for update encoder speed loop
 void loop() 
 {
-  //robot_racer.RC_read(); //<get RC controller values
+  robot_racer.CheckController();
+  if (ready_to_separate >= 0){
+    robot_racer.RC_read(incoming_buffer[ready_to_separate]); //<get RC controller values
+    //Serial.print(incoming_buffer[ready_to_separate][3]);
+    //Serial.print(",");
+    //Serial.println(incoming_buffer[ready_to_separate][4]);
+    ready_to_separate = -1;
+  }
   nh.spinOnce();
 
   long current_time = millis();
@@ -196,7 +214,8 @@ void loop()
   GetBatteryState(current_time);
 
   //call function to publish imu_readings
-  ImuReadings();
+
+  //ImuReadings();
 }
 /*
 *@brief publishes battery percentage at a specified BATTERY_FREQUENCY
@@ -234,4 +253,35 @@ void GetBatteryState(long current_time){
 
     prev_time = millis();
   }
+}
+
+ISR (USART2_RX_vect)
+{
+  cli();
+  if (millis() - last_time > 18)
+  {
+    old_buffer_size = index_in_buffer;
+    if (index_in_buffer < data_max)
+    {
+      sei();
+      return;
+    }
+    index_in_buffer = 0;
+    ready_to_separate = buffer_index;
+    buffer_index++;
+    if (buffer_index >= buffer_max)
+    {
+      buffer_index = 0;
+    }
+  }
+  incoming_buffer[buffer_index][index_in_buffer] = Serial2.read();
+  index_in_buffer++;
+  if (index_in_buffer > data_max)
+  {
+    //this prevents the corrupted data from being read
+    ready_to_separate = -1;
+  }
+  Serial2._rx_complete_irq();
+  last_time = millis();
+  sei();
 }

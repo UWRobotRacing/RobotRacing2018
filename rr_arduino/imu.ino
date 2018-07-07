@@ -4,16 +4,19 @@
  *@brief function reads and publishes two messages, each that obtain its data from BNO055.   
  *@param none
  *@returns void
- */ 
+ */
+
+sensors_event_t event;
+imu::Vector<3> acc, gyro, euler, mag;
+
 void ImuReadings()
 {
   //Get a new sensor event
-  sensors_event_t event; 
   bno.getEvent(&event);
-  imu::Vector<3> acc  = bno.getVector(Adafruit_BNO055::VECTOR_LINEARACCEL);
-  imu::Vector<3> gyro = bno.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
-  imu::Vector<3> euler= bno.getVector(Adafruit_BNO055::VECTOR_EULER);
-  imu::Vector<3> mag  = bno.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
+  acc  = bno.getVector(Adafruit_BNO055::VECTOR_LINEARACCEL);
+  gyro = bno.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
+  euler= bno.getVector(Adafruit_BNO055::VECTOR_EULER);
+  mag  = bno.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
 
   //Get current time
   //ros::Time current_time=ros::Time::now();
