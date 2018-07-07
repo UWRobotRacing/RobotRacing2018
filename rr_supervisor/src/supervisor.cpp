@@ -54,8 +54,8 @@ Supervisor::Supervisor()
   count_lap_service_  = nh_.advertiseService("/Supervisor/count_lap", &Supervisor::CountLap, this);
 
   // Publish messages
-  twist_pub_.publish(twist_msg_);
   null_lock_.publish(bool_msg_);
+  twist_pub_.publish(twist_msg_);
 }
 
 /**
@@ -72,6 +72,8 @@ bool Supervisor::StartRace(std_srvs::Empty::Request &req, std_srvs::Empty::Respo
 
   // Start timer in order to log race time
   begin_time_ = clock();
+
+  ROS_INFO("Race started");
 
   return true;
 }
@@ -102,7 +104,7 @@ bool Supervisor::CountLap(std_srvs::Trigger::Request &req, std_srvs::Trigger::Re
       else
       {
         res.success = false;
-        ROS_INFO("Lap %d of %d complete!", lap_count, 3);
+        ROS_INFO("Lap %d of %d complete!", lap_count_, 3);
       }
     }
   }
