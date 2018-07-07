@@ -1,6 +1,7 @@
 /** @file lane_detection_processor.hpp
  *  @author Matthew Post
  *  @author Toni Ogunmade(oluwatoni)
+ *  @author Angela Gu
  *  @competition IARRC 2018
  */
 #ifndef __LANE_DETECTION_PROCESSOR_HPP
@@ -14,8 +15,10 @@
 #include <nav_msgs/OccupancyGrid.h>
 
 //OPENCV includes
+using namespace std; //required for gpu
 #include <opencv2/opencv.hpp>
 #include <opencv2/highgui/highgui.hpp>
+#include <opencv2/gpu/gpu.hpp>
 
 class lane_detection_processor
 {

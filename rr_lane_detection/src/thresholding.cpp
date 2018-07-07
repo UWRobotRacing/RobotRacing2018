@@ -21,40 +21,47 @@
  *          width and height as the input matrix
  */
 void Multithreshold(const cv::Mat &input_image, const cv::Mat &bounds, cv::Mat &output_image) {
+	//use gpu
+	cv::gpu::GpuMat gpu_input_image = input_image.upload();
+	cv::gpu::GpuMat gpu_bounds = bounds.upload();
+	cv::gpu::GpuMat gpu_output_image;
+
 	//Confirm Dims and define binary mask_
-	assert(input_image.channels() * 2 == bounds.cols&& bounds.rows);
-	assert(input_image.depth() >= 0 && input_image.depth() <= 6);
-	cv::Mat mask_(input_image.rows, input_image.cols, CV_8U, cv::Scalar::all(0));
-	mask_.copyTo(output_image);
+	assert(gpu_input_image.channels() * 2 == gpu_bounds.cols&& gpu_bounds.rows);
+	assert(gpu_input_image.depth() >= 0 && gpu_input_image.depth() <= 6);
+	cv::gpu::GpuMat mask_(gpu_input_image.rows, gpu_input_image.cols, CV_8U, cv::Scalar::all(0));
+	mask_.copyTo(gpu_output_image);
 
 	// define min/max for proper wrapping
 	double max = DBL_MAX;
 	double min = -DBL_MAX;
 
 	// loop through threshold bands, seperate into lower & upper thresholds, if any channel has lower > upper,
-	// split into 2 bands, else keep original. 
-	for (int i = 0; i < bounds.rows; i++) {
-		cv::Mat lowerbound(bounds.colRange(0, bounds.cols / 2).rowRange(i, i + 1));
-		cv::Mat upperbound(bounds.colRange(bounds.cols / 2, bounds.cols).rowRange(i, i + 1));
-		cv::Mat flipedthresh = lowerbound > upperbound;
+	// split into 2 bands, else keep original.
+	for (int i = 0; i < gpu_bounds.rows; i++) {
+		cv::gpu::GpuMat lowerbound(gpu_bounds.colRange(0, gpu_bounds.cols / 2).rowRange(i, i + 1));
+		cv::gpu::GpuMat upperbound(gpu_bounds.colRange(gpu_bounds.cols / 2, gpu_bounds.cols).rowRange(i, i + 1));
+		cv::gpu::GpuMat flipedthresh = lowerbound > upperbound;
 
 		if (sum(flipedthresh)[0] > 0) {
-			cv::Mat lowerbound2(lowerbound.clone());
-			cv::Mat upperbound2(upperbound.clone());
+			cv::gpu::GpuMat lowerbound2(lowerbound.clone());
+			cv::gpu::GpuMat upperbound2(upperbound.clone());
 
 			// use logical array indexing based on flipedthresh
 			lowerbound2.setTo(min, flipedthresh);
 			upperbound2.setTo(max, flipedthresh);
 
-			cv::inRange(input_image, lowerbound, upperbound2, mask_);
-			output_image = output_image | mask_;
-			cv::inRange(input_image, lowerbound2, upperbound, mask_);
-			output_image = output_image | mask_;
+			//cv::inRange(gpu_input_image, lowerbound, upperbound2, mask_);
+			gpu_output_image = gpu_output_image | mask_;
+			//cv::inRange(gpu_input_image, lowerbound2, upperbound, mask_);
+			gpu_output_image = gpu_output_image | mask_;
 		} else {
-			cv::inRange(input_image, lowerbound, upperbound, mask_);
-			output_image = output_image | mask_;
+			cv::inRange(gpu_input_image, lowerbound, upperbound, mask_);
+			//gpu_output_image = gpu_output_image | mask_;
 		}
 	}
+
+	output_image = gpu_output_image;
 }
 
 /** @brief This function performs a channel-wise adaptive threshold to
