@@ -22,8 +22,10 @@
  */
 void Multithreshold(const cv::Mat &input_image, const cv::Mat &bounds, cv::Mat &output_image) {
 	//use gpu
-	cv::gpu::GpuMat gpu_input_image = input_image.upload();
-	cv::gpu::GpuMat gpu_bounds = bounds.upload();
+	cv::gpu::GpuMat gpu_input_image;
+	gpu_input_image.upload(input_image);
+	cv::gpu::GpuMat gpu_bounds;
+	gpu_bounds.upload(bounds);
 	cv::gpu::GpuMat gpu_output_image;
 
 	//Confirm Dims and define binary mask_
@@ -52,16 +54,17 @@ void Multithreshold(const cv::Mat &input_image, const cv::Mat &bounds, cv::Mat &
 			upperbound2.setTo(max, flipedthresh);
 
 			//cv::inRange(gpu_input_image, lowerbound, upperbound2, mask_);
-			gpu_output_image = gpu_output_image | mask_;
+			cv::gpu::bitwise_or(gpu_output_image, gpu_output_image, mask_, cv::gpu::Stream::Null());
+			//gpu_output_image = gpu_output_image | mask_;
 			//cv::inRange(gpu_input_image, lowerbound2, upperbound, mask_);
-			gpu_output_image = gpu_output_image | mask_;
+			//gpu_output_image = gpu_output_image | mask_;
 		} else {
-			cv::inRange(gpu_input_image, lowerbound, upperbound, mask_);
+			//cv::inRange(gpu_input_image, lowerbound, upperbound, mask_);
 			//gpu_output_image = gpu_output_image | mask_;
 		}
 	}
 
-	output_image = gpu_output_image;
+	//output_image = gpu_output_image;
 }
 
 /** @brief This function performs a channel-wise adaptive threshold to

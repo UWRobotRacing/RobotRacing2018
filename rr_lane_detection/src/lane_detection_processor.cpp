@@ -107,9 +107,6 @@ void lane_detection_processor::FindLanes(const sensor_msgs::Image::ConstPtr &msg
   {
     cv_input_bridge_ = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::RGB8);
 
-    //convert to gpu
-    cv::gpu::GpuMat gpu_input_bridge = cv_input_bridge_.upload();
-
     cv_input_bridge_->image.copyTo(im_input_);
     cvtColor(im_input_, Im1_HSV_, CV_BGR2HSV, 3);
     cv::warpPerspective(Im1_HSV_, Im1_HSV_warped_, transform_matrix_, BEV_size_, cv::INTER_LINEAR, cv::BORDER_REPLICATE);
