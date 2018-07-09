@@ -20,6 +20,15 @@
   <build_depend>roslint</build_depend>
   <build_depend>rr_common</build_depend>
   <build_depend>tf</build_depend>
+  <build_depend>gazebo_ros</build_depend>
+  <build_depend>gazebo_msgs</build_depend>
+  <build_depend>gazebo_ros_control</build_depend>
+  <build_depend>gazebo_plugins</build_depend>
+  <build_depend>controller_manager</build_depend>
+  <build_depend>robot_state_publisher</build_depend>
+  <build_depend>joy</build_depend>
+  <build_depend>rospy</build_depend>
+
   <run_depend>rospy</run_depend>
   <run_depend>roscpp</run_depend>
   <run_depend>rr_common</run_depend>
