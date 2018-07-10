@@ -15,5 +15,4 @@
     <arg name="config_file" default="$(find rr_lane_detection)/config/sim_vision_params_right.yaml"/>
     <arg name="camera" default="right_cam"/>
   </include>
-  <!-- <include ns ="right" file="$(find lane_detection)/launch/lane_detection_right_cam.launch" /> -->
 </launch>

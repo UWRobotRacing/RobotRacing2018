@@ -10,8 +10,8 @@
 # @competition IARRC 2018
 
 #Size of Bird's Eye View grid
-bev_width: 270
-bev_height: 314
+bev_width: 320
+bev_height: 490
 bev_resolution: 0.01
 grid_offset_y: 0
 grid_offset_x: 0
