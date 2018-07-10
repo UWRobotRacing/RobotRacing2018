@@ -9,5 +9,5 @@
   <include file="$(find rr_mapper)/launch/mapper_sim.launch" />
     
   <!-- path planner node -->
-  <!-- <include file="$(find rr_path_planner)/launch/drag_race_planner.launch" /> -->
+  <include file="$(find rr_path_planner)/launch/drag_race_planner.launch" />
 </launch>
