@@ -13,8 +13,8 @@
 bev_width: 398
 bev_height: 400
 bev_resolution: 0.01
-grid_offset_y: 0
-grid_offset_x: 3.0
+grid_offset_y: -0.6
+grid_offset_x: 2.5
 
 # 4 point coordinates in image plane. Note: OpenCV Image coordinates are in [x,y], where X is a column index (0 left, positive rightwards), and Y is a row index (0 top, positive downwards)
 # image_coords: [[0, 0], [640, 0], [0, 480], [640, 480]]
@@ -30,7 +30,7 @@ world_coords: !!opencv-matrix
    rows: 4
    cols: 2
    dt: f
-   data: [ 0., 0., 254., 178., 0, 303, 52, 329]
+   data: [ 0., 0., 510., 260., 55., 527., 110, 550]
 
 multibounds: !!opencv-matrix
    rows: 3

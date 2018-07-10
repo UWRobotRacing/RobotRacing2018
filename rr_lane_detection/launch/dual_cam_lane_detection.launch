@@ -7,10 +7,10 @@
  -  @competition IARRC 2018
  -->
 <launch>
-  <param name="device" command="$(find lane_detection)/scripts/camera_parameters.sh"/>
+  <param name="device" command="$(find rr_lane_detection)/scripts/camera_parameters.sh"/>
 
   <node ns ="left" name="usb_cam_left" pkg="usb_cam" type="usb_cam_node" output="screen" >
-    <param name="video_device" value="/dev/cam_left" />
+    <param name="video_device" value="/dev/video0" />
     <param name="image_width" value="640" />
     <param name="image_height" value="480" />
     <param name="pixel_format" value="mjpeg" />
@@ -20,12 +20,12 @@
     
     <param name="auto_white_balance" value="false" />
     <param name="contrast" value="64" />
-    <param name="sharpness" value="233" />
+    <param name="sharpness" value="223" />
   
   </node>
 
   <node ns ="right" name="usb_cam_right" pkg="usb_cam" type="usb_cam_node" output="screen" >
-    <param name="video_device" value="/dev/cam_right" />
+    <param name="video_device" value="/dev/video1" />
     <param name="image_width" value="640" />
     <param name="image_height" value="480" />
     <param name="pixel_format" value="mjpeg" />
@@ -49,6 +49,6 @@
        <param name="autosize" value="true" />
    </node>
 -->
-   <include ns ="left" file="$(find lane_detection)/launch/lane_detection_left_cam.launch" />
-   <include ns ="right" file="$(find lane_detection)/launch/lane_detection_right_cam.launch" />
+   <include ns ="left" file="$(find rr_lane_detection)/launch/lane_detection_left_cam.launch" />
+   <include ns ="right" file="$(find rr_lane_detection)/launch/lane_detection_right_cam.launch" />
 </launch>
