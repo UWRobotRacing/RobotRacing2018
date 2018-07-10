@@ -21,6 +21,8 @@
  *  @param from_grid destination grid to be joined
  *  @param offsetHeight an offset factored into the join
  *  @param offsetWidth an offset factored into the join
+ *  @param start_val the starting value to slot into
+ *         (Used for storing previous values)
  *  @return NONE
 */
 

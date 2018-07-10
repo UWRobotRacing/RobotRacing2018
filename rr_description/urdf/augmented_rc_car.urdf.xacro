@@ -329,7 +329,7 @@
   </joint>
 
   <!-- Outer Shell -->
-  <!-- <link name="outer_shell">
+  <link name="outer_shell">
     <inertial>
       <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
       <mass value="0.1"/>
@@ -338,15 +338,15 @@
     <visual name="outer_shell_stl">
       <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
       <geometry>
-        <mesh filename="package://rr_description/urdf/assets/RR2018.stl" scale="0.0254 0.0254 0.0254"/>
+        <mesh filename="package://rr_description/urdf/assets/RR2018.dae" scale="1 1 1"/>
       </geometry>
     </visual>
   </link>
   <joint name="chassis_to_outer_shell" type="fixed">
     <parent link="chassis"/>
     <child link="outer_shell"/>
-    <origin xyz="-0.26 -0.11 0.04" rpy="${degrees_90} 0.0 ${degrees_90}"/>
-  </joint> -->
+    <origin xyz="-0.35 -0.2 -0.2" rpy="0 0 ${degrees_90}"/>
+  </joint>
 
   <!-- Wheels -->
   <xacro:front_wheel lr_prefix="left" fr_prefix="front"
@@ -361,12 +361,6 @@
   <!-- Sensors -->
   <!-- Lidar -->
   <link name="hokuyo_link">
-    <!-- <collision>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry>
-        <box size="0.1 0.1 0.1"/>
-      </geometry>
-    </collision> -->
     <inertial>
       <mass value="1e-5" />
       <origin xyz="0 0 0" rpy="0 0 0"/>
@@ -421,11 +415,6 @@
   <xacro:macro name="rr_camera"
                params="name x_offset y_offset z_offset pitch yaw">
     <link name="${name}_cam_link">
-      <visual>
-        <geometry>
-          <box size="0.05 0.05 0.05"/>
-        </geometry>
-      </visual>
       <gazebo reference="${name}_cam_link">
         <material>Gazebo/Green</material>
       </gazebo>
@@ -493,9 +482,9 @@
   <xacro:rr_camera name="front" x_offset="0.35"
                 y_offset="0.0" z_offset="0.4" pitch="0.5" yaw="0.0"/>
   <xacro:rr_camera name="right" x_offset="0.35"
-                y_offset="-0.15" z_offset="0.4" pitch="0.55" yaw="-0.3"/>
+                y_offset="-0.15" z_offset="0.4" pitch="0.62" yaw="-0.3"/>
   <xacro:rr_camera name="left" x_offset="0.35"
-                y_offset="0.15" z_offset="0.4" pitch="0.55" yaw="0.3"/>
+                y_offset="0.15" z_offset="0.4" pitch="0.62" yaw="0.3"/>
 
   <!-- IMU -->
   <link name="imu_link">
