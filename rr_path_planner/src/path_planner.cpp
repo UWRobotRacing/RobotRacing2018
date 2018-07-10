@@ -88,7 +88,7 @@ void PathPlanner::GetParams() {
 
   nh_.param<int>("TrajRoll/MAP_WIDTH", map_W_, 600);
   nh_.param<int>("TrajRoll/MAP_HEIGHT", map_H_, 400);
-  nh_.param<double>("TrajRoll/RESOLUTION", resolution_, 0.01);
+  nh_.param<double>("TrajRoll/RESOLUTION", resolution_, 0.05);
   nh_.param<int>("TrajRoll/X_START", X_START_, 0);
   nh_.param<int>("TrajRoll/Y_START", Y_START_, -2);
 

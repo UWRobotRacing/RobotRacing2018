@@ -62,12 +62,12 @@ void LaserMapper::GetParam() {
   nh_.param<std::string>("LaserMapper/Occupancy_Grid_Name", occupancy_grid_name_, "/map");
   nh_.param<std::string>("LaserMapper/Laser_Scan_Name", laser_scan_name_, "/scan");
 
-  nh_.param<double>("LaserMapper/map_res", map_res_, 1);
+  nh_.param<double>("LaserMapper/map_res", map_res_, 5);
   nh_.param<int>("LaserMapper/map_W", map_W_, 800);
   nh_.param<int>("LaserMapper/map_H", map_H_, 300);
   nh_.param<double>("LaserMapper/map_orientation", map_orientation_, M_PI);
   nh_.param<double>("LaserMapper/LASER_ORIENTATION", LASER_ORIENTATION_, -1);
-  nh_.param<int>("LaserMapper/INFLATE_OBS", inflate_obstacle_, 2);
+  nh_.param<int>("LaserMapper/INFLATE_OBS", inflate_obstacle_, 1);
 
   nh_.param<double>("LaserMapper/max_angle", max_angle_, 3.14/2.0);
   nh_.param<double>("LaserMapper/min_angle", min_angle_, -3.14/2.0);

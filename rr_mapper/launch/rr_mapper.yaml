@@ -14,12 +14,12 @@ LaserMapper/NO_OBS:                         0
 LaserMapper/OBS:                            400
 LaserMapper/UNKNOWN:                        -1
 LaserMapper/OBS_SCALE:                      1
-LaserMapper/INFLATE_OBS:                    8
+LaserMapper/INFLATE_OBS:                    3
 LaserMapper/LASER_ORIENTATION:              -1
 
 #Map Parameters#
 #map_res in meter
-LaserMapper/map_res:                        0.01
+LaserMapper/map_res:                        0.05
 LaserMapper/map_W:                          600
 LaserMapper/map_H:                          400
 LaserMapper/map_orientation:                0
