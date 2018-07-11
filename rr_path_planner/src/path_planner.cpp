@@ -92,7 +92,7 @@ void PathPlanner::GetParams()
 {
   nh_.param<int>("TrajRoll/MAP_WIDTH", map_W_, 600);
   nh_.param<int>("TrajRoll/MAP_HEIGHT", map_H_, 400);
-  nh_.param<double>("TrajRoll/RESOLUTION", resolution_, 0.01);
+  nh_.param<double>("TrajRoll/RESOLUTION", resolution_, 0.05);
   nh_.param<int>("TrajRoll/X_START", X_START_, 0);
   nh_.param<int>("TrajRoll/Y_START", Y_START_, 0);
 
@@ -293,7 +293,7 @@ void PathPlanner::GenerateRealPaths()
   ROS_INFO("PATH PLANNER: GenerateRealPaths: selected Angle = %f", selected_path_angle);
 
   selected_path_index = NUM_PATHS_ - selected_path_index - 1;
-  double wheel_speed = Velocity(selected_path_distance, selected_path_angle);
+  double wheel_speed = 0;//Velocity(selected_path_distance, selected_path_angle);
 
   double lf = wheel_to_wheel_dist_ / 2.0;
   double lr = lf;

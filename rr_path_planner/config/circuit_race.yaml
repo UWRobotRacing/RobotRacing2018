@@ -7,7 +7,7 @@
 #Map Size
 TrajRoll/MAP_WIDTH:            1100
 TrajRoll/MAP_HEIGHT:           700
-TrajRoll/RESOLUTION:           0.01
+TrajRoll/RESOLUTION:           0.05
 
 #Trajectory Generation Parameters
 TrajRoll/PLANNER_VELOCITY:     1.0
