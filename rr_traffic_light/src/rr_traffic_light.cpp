@@ -29,12 +29,16 @@ void TrafficLightProcessor::Initialize() {
 
   // Service
   client_ = nh_.serviceClient<std_srvs::Empty>("/Supervisor/start_race");
+
+  consecutive_green_detection = 0;
 }
 
 /**@name InitializePubsAndSubs
  * @brief Initializes the publishers and subscribers of traffic_light_detector
  */
 void TrafficLightProcessor::InitializePubsAndSubs() {
+  shutdown_yolo_pub_ = nh_.advertise<std_msgs::Int8>("/darknet_ros/shutdown", 1 , true);
+
   image_sub_ = nh_.subscribe("/darknet_ros/detection_image", 1,
                             &TrafficLightProcessor::ImageReceivedCallback, this);
   bounding_box_sub_ = nh_.subscribe("/darknet_ros/bounding_boxes", 1,
@@ -108,10 +112,17 @@ bool TrafficLightProcessor::FindTrafficLightColorState(const cv::Mat& traffic_li
     traffic_light_state_ = GREEN;
 
     // Invoke Service call
-    client_.call(srv);
+    consecutive_green_detection ++;
+
+    if (consecutive_green_detection > 3) { 
+      client_.call(srv);
+      // Shutdown
+      ShutdownTrafficLightNodes();
+    }
   } else if (red_pixel_count > red_pixel_threshold && green_pixel_count < green_pixel_threshold) {
     ROS_INFO("--------------------------------------- RED --");
     traffic_light_state_ = RED;
+    consecutive_green_detection = 0;
   } else {
     ROS_INFO("NONE");
     traffic_light_state_ = NO_TRAFFIC_LIGHT;
@@ -123,6 +134,17 @@ bool TrafficLightProcessor::FindTrafficLightColorState(const cv::Mat& traffic_li
  */
 bool TrafficLightProcessor::GetTrafficLightState() {
   return traffic_light_state_;
+}
+
+/**@name ShutdownTrafficLightNodes
+ * @brief Publishes a message to Darknet Node to shutdown
+ */
+void TrafficLightProcessor::ShutdownTrafficLightNodes() {
+  ROS_INFO("TrafficLightProcessor::ShutdownTrafficLightNodes Shutting down Darknet Yolo node");
+  std_msgs::Int8 shutdown_msg;
+  shutdown_yolo_pub_.publish(shutdown_msg);
+  ROS_INFO("TrafficLightProcessor::ShutdownTrafficLightNodes Shutting down Traffic Light node");
+  ros::shutdown();
 }
 
 /**@name ImageReceivedCallback

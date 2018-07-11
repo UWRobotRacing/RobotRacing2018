@@ -51,7 +51,11 @@ class TrafficLightProcessor
     ros::Subscriber bounding_box_sub_;
     ros::Subscriber traffic_light_image_sub_;
 
+    ros::Publisher shutdown_yolo_pub_;
+
     int traffic_light_state_;
+
+    int consecutive_green_detection;
 
     public:
 
@@ -70,6 +74,8 @@ class TrafficLightProcessor
 
     void TrafficLightDetectedCallback(const sensor_msgs::ImageConstPtr& image, 
     const darknet_ros_msgs::BoundingBoxes& bounding_box);
+
+    void ShutdownTrafficLightNodes();
 };
 
 #endif
