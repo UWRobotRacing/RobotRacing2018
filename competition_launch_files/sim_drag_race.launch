@@ -3,7 +3,7 @@
   <include file="$(find rr_gazebo)/launch/rr_drag_race_sim.launch" />
 
   <!-- lane Detection System -->
-  <!-- <include file="$(find rr_lane_detection)/launch/sim_dual_cam_lane_detection.launch" /> -->
+  <include file="$(find rr_lane_detection)/launch/sim_dual_cam_lane_detection.launch" />
 
   <!-- Mapping System -->
   <include file="$(find rr_mapper)/launch/mapper_sim.launch" />
