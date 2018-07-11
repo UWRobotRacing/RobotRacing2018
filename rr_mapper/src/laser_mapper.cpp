@@ -154,9 +154,10 @@ void LaserMapper::PublishMap() {
   //   }
   //   lidar_msg_call_ = false;
   // }
-
-  JoinOccupancyGrid(full_map, lane_detection_left_msg_, 
-                    offset_height_left_, offset_width_left_);
+  if(!lane_detection_left_msg_.data.empty()){
+    JoinOccupancyGrid(full_map, lane_detection_left_msg_, 
+                      offset_height_left_, offset_width_left_);
+  }
   
   //Checks for left lane msg
   // if (left_msg_call_) {
@@ -167,8 +168,10 @@ void LaserMapper::PublishMap() {
   // else 
   //   ROS_WARN("No Left Name Data Detected");
 
+  if(!lane_detection_right_msg_.data.empty()){
   JoinOccupancyGrid(full_map, lane_detection_right_msg_,
                     offset_height_right_, offset_width_right_);
+  }
   //Checks for right lane msg
   // if (right_msg_call_) {
   //   JoinOccupancyGrid(full_map, lane_detection_right_msg_,
