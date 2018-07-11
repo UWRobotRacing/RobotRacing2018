@@ -129,6 +129,11 @@ class YoloObjectDetector
    */
   void publishTrafficLightImage(const cv::Mat& traffic_light_image);
 
+  /*!
+   * Shutdown Node
+   */
+  void shutdownCallback(const std_msgs::Int8& msg);
+
   //! Typedefs.
   typedef actionlib::SimpleActionServer<darknet_ros_msgs::CheckForObjectsAction> CheckForObjectsActionServer;
   typedef std::shared_ptr<CheckForObjectsActionServer> CheckForObjectsActionServerPtr;
@@ -165,6 +170,9 @@ class YoloObjectDetector
 
   // Traffic Light Detection Publisher
   ros::Publisher trafficLightImagePublisher;
+
+  // Shutdown Subscriber
+  ros::Subscriber shutdownSubscriber;
 
   // Yolo running on thread.
   std::thread yoloThread_;

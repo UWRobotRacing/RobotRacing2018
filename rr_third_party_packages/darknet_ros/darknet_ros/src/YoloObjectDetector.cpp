@@ -130,6 +130,7 @@ void YoloObjectDetector::init()
   // TODO Rewrite this to be in a separate function
   std::string cameraTopicName;
   int cameraQueueSize;
+  std::string shutdownTopicName;
   std::string objectDetectorTopicName;
   int objectDetectorQueueSize;
   bool objectDetectorLatch;
@@ -166,6 +167,9 @@ void YoloObjectDetector::init()
   nodeHandle_.param("publishers/traffic_light_image/queue_size", trafficLightImageQueueSize, 1);
   nodeHandle_.param("publishers/traffic_light_image/latch", trafficLightImageLatch, true);
 
+  // Shutdown Listener
+  nodeHandle_.param("subscribers/shutdown/topic", shutdownTopicName,
+                    std::string("/darknet_ros/shutdown"));
 
   imageSubscriber_ = imageTransport_.subscribe(cameraTopicName, cameraQueueSize,
                                                &YoloObjectDetector::cameraCallback, this);
@@ -179,6 +183,8 @@ void YoloObjectDetector::init()
                                                                        detectionImageLatch);
   trafficLightImagePublisher = nodeHandle_.advertise<sensor_msgs::Image>(trafficLightImageTopicName,
     trafficLightImageQueueSize, trafficLightImageLatch);
+  shutdownSubscriber = nodeHandle_.subscribe(shutdownTopicName, 1, 
+                                             &YoloObjectDetector::shutdownCallback, this);
 
   // Action servers.
   std::string checkForObjectsActionName;
@@ -191,6 +197,12 @@ void YoloObjectDetector::init()
   checkForObjectsActionServer_->registerPreemptCallback(
       boost::bind(&YoloObjectDetector::checkForObjectsActionPreemptCB, this));
   checkForObjectsActionServer_->start();
+}
+
+void YoloObjectDetector::shutdownCallback(const std_msgs::Int8& msg)
+{
+  ROS_INFO("Shutting down Darknet Yolo object detection");
+  ros::shutdown();
 }
 
 void YoloObjectDetector::cameraCallback(const sensor_msgs::ImageConstPtr& msg)
