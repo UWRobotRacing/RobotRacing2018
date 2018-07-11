@@ -117,6 +117,12 @@ void lane_detection_processor::FindLanes(const sensor_msgs::Image::ConstPtr &msg
     cv::Mat src = GetContours(mask_warped_1_ &mask_, blob_size_);
     cv::Mat out;               // dst must be a different Mat
     cv::flip(src, out, 1);
+    
+    cv::Mat1b element(4, 4, uchar(1));
+
+		// use square as mask
+		cv::erode(out, out, element);
+		cv::dilate(out, out, element);
 
     //find mask_
     //Copy to output bridge

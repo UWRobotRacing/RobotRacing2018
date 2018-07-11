@@ -46,6 +46,8 @@ private:
     int CheckLength(int angle_index);
     double Velocity(double dist, double steer);
     double StopDistFromVel(geometry_msgs::Twist velocity);
+    std::vector<int> ShiftMap(std::vector<int> prev_map);
+    std::vector<int> RotateMap(std::vector<int> curr_map, double new_ang);
 
     //ROS nodes, pub, sub, msgs & variables
     ros::NodeHandle nh_;
