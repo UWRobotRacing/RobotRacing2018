@@ -48,7 +48,7 @@ void TrafficLightProcessor::InitializePubsAndSubs() {
  * @param msg: Message contents of the subscriber
  */
 void TrafficLightProcessor::TrafficLightImageCallback(const sensor_msgs::ImageConstPtr& msg) {
-  ROS_INFO("TrafficLightProcessor::TrafficLightImageCallback Recieved Traffic Light Image!");
+  ROS_DEBUG("TrafficLightProcessor::TrafficLightImageCallback Recieved Traffic Light Image!");
 
   cv_bridge::CvImageConstPtr cv_ptr;
   try {
@@ -60,7 +60,7 @@ void TrafficLightProcessor::TrafficLightImageCallback(const sensor_msgs::ImageCo
   }
 
   cv::Mat traffic_light_image = cv_ptr->image;
-  ROS_INFO("Matrix Dimesions - Height: %i Width: %i", traffic_light_image.size().height, traffic_light_image.size().width);
+  ROS_DEBUG("Matrix Dimesions - Height: %i Width: %i", traffic_light_image.size().height, traffic_light_image.size().width);
   FindTrafficLightColorState(traffic_light_image);
 }
 
@@ -87,16 +87,15 @@ bool TrafficLightProcessor::FindTrafficLightColorState(const cv::Mat& traffic_li
   cv::inRange(red_hsv, cv::Scalar(170, 70, 50), cv::Scalar(180, 255, 255), red_mask2);
   cv::Mat red_mask = red_mask1 | red_mask2;
   int red_pixel_count = cv::countNonZero(red_mask);
-
   // Detect Green Light
   cv::Mat green_hsv;
   cvtColor(traffic_light_image, green_hsv, cv::COLOR_BGR2HSV);
   cv::Mat green_mask;
-  cv::inRange(green_hsv, cv::Scalar((2/12.0) * 255, (2/20.0) * 255,(6.5/10.0) * 255), cv::Scalar((8/12.0) * 255, 255, 255), green_mask);
+  cv::inRange(green_hsv, cv::Scalar(42, 25, 166), cv::Scalar(170, 255, 255), green_mask);
   int green_pixel_count = cv::countNonZero(green_mask);
 
   // Make number of pixels as a function of the size of the detected image
-  int green_pixel_threshold = (1.0/6) * image_height * image_width;
+  int green_pixel_threshold = (1.0/9.35) * image_height * image_width;
   int red_pixel_threshold = green_pixel_threshold;
 
   ROS_DEBUG("Dimensions Height: %i Width: %i", image_height, image_width);
@@ -105,16 +104,16 @@ bool TrafficLightProcessor::FindTrafficLightColorState(const cv::Mat& traffic_li
 
   // DETECT RED DROP AND GREEN RISE
   if (red_pixel_count < red_pixel_threshold  && green_pixel_count > green_pixel_threshold) {
-    ROS_INFO("-- GREEN LIGHT --");
+    ROS_INFO("-- GREEN ---------------------------------------");
     traffic_light_state_ = GREEN;
 
     // Invoke Service call
     client_.call(srv);
   } else if (red_pixel_count > red_pixel_threshold && green_pixel_count < green_pixel_threshold) {
-    ROS_INFO("-- RED LIGHT --");
+    ROS_INFO("--------------------------------------- RED --");
     traffic_light_state_ = RED;
   } else {
-    ROS_INFO("-- NO LIGHT --");
+    ROS_INFO("NONE");
     traffic_light_state_ = NO_TRAFFIC_LIGHT;
   }
 }
