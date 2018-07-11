@@ -31,6 +31,8 @@ void TrafficLightProcessor::Initialize() {
   client_ = nh_.serviceClient<std_srvs::Empty>("/Supervisor/start_race");
 
   consecutive_green_detection = 0;
+
+  nh_.param<int>("Testmode", test_mode_, 0);
 }
 
 /**@name InitializePubsAndSubs
@@ -103,8 +105,8 @@ bool TrafficLightProcessor::FindTrafficLightColorState(const cv::Mat& traffic_li
   int red_pixel_threshold = green_pixel_threshold;
 
   ROS_DEBUG("Dimensions Height: %i Width: %i", image_height, image_width);
-  ROS_DEBUG("RED Pixels: %i Threshold: %i", red_pixel_count, red_pixel_threshold);
-  ROS_DEBUG("GRE Pixels: %i Threshold: %i", green_pixel_count, green_pixel_threshold);
+  ROS_INFO("RED Pixels: %i Threshold: %i", red_pixel_count, red_pixel_threshold);
+  ROS_INFO("GRE Pixels: %i Threshold: %i", green_pixel_count, green_pixel_threshold);
 
   // DETECT RED DROP AND GREEN RISE
   if (red_pixel_count < red_pixel_threshold  && green_pixel_count > green_pixel_threshold) {
@@ -116,8 +118,9 @@ bool TrafficLightProcessor::FindTrafficLightColorState(const cv::Mat& traffic_li
 
     if (consecutive_green_detection > 3) { 
       client_.call(srv);
-      // Shutdown
-      ShutdownTrafficLightNodes();
+      
+      if (!test_mode_)
+        ShutdownTrafficLightNodes();
     }
   } else if (red_pixel_count > red_pixel_threshold && green_pixel_count < green_pixel_threshold) {
     ROS_INFO("--------------------------------------- RED --");

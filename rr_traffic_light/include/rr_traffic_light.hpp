@@ -57,6 +57,8 @@ class TrafficLightProcessor
 
     int consecutive_green_detection;
 
+    int test_mode_;
+
     public:
 
     TrafficLightProcessor();

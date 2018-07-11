@@ -34,8 +34,6 @@ int main(int argc, char **argv)
 
   std::string camera_source;
   nh_.param<std::string>("Camera_Source_Topic", camera_source, "/traffic_light/image_raw");
-  int testmode;
-  nh_.param<int>("Testmode", testmode, 0);
 
   image_transport::ImageTransport it_(nh_);
   TrafficLightProcessor tlproc(nh_);
@@ -44,7 +42,7 @@ int main(int argc, char **argv)
 
   ros::Rate r(CAMERA_FRAMERATE);
 
-  while (ros::ok() && (tlproc.GetTrafficLightState() != GREEN || testmode ))
+  while (ros::ok())
   {
     ros::spinOnce();
     r.sleep();
