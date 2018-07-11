@@ -21,6 +21,10 @@ catkin_make
 roslaunch sim_$(RACE_TYPE)_race.launch
 ```
 where $(RACE_TYPE) is either drag, ciruit or oval.
+- Run the following command to verify that all the nodes are connected with the right topics
+``` bash
+rqt_graph
+```
 
 ### Actual Robot Instructions
 This includes all the steps to check each of the sensors. To skip the checks follow only last few instructions.
@@ -49,9 +53,29 @@ rqt_image_view
 roslaunch arduino.launch
 ```
 - Verify that each subscriber and publisher gets set up properly, if issues arise check the baud rate setting and make sure the arduino is running the most update rr_arduino.ino file.
+- Place the robot on an elevated surface so the wheels can spin freely
 - To test if it's recieving autonomous commands run the following command
 ``` bash
-roslaunch arduino.launch
+rostopic pub -r 10 /rr_vehicle/vel_cmd geometry_msgs/Twist "linear:
+  x: 0.4
+  y: 0.0
+  z: 0.0
+angular:
+  x: 0.0
+  y: 0.0
+  z: 4.0"
+```
+- The steering should turn left and the wheels should start spinning
+- Run the following to stop the wheels
+- ``` bash
+rostopic pub -r 10 /rr_vehicle/vel_cmd geometry_msgs/Twist "linear:
+  x: 0.0
+  y: 0.0
+  z: 0.0
+angular:
+  x: 0.0
+  y: 0.0
+  z: 0.0"
 ```
 - Close the launch file
 - Navigate to the competition_launch_files/ folder in the repository.
@@ -60,3 +84,8 @@ roslaunch arduino.launch
 roslaunch $(RACE_TYPE)_race.launch
 ```
 - where $(RACE_TYPE) is either drag or ciruit.
+- Run the following command to verify that all the nodes are connected with the right topics
+``` bash
+rqt_graph
+```
+
