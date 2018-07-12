@@ -17,6 +17,7 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
+#include <opencv2/gpu/gpu.hpp>
 
 #include <iostream>
 
@@ -30,6 +31,7 @@ class lane_detection_processor
     cv_bridge::CvImagePtr cv_input_bridge_;
     cv_bridge::CvImage cv_output_bridge_;
     cv::Mat im_input_;
+    //cv::gpu::GpuMat gpu_im_input;
     image_transport::ImageTransport it_;
 
     nav_msgs::MapMetaData meta_data_;
@@ -53,12 +55,16 @@ class lane_detection_processor
     int adapt_hsv_patch_size_;
     cv::Scalar bounds_;
     cv::Mat multibounds_;
+    //cv::gpu::GpuMat gpu_multibounds_;
     cv::Mat Im1_HSV_, Im1_HSV_warped_, mask_warped_1_,mask_warped_2_, mask_;
+    //cv::gpu::GpuMat gpu_Im1_HSV_, gpu_Im1_HSV_warped_, gpu_mask_warped_1_, gpu_mask_warped_2_, gpu_mask_;
     
     std::string opencv_file_name_;
     cv::Mat image_coords_;
     cv::Mat world_coords_;
+
     cv::Mat transform_matrix_;
+    //cv::gpu::GpuMat gpu_transform_matrix_;
     cv::Size BEV_size_;
     double grid_resolution_;
 

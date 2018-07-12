@@ -51,6 +51,7 @@ lane_detection_processor::lane_detection_processor(ros::NodeHandle nh) : it_(nh)
   meta_data_.resolution = grid_resolution_;
 
   transform_matrix_ = cv::getPerspectiveTransform(image_coords_, world_coords_);
+  //gpu_transform_matrix.upload(transform_matrix);
 
   //Publishers
   image_pub_ = it_.advertise(binary_out_im_, 1);
@@ -99,13 +100,19 @@ void lane_detection_processor::FindLanes(const sensor_msgs::Image::ConstPtr &msg
   {
     cv_input_bridge_ = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
     cv_input_bridge_->image.copyTo(im_input_);
+    //cv_input_bridge_->image.copyTo(gpu_im_input_);
 
     cvtColor(im_input_, Im1_HSV_, CV_BGR2HSV, 3);
     cv::warpPerspective(Im1_HSV_, Im1_HSV_warped_, transform_matrix_, BEV_size_, cv::INTER_LINEAR, cv::BORDER_REPLICATE);
+    //cv::gpu::cvtColor(gpu_im_input_, gpu_Im1_HSV_, CV_BGR2HSV, 3);
+    //cv::gpu::warpPerspective(gpu_Im1_HSV_, gpu_Im1_HSV_warped_, gpu_transform_matrix_, BEV_size_, cv::INTER_LINEAR, cv::BORDER_REPLICATE);
 
     Multithreshold(Im1_HSV_warped_, multibounds_, mask_warped_1_);
     FindWhite(Im1_HSV_warped_, bounds_, adapt_hsv_patch_size_, mask_warped_2_);
     cv::bitwise_or(mask_warped_1_, mask_warped_2_, mask_warped_1_);
+    //Multithreshold(gpu_Im1_HSV_warped_, multibounds_, gpu_mask_warped_1_);
+    //FindWhite(gpu_Im1_HSV_warped_, bounds_, adapt_hsv_patch_size_, gpu_mask_warped_2_);
+    //cv::gpu::bitwise_or(gpu_mask_warped_1_, gpu_mask_warped_2_, gpu_mask_warped_1_);
 
     // sets up the BEV mask for that camera to remove everything outside of them
     // masked area
@@ -113,28 +120,37 @@ void lane_detection_processor::FindLanes(const sensor_msgs::Image::ConstPtr &msg
     {
       mask_ = cv::Mat(im_input_.rows, im_input_.cols, CV_8U, cv::Scalar::all(255));
       cv::warpPerspective(mask_, mask_, transform_matrix_, BEV_size_);
+      //gpu_mask_ = cv::gpu::GpuMat(gpu_im_input_.rows, gpu_im_input_.cols, CV_8U, cv::Scalar::all(255));
+      //cv::gpu::warpPerspective(gpu_mask_, gpu_mask_, gpu_transform_matrix_, BEV_size_);
     }
 
     cv::Mat out;               // dst must be a different Mat
+    //cv::gpu::GpuMat gpu_out;
 
   if (simulation_) {
     cv::Mat src = GetContours(mask_warped_1_ &mask_, blob_size_);
     cv::flip(src, out, 1);
-    
+    //cv::gpu::GpuMat gpu_src = GetContours(gpu_mask_warped_1_ &gpu_mask_, blob_size_);
+    //cv::gpu::flip(gpu_src, gpu_out, 1);
+
     cv::Mat1b element(4, 4, uchar(1));
 
-		// use square as mask
-		cv::erode(out, out, element);
-		cv::dilate(out, out, element);
+    // use square as mask
+    cv::erode(out, out, element);
+    cv::dilate(out, out, element);
+    //cv::gpu::erode(gpu_out, gpu_out, element);
+    //cv::gpu::dilate(gpu_out, gpu_out, element);
   }
   else
   {
     out = GetContours(mask_warped_1_ &mask_, blob_size_);
+    //gpu_out = GetContours(gpu_mask_warped_1_ &gpu_mask_, blob_size_);
   }
 
     //find mask_
     //Copy to output bridge
     out.copyTo(cv_output_bridge_.image);
+    //gpu_out.copyTo(cv_output_bridge_.image);
     cv_output_bridge_.encoding = "mono8";
 
     //Input Image has been processed and published
