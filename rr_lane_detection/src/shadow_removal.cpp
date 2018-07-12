@@ -17,12 +17,12 @@
  */
 void RemoveShadows(const cv::Mat &input_image, cv::Mat &output_image) {
 	// Configurable constants
-    const double THRESHOLD_TOLERANCE = 0.8;
+    const double THRESHOLD_TOLERANCE = 1.2;//0.8;
 	const double MORPH_KERNEL_SIZE = 3;
     const double MIN_SHADOW_AREA = 30;
-    const double MASK_DILATION = 6;
+    const double MASK_DILATION = 8;//6;
     const double EXPANDED_SHADOW_MASK_DILATION = 10;
-    const double CORRECTION_MASK_EROSION = 4;
+    const double CORRECTION_MASK_EROSION = 6;//4;
     const double MED_FILTER_KERNEL_SIZE = 15;
 
 	// Get the mean of L, a, b planes
@@ -41,11 +41,11 @@ void RemoveShadows(const cv::Mat &input_image, cv::Mat &output_image) {
 	double shadow_threshold = mean_l[0] - (stdev_l[0] / THRESHOLD_TOLERANCE);
 
 	if (mean_a[0] + mean_b[0] > 256) {
-		cv::inRange(shadow_lab_image, cv::Scalar(0, 0, 0), cv::Scalar(shadow_threshold, 1, 1), shadow_pixels_mask);
+		cv::inRange(shadow_lab_image, cv::Scalar(0, 0, 0), cv::Scalar(shadow_threshold, 255, 255), shadow_pixels_mask);
 	} else {
 		cv::Mat mask_l, mask_b;
-		cv::inRange(shadow_lab_image, cv::Scalar(0, 0, 0), cv::Scalar(shadow_threshold, 1, 1), mask_l);
-		cv::inRange(shadow_lab_image, cv::Scalar(0, 0, 0), cv::Scalar(1, 1, shadow_threshold), mask_b);
+		cv::inRange(shadow_lab_image, cv::Scalar(0, 0, 0), cv::Scalar(shadow_threshold, 255, 255), mask_l);
+		cv::inRange(shadow_lab_image, cv::Scalar(0, 0, 0), cv::Scalar(255, 255, shadow_threshold), mask_b);
 		shadow_pixels_mask = mask_l | mask_b;
 	}
 
@@ -85,15 +85,15 @@ void RemoveShadows(const cv::Mat &input_image, cv::Mat &output_image) {
 		cv::Mat dilated_component_mask, dilated_component_edge;
 		kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(EXPANDED_SHADOW_MASK_DILATION, EXPANDED_SHADOW_MASK_DILATION));
 		cv::dilate(component_mask, dilated_component_mask, kernel);
-		cv::bitwise_not(dilated_component_mask, dilated_component_edge, component_mask);
+		cv::bitwise_xor(dilated_component_mask, component_mask, dilated_component_edge);
 
 		// Get mean BGR in masks
-		cv::Scalar outer_mean_rgb = mean(shadow_removed_image, dilated_component_edge);
-		cv::Scalar inner_mean_rgb = mean(shadow_removed_image, component_mask);
+		cv::Scalar outer_mean_bgr = mean(shadow_removed_image, dilated_component_edge);
+		cv::Scalar inner_mean_bgr = mean(shadow_removed_image, component_mask);
 
-		cv::Scalar bgr_ratios(outer_mean_rgb[0] / inner_mean_rgb[0],
-							outer_mean_rgb[1] / inner_mean_rgb[1],
-							outer_mean_rgb[2] / inner_mean_rgb[2]);
+		cv::Scalar bgr_ratios(outer_mean_bgr[0] / inner_mean_bgr[0],
+							outer_mean_bgr[1] / inner_mean_bgr[1],
+							outer_mean_bgr[2] / inner_mean_bgr[2]);
 
 		if (std::isinf(bgr_ratios[0])) {
 			bgr_ratios[0] = 1;
@@ -123,7 +123,7 @@ void RemoveShadows(const cv::Mat &input_image, cv::Mat &output_image) {
 		cv::Mat eroded_component_mask, component_edge;
 		kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(CORRECTION_MASK_EROSION, CORRECTION_MASK_EROSION));
 		cv::erode(component_mask, eroded_component_mask, kernel);
-		cv::bitwise_not(component_mask, component_edge, eroded_component_mask);
+		cv::bitwise_xor(component_mask, eroded_component_mask, component_edge);
 
 		cv::Mat median_filtered_image;
 		cv::medianBlur(corrected_image, median_filtered_image, MED_FILTER_KERNEL_SIZE);
