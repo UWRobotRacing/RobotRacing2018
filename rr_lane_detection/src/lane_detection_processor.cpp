@@ -103,84 +103,71 @@ void lane_detection_processor::FindLanes(const sensor_msgs::Image::ConstPtr &msg
     cv_input_bridge_ = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
     cv_input_bridge_->image.copyTo(im_input_);
 
-    /* Begin RemoveShadows test */
-    cv::Mat file_image = cv::imread("/home/brian/dev/RobotRacing2018/simulations/lane_detection/shadowcrop6.png", cv::IMREAD_COLOR);
-    if (file_image.data == NULL) ROS_ERROR("Could not load image file");
-    cvtColor(file_image, file_image, CV_RGB2BGR, 3);
-    file_image.copyTo(im_input_);
-
-    cv::Mat Im1_Shadows_Removed;
     RemoveShadows(im_input_, Im1_Shadows_Removed);
 
-    cv_bridge::CvImage out;
-    Im1_Shadows_Removed.copyTo(out.image);
-    out.encoding = "rgb8";
-    image_pub_.publish(out.toImageMsg());
-    /* End RemoveShadows test */
+    cvtColor(im_input_, Im1_HSV_, CV_BGR2HSV, 3);
+    cv::warpPerspective(Im1_HSV_, Im1_HSV_warped_, transform_matrix_, BEV_size_, cv::INTER_LINEAR, cv::BORDER_REPLICATE);
 
-    // cvtColor(im_input_, Im1_HSV_, CV_BGR2HSV, 3);
-    // cv::warpPerspective(Im1_HSV_, Im1_HSV_warped_, transform_matrix_, BEV_size_, cv::INTER_LINEAR, cv::BORDER_REPLICATE);
+    Multithreshold(Im1_HSV_warped_, multibounds_, mask_warped_1_);
+    FindWhite(Im1_HSV_warped_, bounds_, adapt_hsv_patch_size_, mask_warped_2_);
+    cv::bitwise_or(mask_warped_1_, mask_warped_2_, mask_warped_1_);
 
-    // Multithreshold(Im1_HSV_warped_, multibounds_, mask_warped_1_);
-    // FindWhite(Im1_HSV_warped_, bounds_, adapt_hsv_patch_size_, mask_warped_2_);
-    // cv::bitwise_or(mask_warped_1_, mask_warped_2_, mask_warped_1_);
+    // sets up the BEV mask for that camera to remove everything outside of them
+    // masked area
+    if (!((mask_.cols == mask_warped_1_.cols) && (mask_.rows == mask_warped_1_.rows)))
+    {
+      mask_ = cv::Mat(im_input_.rows, im_input_.cols, CV_8U, cv::Scalar::all(255));
+      cv::warpPerspective(mask_, mask_, transform_matrix_, BEV_size_);
+    }
 
-    // // sets up the BEV mask for that camera to remove everything outside of them
-    // // masked area
-    // if (!((mask_.cols == mask_warped_1_.cols) && (mask_.rows == mask_warped_1_.rows)))
-    // {
-    //   mask_ = cv::Mat(im_input_.rows, im_input_.cols, CV_8U, cv::Scalar::all(255));
-    //   cv::warpPerspective(mask_, mask_, transform_matrix_, BEV_size_);
-    // }
+    cv::Mat out;               // dst must be a different Mat
 
-    // cv::Mat out;               // dst must be a different Mat
-
-    // if (simulation_) {
-    //   cv::Mat src = GetContours(mask_warped_1_ &mask_, blob_size_);
-    //   cv::flip(src, out, 1);
+    if (simulation_) {
+      cv::Mat src = GetContours(mask_warped_1_ &mask_, blob_size_);
+      cv::flip(src, out, 1);
       
-    //   cv::Mat1b element(4, 4, uchar(1));
+      cv::Mat1b element(4, 4, uchar(1));
 
-    //   // use square as mask
-    //   cv::erode(out, out, element);
-    //   cv::dilate(out, out, element);
-    // }
-    // else
-    // {
-    //   out = GetContours(mask_warped_1_ &mask_, blob_size_);
-    // }
+      // use square as mask
+      cv::erode(out, out, element);
+      cv::dilate(out, out, element);
+    }
+    else
+    {
+      out = GetContours(mask_warped_1_ &mask_, blob_size_);
+    }
 
-    // //find mask_
-    // //Copy to output bridge
-    // out.copyTo(cv_output_bridge_.image);
-    // cv_output_bridge_.encoding = "mono8";
+    //find mask_
+    //Copy to output bridge
+    out.copyTo(cv_output_bridge_.image);
+    cv_output_bridge_.encoding = "mono8";
 
-    // //Input Image has been processed and published
-    // image_pub_.publish(cv_output_bridge_.toImageMsg());
+    //Input Image has been processed and published
+    image_pub_.publish(cv_output_bridge_.toImageMsg());
 
-    // if (point_out_)
-    // {
-    //   occupancy_.clear();
-    //   occupancy_.reserve(out.cols * out.rows);
+    if (point_out_)
+    {
+      occupancy_.clear();
+      occupancy_.reserve(out.cols * out.rows);
 
-    //   data_pointer_ = out.data;
-    //   for (int i = 0; i < out.rows * out.cols; i++)
-    //   {
-    //     value1_ = *data_pointer_;
-    //     data_pointer_++;
-    //     if (value1_ == 0)
-    //     {
-    //       occupancy_.push_back(-1);
-    //     }
-    //     else
-    //     {
-    //       occupancy_.push_back(100);
-    //     }
-    //   }
-    //   grid_msg_.data = occupancy_;
-    //   grid_msg_.info = meta_data_;
-    //   pointList_pub_.publish(grid_msg_);
-    // }
+      data_pointer_ = out.data;
+      for (int i = 0; i < out.rows * out.cols; i++)
+      {
+        value1_ = *data_pointer_;
+        data_pointer_++;
+        if (value1_ == 0)
+        {
+          occupancy_.push_back(-1);
+        }
+        else
+        {
+          occupancy_.push_back(100);
+        }
+      }
+      grid_msg_.data = occupancy_;
+      grid_msg_.info = meta_data_;
+      pointList_pub_.publish(grid_msg_);
+    }
   }
   catch (cv_bridge::Exception &e)
   {
