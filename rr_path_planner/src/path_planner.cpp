@@ -111,12 +111,12 @@ void PathPlanner::GetParams()
 
   nh_.param<double>("TrajRoll/MAX_STEERING_ANGLE", MAX_STEERING_ANGLE_, 0.8);   //** 0.2 rad ~ 11 degree; 0.8 rad ~ 45 degree;
   nh_.param<double>("TrajRoll/CAR_WIDTH", CAR_WIDTH_, 0.27);
-  nh_.param<double>("TrajRoll/DIST_COST_FACTOR", DIST_COST_FACTOR_, 1.0);
+  nh_.param<double>("TrajRoll/DIST_REWARD_FACTOR", DIST_REWARD_FACTOR_, 1.0);
   nh_.param<double>("TrajRoll/MIN_OFFSET_DIST", min_offset_dist_, 0.1);
 
   nh_.param<bool>("TrajRoll/VISUALIZATION", VISUALIZATION_, true);
   nh_.param<bool>("TrajRoll/DEBUG_ON", DEBUG_ON_, false);
-  nh_.param<double>("simulated_odometry/wheel_to_wheel_dist", wheel_to_wheel_dist_, 0.339);
+  nh_.param<double>("simulated_odometry/wheel_to_wheel_dist", wheel_to_wheel_dist_, 0.335);
 
   //ROS_INFO("<<<<<<<< Loaded Parameters >>>>>>>>");
 }
@@ -166,14 +166,15 @@ void PathPlanner::GenerateIdealPaths()
     double y = Y_START_;
     double theta = 0.0;
     double dist = 0.0;
-    double dt = 0.025;
+    double dt = 0.05;
+    double planning_speed = 1;
 
     for(int j = 0; j < TRAJECTORY_STEPS_; j++)
     {
-      x += STRAIGHT_SPEED_*sin(-theta)*dt; //** robot dx as calculated by motion model
-      y += STRAIGHT_SPEED_*cos(-theta)*dt; //** -theta flips the Y axis. theta is measured around Y_axis
-      theta += angles_and_weights[i][0]*STRAIGHT_SPEED_*dt;
-      dist += sqrt(pow(STRAIGHT_SPEED_*sin(theta)*dt_,2)+pow(STRAIGHT_SPEED_*cos(theta)*dt,2));
+      x += planning_speed * sin(-theta) * dt; //** robot dx as calculated by motion model
+      y += planning_speed * cos(-theta) * dt; //** -theta flips the Y axis. theta is measured around Y_axis
+      theta += angles_and_weights[i][0] * planning_speed * dt;
+      dist += sqrt(pow(planning_speed * sin(theta) * dt_, 2) + pow(planning_speed * cos(theta) * dt, 2));
       path_distance[i][j] = dist;
       //compensating rectangluar car around x and y
       double x0 = x + (CAR_WIDTH_) * cos(theta);
@@ -259,7 +260,7 @@ void PathPlanner::GenerateRealPaths()
   {
     int index_on_path = CheckLength(i);
     dist = path_distance[i][index_on_path];
-    dist_reward = DIST_COST_FACTOR_ * dist;
+    dist_reward = DIST_REWARD_FACTOR_ * dist;
     angle_reward = angles_and_weights[i][1];
     reward = dist_reward + angle_reward;
     if (i == 0)
@@ -278,9 +279,9 @@ void PathPlanner::GenerateRealPaths()
     }
   }
 
-  ROS_INFO("PATH PLANNER: GenerateRealPaths: Selected path = %d", selected_path_index);
-  ROS_INFO("PATH PLANNER: GenerateRealPaths: Longest Distance = %f", selected_path_distance);
-  ROS_INFO("PATH PLANNER: GenerateRealPaths: selected Angle = %f", selected_path_angle);
+//  ROS_INFO("PATH PLANNER: GenerateRealPaths: Selected path = %d", selected_path_index);
+//  ROS_INFO("PATH PLANNER: GenerateRealPaths: Longest Distance = %f", selected_path_distance);
+//  ROS_INFO("PATH PLANNER: GenerateRealPaths: selected Angle = %f", selected_path_angle);
 
   selected_path_index = NUM_PATHS_ - selected_path_index - 1;
   double wheel_speed = Velocity(selected_path_distance, selected_path_angle);
@@ -294,8 +295,6 @@ void PathPlanner::GenerateRealPaths()
   vel_cmd_.linear.x = wheel_speed * cos(0.7071 + beta);
   vel_cmd_.linear.y = wheel_speed * sin(0.7071 + beta);
   vel_cmd_.angular.z = (wheel_speed / lr) * -sin(beta);
-  ROS_INFO("PATH PLANNER: VelMsg is  %f", GetVelocityMagnitude(vel_cmd_));
-
   //Publish vel_level, steer_cmd,
   cmd_pub_.publish(vel_cmd_);
   //Publish for VISUALIZATION_: selected_path based on index_of_longest_path
@@ -497,8 +496,8 @@ double PathPlanner::Velocity(double dist, double steer)
   else
   {
     //turning radius break point at
-    vel = std::min(STRAIGHT_SPEED_/(1+abs(steer)),STRAIGHT_SPEED_);
-    ROS_INFO("PathPlanner: Velocity(: vel=%f", vel);
+    vel = std::min(STRAIGHT_SPEED_/(1 + 2 * abs(steer)), STRAIGHT_SPEED_);
+    //ROS_INFO("PathPlanner: Velocity = %f", vel);
   }
   return vel;
 }
@@ -534,155 +533,4 @@ int PathPlanner::xyToMapIndex(double x, double y)
 double PathPlanner::StopDistFromVel(geometry_msgs::Twist velocity)
 {
   return (pow(GetVelocityMagnitude(velocity), 2) * STOPPING_FACTOR_);
-}
-
-/**
- * @name ShiftMap
- * @brief Shifts the map based on x y movement
- * @param[in] prev_map: map that needs to be updated
- * @return Updates the prev_map with shifting map
- */
-std::vector<int> LaserMapper::ShiftMap(std::vector<int> prev_map) {
-  std::vector<int> shift_map(map_W_*map_H_);
-  if(prev_map.empty()){
-    ROS_ERROR("There is no map to shift!");
-    return shift_map;
-  } 
-  else {
-    shift_map = prev_map;
-  }
-  
-  tf::StampedTransform transform;
-  try {
-    position_listener_.lookupTransform("/odom", "/base_link",
-                              ros::Time(0), transform);
-
-  } catch (tf::TransformException ex) {
-      ROS_ERROR("%s",ex.what());
-      return shift_map;
-  }
-
-  // Assumes previous value is given
-  if (prev_x_ != 0 && prev_y_ != 0) {
-    /*Gains the difference in x and y transition
-      If the diff value is negative it is 
-      either fill left or bottom (vice versa)
-    */
-    int diff_x = transform.getOrigin().x() - prev_x_;
-    int diff_y = transform.getOrigin().y() - prev_y_;
-
-    //Filling UNKNOWN for x
-    if (diff_x > 0) {
-      for(int i = 0; i < map_H_; i++) {
-        std::vector<int> temp(map_W_);
-        std::copy(shift_map.begin(), shift_map.begin()+map_W_, temp.begin());
-        std::rotate(temp.begin(), temp.begin()+abs(diff_x), temp.end());
-        std::fill(temp.rbegin(), temp.rbegin()+abs(diff_x), UNKNOWN_);
-        std::copy(temp.begin(), temp.end(), shift_map.begin());
-      }
-
-      // Replaces functionality with std::fill()
-      // for(int i = 1; i <= map_H_; i++) {
-      //   for(int j = 1; j <= abs(diff_x); j++) {
-      //     shift_map[(j*i)-1] = UNKNOWN_;
-      //   }
-      // }
-
-    }
-    else {
-      for(int i = 0; i < map_H_; i++) {
-        std::vector<int> temp(map_W_);
-        std::copy(shift_map.begin(), shift_map.begin()+map_W_, temp.begin());
-        std::rotate(temp.begin(), temp.begin()+abs(diff_x), temp.end());
-        std::fill(temp.begin(), temp.begin()+abs(diff_x), UNKNOWN_);
-        std::copy(temp.begin(), temp.end(), shift_map.begin());
-      }
-
-      // Replaces functionality with std::fill()
-      // for(int i = map_H_; i >= 1; i--) {
-      //   for(int j = abs(diff_x); j >= 1; j--) {
-      //     shift_map[(j*i)-1] = UNKNOWN_;
-      //   }
-      // }
-    }
-    
-    //Filling UNKNOWN for y
-    if (diff_y > 0) {
-      //'Rotates' the map dragging all values 
-      //By abs(diff_y)*map_W_ amount
-      std::rotate(shift_map.begin(), 
-          shift_map.begin()+(abs(diff_y)*map_W_), 
-          shift_map.end());
-
-      for(int i = 0; i < abs(diff_y)*map_W_; i++) {
-        shift_map[i] = UNKNOWN_;
-      }
-    }
-    else {
-      std::rotate(shift_map.rbegin(), 
-          shift_map.rbegin()+(abs(diff_y)*map_W_), 
-          shift_map.rend());
-
-      for(int i = (abs(diff_y)*map_W_)-1; i >= 0; i--) {
-        shift_map[i] = UNKNOWN_;
-      }
-    }
-  }
-
-  prev_x_ = transform.getOrigin().x();
-  prev_y_ = transform.getOrigin().y();
-
-  //Rotation
-  double diff_ang = transform.getRotation().getAngle() - prev_ang_;
-  shift_map = RotateMap(shift_map, diff_ang);
-  prev_ang_ = transform.getRotation().getAngle();
-  return shift_map;
-}
-
-/**
- * @name RotateMap
- * @brief Rotates the map based on angular rotation
- * @param[in] curr_map: current map to analyze
- * @param[in] new_ang: angular difference from previous location
- * @return rot_map: newly rotated map
- */
-std::vector<int> LaserMapper::RotateMap(std::vector<int> curr_map, double new_ang){
-  std::vector<LaserMapper::CellEntity> cell_map;
-  std::vector<int> rot_map;
-  //Return a empty Cell Map if no value is input
-  if(curr_map.empty()){
-    ROS_ERROR("LaserMapper::RotateMap: Map is empty!");
-    return rot_map;
-  }
-
-  //Generate CellEntity Vector & Rotate
-  for(int i = 0; i < map_H_; i++){
-    for(int j = 1; j <= map_W_; j++){
-      int curr_x = j - map_W_/2;
-      int curr_y = map_H_ - i;
-      LaserMapper::CellEntity curr_en;
-      curr_en.val = curr_map.at(i*map_H_ + j - 1);
-      curr_en.length = sqrt(curr_x*curr_x +
-                        curr_y*curr_y);
-      curr_en.angle = atan2(curr_y, curr_y) + new_ang;
-      curr_en.xloc = rint(curr_en.length*cos(curr_en.angle));
-      curr_en.yloc = rint(curr_en.length*sin(curr_en.angle));
-      cell_map.push_back(curr_en);
-    }
-  }
-
-  //Generates a map of unknwons same size as the belief map
-  rot_map.resize(map_W_*map_H_, UNKNOWN_);
-
-  //Fills in values based on criteria  
-  for(int i = 0; i < rot_map.size(); i++){
-    LaserMapper::CellEntity curr_en = cell_map.at(i);
-    //Checks for bounds of x & y
-    if((curr_en.xloc >= 0 && curr_en.xloc <= map_W_) && 
-        (curr_en.yloc >= 0 && curr_en.yloc <= map_H_)){
-      rot_map[i] = curr_en.val;
-    }
-  }
-
-  return rot_map;
 }

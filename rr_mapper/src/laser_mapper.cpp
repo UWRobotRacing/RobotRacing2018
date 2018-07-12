@@ -283,3 +283,154 @@ void LaserMapper::RayTracing(const float& angle, const float& range, const int& 
     }
   } 
 }
+
+/**
+ * @name ShiftMap
+ * @brief Shifts the map based on x y movement
+ * @param[in] prev_map: map that needs to be updated
+ * @return Updates the prev_map with shifting map
+ */
+std::vector<int> LaserMapper::ShiftMap(std::vector<int> prev_map) {
+  std::vector<int> shift_map(map_width_*map_height_);
+  if(prev_map.empty()){
+    ROS_ERROR("There is no map to shift!");
+    return shift_map;
+  } 
+  else {
+    shift_map = prev_map;
+  }
+  
+  tf::StampedTransform transform;
+  try {
+    position_listener_.lookupTransform("/odom", "/base_link",
+                              ros::Time(0), transform);
+
+  } catch (tf::TransformException ex) {
+      ROS_ERROR("%s",ex.what());
+      return shift_map;
+  }
+
+  // Assumes previous value is given
+  if (prev_x_ != 0 && prev_y_ != 0) {
+    /*Gains the difference in x and y transition
+      If the diff value is negative it is 
+      either fill left or bottom (vice versa)
+    */
+    int diff_x = transform.getOrigin().x() - prev_x_;
+    int diff_y = transform.getOrigin().y() - prev_y_;
+
+    //Filling UNKNOWN for x
+    if (diff_x > 0) {
+      for(int i = 0; i < map_height_; i++) {
+        std::vector<int> temp(map_width_);
+        std::copy(shift_map.begin(), shift_map.begin()+map_width_, temp.begin());
+        std::rotate(temp.begin(), temp.begin()+abs(diff_x), temp.end());
+        std::fill(temp.rbegin(), temp.rbegin()+abs(diff_x), UNKNOWN_);
+        std::copy(temp.begin(), temp.end(), shift_map.begin());
+      }
+
+      // Replaces functionality with std::fill()
+      // for(int i = 1; i <= map_height_; i++) {
+      //   for(int j = 1; j <= abs(diff_x); j++) {
+      //     shift_map[(j*i)-1] = UNKNOWN_;
+      //   }
+      // }
+
+    }
+    else {
+      for(int i = 0; i < map_height_; i++) {
+        std::vector<int> temp(map_width_);
+        std::copy(shift_map.begin(), shift_map.begin()+map_width_, temp.begin());
+        std::rotate(temp.begin(), temp.begin()+abs(diff_x), temp.end());
+        std::fill(temp.begin(), temp.begin()+abs(diff_x), UNKNOWN_);
+        std::copy(temp.begin(), temp.end(), shift_map.begin());
+      }
+
+      // Replaces functionality with std::fill()
+      // for(int i = map_height_; i >= 1; i--) {
+      //   for(int j = abs(diff_x); j >= 1; j--) {
+      //     shift_map[(j*i)-1] = UNKNOWN_;
+      //   }
+      // }
+    }
+    
+    //Filling UNKNOWN for y
+    if (diff_y > 0) {
+      //'Rotates' the map dragging all values 
+      //By abs(diff_y)*map_width_ amount
+      std::rotate(shift_map.begin(), 
+          shift_map.begin()+(abs(diff_y)*map_width_), 
+          shift_map.end());
+
+      for(int i = 0; i < abs(diff_y)*map_width_; i++) {
+        shift_map[i] = UNKNOWN_;
+      }
+    }
+    else {
+      std::rotate(shift_map.rbegin(), 
+          shift_map.rbegin()+(abs(diff_y)*map_width_), 
+          shift_map.rend());
+
+      for(int i = (abs(diff_y)*map_width_)-1; i >= 0; i--) {
+        shift_map[i] = UNKNOWN_;
+      }
+    }
+  }
+
+  prev_x_ = transform.getOrigin().x();
+  prev_y_ = transform.getOrigin().y();
+
+  //Rotation
+  double diff_ang = transform.getRotation().getAngle() - prev_ang_;
+  shift_map = RotateMap(shift_map, diff_ang);
+  prev_ang_ = transform.getRotation().getAngle();
+  return shift_map;
+}
+
+/**
+ * @name RotateMap
+ * @brief Rotates the map based on angular rotation
+ * @param[in] curr_map: current map to analyze
+ * @param[in] new_ang: angular difference from previous location
+ * @return rot_map: newly rotated map
+ */
+std::vector<int> LaserMapper::RotateMap(std::vector<int> curr_map, double new_ang){
+  std::vector<LaserMapper::CellEntity> cell_map;
+  std::vector<int> rot_map;
+  //Return a empty Cell Map if no value is input
+  if(curr_map.empty()){
+    ROS_ERROR("LaserMapper::RotateMap: Map is empty!");
+    return rot_map;
+  }
+
+  //Generate CellEntity Vector & Rotate
+  for(int i = 0; i < map_height_; i++){
+    for(int j = 1; j <= map_width_; j++){
+      int curr_x = j - map_width_/2;
+      int curr_y = map_height_ - i;
+      LaserMapper::CellEntity curr_en;
+      curr_en.val = curr_map.at(i*map_height_ + j - 1);
+      curr_en.length = sqrt(curr_x*curr_x +
+                        curr_y*curr_y);
+      curr_en.angle = atan2(curr_y, curr_y) + new_ang;
+      curr_en.xloc = rint(curr_en.length*cos(curr_en.angle));
+      curr_en.yloc = rint(curr_en.length*sin(curr_en.angle));
+      cell_map.push_back(curr_en);
+    }
+  }
+
+  //Generates a map of unknwons same size as the belief map
+  rot_map.resize(map_width_*map_height_, UNKNOWN_);
+
+  //Fills in values based on criteria  
+  for(int i = 0; i < rot_map.size(); i++){
+    LaserMapper::CellEntity curr_en = cell_map.at(i);
+    //Checks for bounds of x & y
+    if((curr_en.xloc >= 0 && curr_en.xloc <= map_width_) && 
+        (curr_en.yloc >= 0 && curr_en.yloc <= map_height_)){
+      rot_map[i] = curr_en.val;
+    }
+  }
+
+  return rot_map;
+}

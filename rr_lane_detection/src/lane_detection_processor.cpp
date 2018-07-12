@@ -44,6 +44,7 @@ lane_detection_processor::lane_detection_processor(ros::NodeHandle nh) : it_(nh)
   fs["bev_resolution"] >> grid_resolution_;
   fs["grid_offset_x"] >> meta_data_.origin.position.x;
   fs["grid_offset_y"] >> meta_data_.origin.position.y;
+  fs["simulation"] >> simulation_;
   fs.release();
   meta_data_.width = BEV_size_.width;
   meta_data_.height = BEV_size_.height;
@@ -114,8 +115,10 @@ void lane_detection_processor::FindLanes(const sensor_msgs::Image::ConstPtr &msg
       cv::warpPerspective(mask_, mask_, transform_matrix_, BEV_size_);
     }
 
-    cv::Mat src = GetContours(mask_warped_1_ &mask_, blob_size_);
     cv::Mat out;               // dst must be a different Mat
+
+  if (simulation_) {
+    cv::Mat src = GetContours(mask_warped_1_ &mask_, blob_size_);
     cv::flip(src, out, 1);
     
     cv::Mat1b element(4, 4, uchar(1));
@@ -123,6 +126,11 @@ void lane_detection_processor::FindLanes(const sensor_msgs::Image::ConstPtr &msg
 		// use square as mask
 		cv::erode(out, out, element);
 		cv::dilate(out, out, element);
+  }
+  else
+  {
+    out = GetContours(mask_warped_1_ &mask_, blob_size_);
+  }
 
     //find mask_
     //Copy to output bridge

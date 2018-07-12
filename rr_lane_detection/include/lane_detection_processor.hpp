@@ -62,6 +62,7 @@ class lane_detection_processor
     cv::Size BEV_size_;
     double grid_resolution_;
 
+    bool simulation_;
     // I/O behavioural params
     bool point_out_;
   public:

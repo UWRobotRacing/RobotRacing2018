@@ -15,7 +15,6 @@
 #include <math.h>
 #include <vector>
 #include <string>
-#include <algorithm>
 
 // ROS headers
 #include <ros/ros.h>
@@ -40,6 +39,19 @@ class LaserMapper
     void PublishMap();
 
   private:
+    struct CellEntity {
+      //Occupancy Grid Value (Subject to Change)
+      int val;
+      
+      //Cartesian Coordinates
+      double xloc;
+      double yloc;
+
+      //Polar Coordinates
+      double length;
+      double angle;
+    };    
+
     // Subscribers
     void LidarCallback(const sensor_msgs::LaserScan::ConstPtr& msg);
     void DetectLeftLaneCallback(const nav_msgs::OccupancyGrid::ConstPtr& msg);
@@ -51,6 +63,8 @@ class LaserMapper
     void UpdateLaserMap(const int& x, const int& y, const double& value);
     double CheckMap(const int& x, const int& y);
     void RayTracing(const float& angle, const float& range, const int& inflate_factor);
+    std::vector<int> ShiftMap(std::vector<int> prev_map);
+    std::vector<int> RotateMap(std::vector<int> curr_map, double new_ang); 
 
     // ROS Variables
     ros::NodeHandle nh_;
@@ -110,7 +124,7 @@ class LaserMapper
     double prev_x_;
     double prev_y_;
     double prev_ang_;
+    
 };
 
 #endif  // LASERMAPPER_H
-
