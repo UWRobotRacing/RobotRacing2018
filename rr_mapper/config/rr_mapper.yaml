@@ -1,0 +1,40 @@
+# @file rr_mapper.yaml
+# @author Sirui Song
+# @author Jungwook Lee
+# @author Raymond Kuo
+# @author Toni Ogunmade(oluwatoni)
+# @competition IARRC 2018
+
+#Names#
+LaserMapper/Occupancy_Grid_Name:            "/rr_vehicle/map"
+LaserMapper/Laser_Scan_Name:                "/rr_vehicle/laserscan"
+
+#Obstacle#
+LaserMapper/INFLATE_OBS:                    8
+LaserMapper/LASER_ORIENTATION:              -1
+
+#Map Parameters#
+#map_res in meter
+LaserMapper/map_res:                        0.01
+LaserMapper/map_W:                          600
+LaserMapper/map_H:                          400
+LaserMapper/map_orientation:                0
+
+#Scan parameters#
+#Angles are in radian, range in meter
+LaserMapper/max_angle:                      1.35
+LaserMapper/min_angle:                      -1.35
+LaserMapper/minrange:                       0.20
+LaserMapper/maxrange:                       6
+LaserMapper/samplerate:                     1
+LaserMapper/scan_processing_subsample:      0
+LaserMapper/mechanical_offset:              0
+
+LaserMapper/lane_detection_left_msg/offset_height:     0
+LaserMapper/lane_detection_left_msg/offset_width:      0
+
+LaserMapper/lane_detection_right_msg/offset_height:    0
+LaserMapper/lane_detection_right_msg/offset_width:     0
+
+#Debugging#
+LaserMapper/DEBUG:                          false

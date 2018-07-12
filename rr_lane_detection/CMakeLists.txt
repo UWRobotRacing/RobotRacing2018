@@ -12,7 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
   cv_bridge
 )
 
-find_package(OpenCV)
+find_package(OpenCV REQUIRED)
 
 catkin_package()
 
@@ -20,4 +20,4 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 include_directories(include ${catkin_INCLUDE_DIRS})
 
 add_executable(lane_detection src/lane_detection.cpp src/thresholding.cpp src/lane_detection_processor.cpp include/lane_detection_processor.hpp include/thresholding.hpp)
-target_link_libraries(lane_detection ${catkin_LIBRARIES})
+target_link_libraries(lane_detection ${catkin_LIBRARIES} ${OpenCV_LIBS})

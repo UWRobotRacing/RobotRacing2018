@@ -26,8 +26,8 @@ LaserMapper::LaserMapper() {
   
   // SUBSCRIBERS
   scan_sub_ = nh_.subscribe(laser_scan_name_, 1, &LaserMapper::LidarCallback, this);
-  lane_detection_left_sub_ = nh_.subscribe("/output_point_list_left", 1, &LaserMapper::DetectLeftLaneCallback, this);
-  lane_detection_right_sub_ = nh_.subscribe("/output_point_list_right", 1, &LaserMapper::DetectRightLaneCallback, this);
+  lane_detection_left_sub_ = nh_.subscribe("/output_point_list_left_cam", 1, &LaserMapper::DetectLeftLaneCallback, this);
+  lane_detection_right_sub_ = nh_.subscribe("/output_point_list_right_cam", 1, &LaserMapper::DetectRightLaneCallback, this);
 
   // out_file_.open("debug.txt", std::fstream::out);
 
@@ -52,18 +52,18 @@ LaserMapper::~LaserMapper() {
  */
 void LaserMapper::InitMap() {
   //Fills the map with Unknown values in the vector
-  belief_map_.resize(map_W_*map_H_, UNKNOWN_);
-  ROS_INFO("Map Initialized with UNKNOWN, Height: %d, Width: %d", map_H_, map_W_);
+  belief_map_.resize(map_width_*map_height_, UNKNOWN_);
+  ROS_INFO("Map Initialized with UNKNOWN, Height: %d, Width: %d", map_height_, map_width_);
   //Initializes full map values 
-  full_map_.header.frame_id = "/map";
+  full_map_.header.frame_id = "/base_link";
   full_map_.info.resolution = map_res_;
-  full_map_.info.width = map_W_;
-  full_map_.info.height = map_H_;
-  full_map_.info.origin.position.x = map_W_/2*map_res_;//-map_W_/2*map_res_; //map_W_/2*map_res_
-  full_map_.info.origin.position.y = 0;//-map_H_/2*map_res_; //map_H_*map_res_
+  full_map_.info.width = map_width_;
+  full_map_.info.height = map_height_;
+  full_map_.info.origin.position.x = map_width_/2*map_res_;//-map_width_/2*map_res_; //map_width_/2*map_res_
+  full_map_.info.origin.position.y = 0;//-map_height_/2*map_res_; //map_height_*map_res_
   full_map_.info.origin.orientation =
              tf::createQuaternionMsgFromRollPitchYaw(M_PI, -1*M_PI, 0);
-  full_map_.data.resize(map_W_*map_H_);
+  full_map_.data.resize(map_width_*map_height_);
 }
 
 /**
@@ -76,9 +76,8 @@ void LaserMapper::GetParam() {
   nh_.param<std::string>("LaserMapper/Laser_Scan_Name", laser_scan_name_, "/scan");
 
   nh_.param<double>("LaserMapper/map_res", map_res_, 5);
-  nh_.param<int>("LaserMapper/map_W", map_W_, 800);
-  nh_.param<int>("LaserMapper/map_H", map_H_, 300);
-  nh_.param<double>("LaserMapper/map_orientation", map_orientation_, M_PI);
+  nh_.param<int>("LaserMapper/map_W", map_width_, 800);
+  nh_.param<int>("LaserMapper/map_H", map_height_, 300);
   nh_.param<double>("LaserMapper/LASER_ORIENTATION", LASER_ORIENTATION_, -1);
   nh_.param<int>("LaserMapper/INFLATE_OBS", inflate_obstacle_, 1);
 
@@ -96,7 +95,6 @@ void LaserMapper::GetParam() {
   nh_.param<int>("LaserMapper/lane_detection_right_msg/offset_width", offset_width_right_, 500);
 }
 
-
 /**
  * @name PublishMap
  * @brief Joins the entire map together
@@ -105,13 +103,16 @@ void LaserMapper::GetParam() {
  */
 void LaserMapper::PublishMap() {
   //Checks for lidar msg
-  int n = floor(abs(min_angle_-laser_msg_.angle_min)/laser_msg_.angle_increment)+mech_offset_;    
+  int n = floor(abs(min_angle_-laser_msg_.angle_min)/laser_msg_.angle_increment)+mech_offset_;
   double increment = (samplerate_)*laser_msg_.angle_increment;
 
-  if (prev_header_.seq != laser_msg_.header.seq) {
-    for (double i = min_angle_; i < max_angle_; i+= increment) {
+  if (prev_header_.seq != laser_msg_.header.seq)
+  {
+    for (double i = min_angle_; i < max_angle_; i+= increment)
+    {
       // Check for NaN ranges
-      if (std::isnan (laser_msg_.ranges[n]) == false) {
+      if (std::isnan (laser_msg_.ranges[n]) == false)
+      {
         RayTracing(i, laser_msg_.ranges[n], inflate_obstacle_);
       }
       n += samplerate_;
@@ -125,9 +126,8 @@ void LaserMapper::PublishMap() {
   // prev_time_ = GetCPUTime();
 
   
-  for (int i = 0; i < map_W_*map_H_; i++) {
-    full_map_.data[i] =
-    std::max(std::min(100, inflate_obstacle_*belief_map_[i]), belief_map_[i]);
+  for (int i = 0; i < map_width_*map_height_; i++) {
+    full_map_.data[i] = belief_map_[i];
   }
 
   // out_file_ << "static_cast timediff: " << GetCPUTime() - prev_time_ << std::endl;
@@ -147,7 +147,7 @@ void LaserMapper::PublishMap() {
   //     prev_header_ = laser_msg_.header;
   //   }
 
-  //   for (int i = 0; i < map_W_*map_H_; i++) {
+  //   for (int i = 0; i < map_width_*map_height_; i++) {
   //     double weight = std::min(100.0, OBS_SCALE_*belief_map_[i]);
   //     weight = std::max(0.0, weight);
 
@@ -187,7 +187,7 @@ void LaserMapper::PublishMap() {
   
   map_pub_.publish(full_map_);
   belief_map_.clear();
-  belief_map_.resize(map_W_*map_H_);
+  belief_map_.resize(map_width_*map_height_);
 
 }
 
@@ -198,7 +198,8 @@ void LaserMapper::PublishMap() {
  * @param[in] msg: Lidar Message
  * @return NONE
  */
-void LaserMapper::LidarCallback(const sensor_msgs::LaserScan::ConstPtr& msg) {
+void LaserMapper::LidarCallback(const sensor_msgs::LaserScan::ConstPtr& msg)
+{
   /* 
     Lidar, Left Lane, Right Lane callbacks all require
     DeleteValues - Deletes values of the 
@@ -207,7 +208,6 @@ void LaserMapper::LidarCallback(const sensor_msgs::LaserScan::ConstPtr& msg) {
   */
 
   laser_msg_ = *msg;
-  // lidar_msg_call_ = true;
   PublishMap();
 }
 
@@ -219,7 +219,6 @@ void LaserMapper::LidarCallback(const sensor_msgs::LaserScan::ConstPtr& msg) {
  */
 void LaserMapper::DetectLeftLaneCallback(const nav_msgs::OccupancyGrid::ConstPtr& msg) {
   lane_detection_left_msg_ = *msg;
-  // left_msg_call_ = true;
 }
 
 /**
@@ -230,7 +229,6 @@ void LaserMapper::DetectLeftLaneCallback(const nav_msgs::OccupancyGrid::ConstPtr
  */
 void LaserMapper::DetectRightLaneCallback(const nav_msgs::OccupancyGrid::ConstPtr& msg) {
   lane_detection_right_msg_ = *msg;
-  // right_msg_call_ = true;
 }
 
 /**
@@ -243,8 +241,8 @@ void LaserMapper::DetectRightLaneCallback(const nav_msgs::OccupancyGrid::ConstPt
  * @return NONE
  */
 void LaserMapper::UpdateLaserMap(const int& x, const int& y, const double& value) {
-  if (abs(x) < map_W_/2 && y < map_H_ && y > 0) {
-    int map_index = (map_W_/2 - x) + (map_H_ - y)*map_W_;
+  if (abs(x) < map_width_/2 && y < map_height_ && y > 0) {
+    int map_index = (map_width_/2 - x) + (map_height_ - y)*map_width_;
     belief_map_[map_index] = value;
   }
 }
@@ -257,9 +255,11 @@ void LaserMapper::UpdateLaserMap(const int& x, const int& y, const double& value
  * @return double: value of occupany grid at belief map
  */
 //TODO Change this function to have less redundant code (Duplicate with UpdateLaserMap)
-double LaserMapper::CheckMap(const int& x, const int& y) {
-  if (abs(x) < map_W_/2 && y < map_H_ && y > 0) {
-    int map_index = (map_W_/2 - x) + (map_H_ - y)*map_W_;
+double LaserMapper::CheckMap(const int& x, const int& y)
+{
+  if (abs(x) < map_width_/2 && y < map_height_ && y > 0)
+  {
+    int map_index = (map_width_/2 - x) + (map_height_ - y)*map_width_;
     return belief_map_[map_index];
   }
   return OBS_;
@@ -273,7 +273,8 @@ double LaserMapper::CheckMap(const int& x, const int& y) {
  * @param[in] inflate_factor: magnification value
  *  @return NONE
  */
-void LaserMapper::RayTracing(const float& angle, const float& range, const int& inflate_factor) {
+void LaserMapper::RayTracing(const float& angle, const float& range, const int& inflate_factor)
+{
   if (range < min_range_ || range > max_range_)
     return;
   
@@ -339,7 +340,7 @@ void LaserMapper::RayTracing(const float& angle, const float& range, const int& 
  * @return Updates the prev_map with shifting map
  */
 std::vector<int> LaserMapper::ShiftMap(std::vector<int> prev_map) {
-  std::vector<int> shift_map(map_W_*map_H_);
+  std::vector<int> shift_map(map_width_*map_height_);
   if(prev_map.empty()){
     ROS_ERROR("There is no map to shift!");
     return shift_map;
@@ -369,16 +370,16 @@ std::vector<int> LaserMapper::ShiftMap(std::vector<int> prev_map) {
 
     //Filling UNKNOWN for x
     if (diff_x > 0) {
-      for(int i = 0; i < map_H_; i++) {
-        std::vector<int> temp(map_W_);
-        std::copy(shift_map.begin(), shift_map.begin()+map_W_, temp.begin());
+      for(int i = 0; i < map_height_; i++) {
+        std::vector<int> temp(map_width_);
+        std::copy(shift_map.begin(), shift_map.begin()+map_width_, temp.begin());
         std::rotate(temp.begin(), temp.begin()+abs(diff_x), temp.end());
         std::fill(temp.rbegin(), temp.rbegin()+abs(diff_x), UNKNOWN_);
         std::copy(temp.begin(), temp.end(), shift_map.begin());
       }
 
       // Replaces functionality with std::fill()
-      // for(int i = 1; i <= map_H_; i++) {
+      // for(int i = 1; i <= map_height_; i++) {
       //   for(int j = 1; j <= abs(diff_x); j++) {
       //     shift_map[(j*i)-1] = UNKNOWN_;
       //   }
@@ -386,16 +387,16 @@ std::vector<int> LaserMapper::ShiftMap(std::vector<int> prev_map) {
 
     }
     else {
-      for(int i = 0; i < map_H_; i++) {
-        std::vector<int> temp(map_W_);
-        std::copy(shift_map.begin(), shift_map.begin()+map_W_, temp.begin());
+      for(int i = 0; i < map_height_; i++) {
+        std::vector<int> temp(map_width_);
+        std::copy(shift_map.begin(), shift_map.begin()+map_width_, temp.begin());
         std::rotate(temp.begin(), temp.begin()+abs(diff_x), temp.end());
         std::fill(temp.begin(), temp.begin()+abs(diff_x), UNKNOWN_);
         std::copy(temp.begin(), temp.end(), shift_map.begin());
       }
 
       // Replaces functionality with std::fill()
-      // for(int i = map_H_; i >= 1; i--) {
+      // for(int i = map_height_; i >= 1; i--) {
       //   for(int j = abs(diff_x); j >= 1; j--) {
       //     shift_map[(j*i)-1] = UNKNOWN_;
       //   }
@@ -405,21 +406,21 @@ std::vector<int> LaserMapper::ShiftMap(std::vector<int> prev_map) {
     //Filling UNKNOWN for y
     if (diff_y > 0) {
       //'Rotates' the map dragging all values 
-      //By abs(diff_y)*map_W_ amount
+      //By abs(diff_y)*map_width_ amount
       std::rotate(shift_map.begin(), 
-          shift_map.begin()+(abs(diff_y)*map_W_), 
+          shift_map.begin()+(abs(diff_y)*map_width_), 
           shift_map.end());
 
-      for(int i = 0; i < abs(diff_y)*map_W_; i++) {
+      for(int i = 0; i < abs(diff_y)*map_width_; i++) {
         shift_map[i] = UNKNOWN_;
       }
     }
     else {
       std::rotate(shift_map.rbegin(), 
-          shift_map.rbegin()+(abs(diff_y)*map_W_), 
+          shift_map.rbegin()+(abs(diff_y)*map_width_), 
           shift_map.rend());
 
-      for(int i = (abs(diff_y)*map_W_)-1; i >= 0; i--) {
+      for(int i = (abs(diff_y)*map_width_)-1; i >= 0; i--) {
         shift_map[i] = UNKNOWN_;
       }
     }
@@ -452,12 +453,12 @@ std::vector<int> LaserMapper::RotateMap(std::vector<int> curr_map, double new_an
   }
 
   //Generate CellEntity Vector & Rotate
-  for(int i = 0; i < map_H_; i++){
-    for(int j = 1; j <= map_W_; j++){
-      int curr_x = j - map_W_/2;
-      int curr_y = map_H_ - i;
+  for(int i = 0; i < map_height_; i++){
+    for(int j = 1; j <= map_width_; j++){
+      int curr_x = j - map_width_/2;
+      int curr_y = map_height_ - i;
       LaserMapper::CellEntity curr_en;
-      curr_en.val = curr_map.at(i*map_H_ + j - 1);
+      curr_en.val = curr_map.at(i*map_height_ + j - 1);
       curr_en.length = sqrt(curr_x*curr_x +
                         curr_y*curr_y);
       curr_en.angle = atan2(curr_y, curr_y) + new_ang;
@@ -468,14 +469,14 @@ std::vector<int> LaserMapper::RotateMap(std::vector<int> curr_map, double new_an
   }
 
   //Generates a map of unknwons same size as the belief map
-  rot_map.resize(map_W_*map_H_, UNKNOWN_);
+  rot_map.resize(map_width_*map_height_, UNKNOWN_);
 
   //Fills in values based on criteria  
   for(int i = 0; i < rot_map.size(); i++){
     LaserMapper::CellEntity curr_en = cell_map.at(i);
     //Checks for bounds of x & y
-    if((curr_en.xloc >= 0 && curr_en.xloc <= map_W_) && 
-        (curr_en.yloc >= 0 && curr_en.yloc <= map_H_)){
+    if((curr_en.xloc >= 0 && curr_en.xloc <= map_width_) && 
+        (curr_en.yloc >= 0 && curr_en.yloc <= map_height_)){
       rot_map[i] = curr_en.val;
     }
   }

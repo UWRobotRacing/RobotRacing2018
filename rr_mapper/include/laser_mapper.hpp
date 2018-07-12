@@ -86,9 +86,8 @@ class LaserMapper
     nav_msgs::OccupancyGrid full_map_;
 
     // Callback Toggle
-    // bool left_msg_call_ = false;
-    // bool right_msg_call_ = false;
-    // bool lidar_msg_call_ = false;
+    bool left_msg_call_ = false;
+    bool right_msg_call_ = false;
 
     std::string occupancy_grid_name_;
     std::string laser_scan_name_ = "/rr_vehicle/laserscan";
@@ -97,8 +96,8 @@ class LaserMapper
     // Map Parameters
     double map_res_;
     double map_orientation_;
-    int map_W_;
-    int map_H_;
+    int map_width_;
+    int map_height_;
 
     // Scan Parameters
     double max_angle_;
@@ -138,4 +137,3 @@ class LaserMapper
 };
 
 #endif  // LASERMAPPER_H
-

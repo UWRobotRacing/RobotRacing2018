@@ -45,7 +45,7 @@ private:
     bool IsCellOccupied(int index);
     int CheckLength(int angle_index);
     double Velocity(double dist, double steer);
-    double StopDistFromVel(double vel1);
+    double StopDistFromVel(geometry_msgs::Twist velocity);
 
     //ROS nodes, pub, sub, msgs & variables
     ros::NodeHandle nh_;
@@ -55,7 +55,6 @@ private:
     ros::Publisher cmd_pub_;
     nav_msgs::OccupancyGrid::ConstPtr map_;  //map in 2d grid
     geometry_msgs::Twist vel_cmd_;
-    std_msgs::Float32 last_velMsg;
 
     ros::Subscriber enable_sub;
     std_msgs::Int8 enable;
@@ -96,19 +95,11 @@ private:
     double MIN_ACCELERATION_ANGLE_;
     double STRAIGHT_SPEED_;
     
-    // Drag mode
-    bool DRAG_MODE_;
-    int DRAG_DURATION_;
-    int DRAG_DURATION_NANO_;
-    ros::Duration drag_duration_;
-    bool start_recorded_; //used in drag mode to stop after a particular time
-    ros::Time start_time_;
-
     // Offset box params, obs in the box is ignored
     double min_offset_dist_;
     double MIN_STOPPING_DIST_;
     double STOPPING_FACTOR_;
-    double DIST_COST_FACTOR_;
+    double DIST_REWARD_FACTOR_;
 
     //Debug variables
     bool VISUALIZATION_;
@@ -121,12 +112,12 @@ private:
     std::vector <visualization_msgs::Marker> trajectory_marker_vector_;  //used for visualizing selected_path
     visualization_msgs::Marker trajectory_points_;
     //drawing axis
-    /*visualization_msgs::Marker X_axis_marker_points;
+    visualization_msgs::Marker X_axis_marker_points;
     visualization_msgs::Marker Y_axis_marker_points;
     ros::Publisher X_axis_pub;
     ros::Publisher Y_axis_pub;
     int X_axis_marker_id;
-    int Y_axis_marker_id;*/
+    int Y_axis_marker_id;
     //drawing rayTrace
     std::vector <visualization_msgs::Marker> trajectory_marker_rayTrace_;
     ros::Publisher rayTrace_pub_;

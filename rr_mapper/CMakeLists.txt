@@ -6,14 +6,14 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 set(CMAKE_BUILD_TYPE Release)
 
 find_package(
-	catkin REQUIRED COMPONENTS 
-	roscpp 
-	rospy 
-	std_msgs 
-	sensor_msgs 
-	nav_msgs
-	tf
-	roslint
+  catkin REQUIRED COMPONENTS 
+  roscpp 
+  rospy 
+  std_msgs 
+  sensor_msgs 
+  nav_msgs
+  tf
+  roslint
 )
 
 catkin_package()
