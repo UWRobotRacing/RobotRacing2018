@@ -6,12 +6,9 @@
 
 #include "lane_detection_processor.hpp"
 #include "thresholding.hpp"
-<<<<<<< HEAD
 #include "shadow_removal.hpp"
 #include <iostream>
 #include <sstream>
-=======
->>>>>>> 0dbd959f44c48884ef796f62cbb46c5f71a4ddb9
 
 /** @brief sets the rosparams and obtains the perspective transforms
  *  @param nh is the node handle of the node
