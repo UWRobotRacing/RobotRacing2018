@@ -3,7 +3,7 @@
   <include file="$(find rr_gazebo)/launch/rr_vehicle_teleop.launch" />
 
   <!-- land Detection System -->
-  <!-- <include file="$(find rr_lane_detection)/launch/sim_dual_cam_lane_detection.launch" /> -->
+  <include file="$(find rr_lane_detection)/launch/sim_dual_cam_lane_detection.launch" />
 
   <!-- Mapping System -->
   <include file="$(find rr_mapper)/launch/mapper.launch" />

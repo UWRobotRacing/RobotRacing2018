@@ -15,6 +15,10 @@
 #include <math.h>
 #include <vector>
 #include <string>
+#include <time.h>
+#include <sys/time.h>
+#include <iostream>
+#include <fstream>
 
 // ROS headers
 #include <ros/ros.h>
@@ -79,6 +83,7 @@ class LaserMapper
     nav_msgs::OccupancyGrid lane_detection_left_msg_;
     nav_msgs::OccupancyGrid lane_detection_right_msg_;
     sensor_msgs::LaserScan laser_msg_;
+    nav_msgs::OccupancyGrid full_map_;
 
     // Callback Toggle
     // bool left_msg_call_ = false;
@@ -107,7 +112,7 @@ class LaserMapper
     double LASER_ORIENTATION_;
 
     // Map Values
-    const double OBS_SCALE_ = 1;
+    // const double OBS_SCALE_ = 1;
 
     // lane_detection Map Values
     int offset_height_left_;
@@ -126,6 +131,10 @@ class LaserMapper
     double prev_y_;
     double prev_ang_;
     
+    //Debug
+    double GetCPUTime();
+    double prev_time_;
+    std::ofstream out_file_;
 };
 
 #endif  // LASERMAPPER_H

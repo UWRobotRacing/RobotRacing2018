@@ -29,6 +29,8 @@ LaserMapper::LaserMapper() {
   lane_detection_left_sub_ = nh_.subscribe("/output_point_list_left", 1, &LaserMapper::DetectLeftLaneCallback, this);
   lane_detection_right_sub_ = nh_.subscribe("/output_point_list_right", 1, &LaserMapper::DetectRightLaneCallback, this);
 
+  // out_file_.open("debug.txt", std::fstream::out);
+
   // Initialize an occupancy grid (std::vector<int>)
   InitMap();
 }
@@ -40,6 +42,7 @@ LaserMapper::LaserMapper() {
  */
 LaserMapper::~LaserMapper() {
   belief_map_.clear();
+  // out_file_.close();
 }
 
 /**
@@ -51,6 +54,16 @@ void LaserMapper::InitMap() {
   //Fills the map with Unknown values in the vector
   belief_map_.resize(map_W_*map_H_, UNKNOWN_);
   ROS_INFO("Map Initialized with UNKNOWN, Height: %d, Width: %d", map_H_, map_W_);
+  //Initializes full map values 
+  full_map_.header.frame_id = "/map";
+  full_map_.info.resolution = map_res_;
+  full_map_.info.width = map_W_;
+  full_map_.info.height = map_H_;
+  full_map_.info.origin.position.x = map_W_/2*map_res_;//-map_W_/2*map_res_; //map_W_/2*map_res_
+  full_map_.info.origin.position.y = 0;//-map_H_/2*map_res_; //map_H_*map_res_
+  full_map_.info.origin.orientation =
+             tf::createQuaternionMsgFromRollPitchYaw(M_PI, -1*M_PI, 0);
+  full_map_.data.resize(map_W_*map_H_);
 }
 
 /**
@@ -87,12 +100,10 @@ void LaserMapper::GetParam() {
 /**
  * @name PublishMap
  * @brief Joins the entire map together
- *        & Publishes the full_map
+ *        & Publishes the full_map_
  * @return NONE
  */
 void LaserMapper::PublishMap() {
-  nav_msgs::OccupancyGrid full_map;
-
   //Checks for lidar msg
   int n = floor(abs(min_angle_-laser_msg_.angle_min)/laser_msg_.angle_increment)+mech_offset_;    
   double increment = (samplerate_)*laser_msg_.angle_increment;
@@ -108,27 +119,18 @@ void LaserMapper::PublishMap() {
     prev_header_ = laser_msg_.header;
   }
 
-  full_map.header.frame_id = "/map";
-  full_map.info.resolution = map_res_;
-  full_map.info.width = map_W_;
-  full_map.info.height = map_H_;
-  full_map.info.origin.position.x = map_W_/2*map_res_;//-map_W_/2*map_res_; //map_W_/2*map_res_
-  full_map.info.origin.position.y = 0;//-map_H_/2*map_res_; //map_H_*map_res_
-  full_map.info.origin.orientation =
-             tf::createQuaternionMsgFromRollPitchYaw(M_PI, -1*M_PI, 0);
-  full_map.data.resize(map_W_*map_H_);
-
   //Deletes Values based on new position
   //belief_map_ = ShiftMap(belief_map_);
+  
+  // prev_time_ = GetCPUTime();
 
-
+  
   for (int i = 0; i < map_W_*map_H_; i++) {
-    double weight = std::min(100.0, OBS_SCALE_*belief_map_[i]);
-    weight = std::max(0.0, weight);
-
-    full_map.data[i] =
-    std::max(static_cast<int>(weight), static_cast<int>(belief_map_[i]));
+    full_map_.data[i] =
+    std::max(std::min(100, inflate_obstacle_*belief_map_[i]), belief_map_[i]);
   }
+
+  // out_file_ << "static_cast timediff: " << GetCPUTime() - prev_time_ << std::endl;
 
   // if(lidar_msg_call_){
   //   int n = floor(abs(min_angle_-laser_msg_.angle_min)/laser_msg_.angle_increment)+mech_offset_;    
@@ -149,19 +151,20 @@ void LaserMapper::PublishMap() {
   //     double weight = std::min(100.0, OBS_SCALE_*belief_map_[i]);
   //     weight = std::max(0.0, weight);
 
-  //     full_map.data[i] =
+  //     full_map_.data[i] =
   //     std::max(static_cast<int>(weight), static_cast<int>(belief_map_[i]));
   //   }
   //   lidar_msg_call_ = false;
   // }
+
   if(!lane_detection_left_msg_.data.empty()){
-    JoinOccupancyGrid(full_map, lane_detection_left_msg_, 
+    JoinOccupancyGrid(full_map_, lane_detection_left_msg_, 
                       offset_height_left_, offset_width_left_);
   }
   
   //Checks for left lane msg
   // if (left_msg_call_) {
-  //   JoinOccupancyGrid(full_map, lane_detection_left_msg_, 
+  //   JoinOccupancyGrid(full_map_, lane_detection_left_msg_, 
   //                     offset_height_left_, offset_width_left_);
   //   left_msg_call_ = false;
   // }
@@ -169,21 +172,23 @@ void LaserMapper::PublishMap() {
   //   ROS_WARN("No Left Name Data Detected");
 
   if(!lane_detection_right_msg_.data.empty()){
-  JoinOccupancyGrid(full_map, lane_detection_right_msg_,
+  JoinOccupancyGrid(full_map_, lane_detection_right_msg_,
                     offset_height_right_, offset_width_right_);
   }
+
   //Checks for right lane msg
   // if (right_msg_call_) {
-  //   JoinOccupancyGrid(full_map, lane_detection_right_msg_,
+  //   JoinOccupancyGrid(full_map_, lane_detection_right_msg_,
   //                     offset_height_right_, offset_width_right_);
   //   right_msg_call_ = false;
   // } 
   // else
   //   ROS_WARN("No Right Lane Data Detected");
   
-  map_pub_.publish(full_map);
+  map_pub_.publish(full_map_);
   belief_map_.clear();
   belief_map_.resize(map_W_*map_H_);
+
 }
 
 /**
@@ -476,4 +481,8 @@ std::vector<int> LaserMapper::RotateMap(std::vector<int> curr_map, double new_an
   }
 
   return rot_map;
+}
+
+double LaserMapper::GetCPUTime() {
+  return (double)clock() / CLOCKS_PER_SEC;
 }
