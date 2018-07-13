@@ -10,7 +10,7 @@ material Asphalt/Image
 
       texture_unit
       {
-        texture damaged-asphalt-texture.jpg
+        texture asphalt.jpg
         scale 0.01 0.01
       }
     }
