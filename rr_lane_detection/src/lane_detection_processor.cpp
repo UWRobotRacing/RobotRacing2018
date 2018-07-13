@@ -116,18 +116,19 @@ void lane_detection_processor::FindLanes(const sensor_msgs::Image::ConstPtr &msg
     }
 
     cv::Mat out;               // dst must be a different Mat
-
-  if (simulation_) {
+/*
+  if (true) {
     cv::Mat src = GetContours(mask_warped_1_ &mask_, blob_size_);
-    cv::flip(src, out, 1);
+    cv::flip(src, out, 0);
     
     cv::Mat1b element(4, 4, uchar(1));
 
 		// use square as mask
-		cv::erode(out, out, element);
-		cv::dilate(out, out, element);
+		//cv::erode(out, out, element);
+		//cv::dilate(out, out, element);
+    //ROS_INFO("FLIPPED");
   }
-  else
+  else*/
   {
     out = GetContours(mask_warped_1_ &mask_, blob_size_);
   }

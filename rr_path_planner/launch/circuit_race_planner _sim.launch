@@ -1,0 +1,12 @@
+<!--@file circuit_race_planner.launch
+ -  @author Sirui Song
+ -  @author Jungwook Lee
+ -  @author Toni Ogunmade(oluwatoni)
+ -  @competition IARRC 2018
+ -->
+<launch>
+  <rosparam file="$(find rr_path_planner)/config/circuit_race.yaml"/>
+
+  <node pkg="rr_path_planner" name="rr_path_planner" type="rr_path_planner" output="screen">
+  </node>  
+</launch>

@@ -5,7 +5,7 @@
 # This camera is typically used for lane detection
 # This is used to transform point from camera coords to real world coords
 #
-# @author Matthew Post
+# @author Matthew 
 # @author Toni Ogunmade(oluwatoni)
 # @competition IARRC 2018
 
@@ -13,8 +13,8 @@
 bev_width: 456
 bev_height: 500
 bev_resolution: 0.01
-grid_offset_y: -0.6
-grid_offset_x: 2.5
+grid_offset_y: 0
+grid_offset_x: 0
 simulation: false
 
 # 4 point coordinates in image plane. Note: OpenCV Image coordinates are in [x,y], where X is a column index (0 left, positive rightwards), and Y is a row index (0 top, positive downwards)
@@ -31,10 +31,11 @@ world_coords: !!opencv-matrix
    rows: 4
    cols: 2
    dt: f
-   data: [ 473., 481., 410., 457., 871., 177., 415., 0]
+   data: [ 58., 19., -5., 43., 456., 323., 0., 500]
 
 multibounds: !!opencv-matrix
    rows: 3
    cols: 6
    dt: d
-   data: [0, 100, 186, 120, 255, 255,0,0,250,255,25,255, 25, 5, 186, 130, 50, 255]
+   # the first three out of the six in the row values are the lower bound and the higher ones are the last three 
+   data: [0, 128, 140, 120, 255, 255,0,0,250,255,25,255, 25, 5, 186, 130, 50, 255]
