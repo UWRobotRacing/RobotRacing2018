@@ -1,3 +1,5 @@
+#include <ArduinoHardware.h>
+
 /*
  * @file Robot Racer Controller                                                       
  * @author Tom Meredith
@@ -55,6 +57,15 @@ volatile int index_in_buffer = 0;
 volatile int buffer_index = 0;
 volatile int old_buffer_size = 0;
 
+//parameters for encoder counter processing 
+const char REQUEST_MESSAGE = 'r';
+
+//encoder constant parameter = 28000; 
+const int  ENCODER_CONST = 28000;
+
+//previous time 
+long prev_time_encoder = 0; 
+ 
 /**
  *@brief function Call
  *publishes actual velocity & average battery value
@@ -105,7 +116,8 @@ ros::Publisher imu_pub("/arduino/imu_data", &imu_msg);
 ros::Publisher magnetic_pub("/arduino/mag_data", &magnetic_msg);
 ros::Subscriber <geometry_msgs::Twist> cmd_sub ("/rr_vehicle/vel_cmd", cmdCallback);
 
-int steering_angle = 1500;
+float steering_angle_signal = 1500;
+float steering_angle_raw;
 int ROS_watchdog = 0;
 
 /**
@@ -120,6 +132,11 @@ void setup() {
   Serial.begin(ROS_BAUD_RATE);
 #endif
   Serial2.begin(RC_BAUD_RATE);
+
+/*
+ * begin i2c communication 
+ */
+  Wire.begin(); 
 
 /*
  *ROS Node Handler setup
@@ -185,6 +202,11 @@ void loop()
     encoder.publish(&actual_velocity_msg);`
   }*/
 
+  
+  //velocity for the robot 
+  float velocity = 0; 
+  
+
   switch (robot_racer.GetState()) {
 //case for emergency stop
     case ESTOP:
@@ -202,7 +224,7 @@ void loop()
       // ThrottlePID.Compute();
       robot_racer.SetThrottle((int)autonomous_throttle);
       //maps angle from -30 to 30 deg to MIN_STEER_VAL to MAX_STEER_VAL
-      robot_racer.SetSteering((int)steering_angle);
+      robot_racer.SetSteering((int)steering_angle_signal);
 
       break;
   }
@@ -286,3 +308,29 @@ ISR (USART2_RX_vect)
   last_time = millis();
   sei();
 }
+
+float encoder_to_velocity(){
+  int16_t encoder_count = 0;
+  int8_t count_first = 0, count_second = 0; 
+  long current_time_encoder = millis();
+  
+  Wire.beginTransmission(SLAVE_ADDRESS); 
+  Wire.write(REQUEST_MESSAGE); 
+  Wire.endTransmission(false);
+
+  Wire.requestFrom(SLAVE_ADDRESS, 1, true); 
+  count_first = Wire.read(); 
+  Wire.requestFrom(SLAVE_ADDRESS, 1, true); 
+  count_second = Wire.read();
+
+  encoder_count = (count_first << 8) | (count_second); 
+  Serial.print(encoder_count); 
+  long double time_diff = (current_time_encoder - prev_time_encoder) / 1000.0;
+  prev_time_encoder = current_time_encoder; 
+
+  
+  return (encoder_count / (float) ENCODER_CONST) / time_diff ; 
+  
+}
+
+

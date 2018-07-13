@@ -11,19 +11,19 @@ void cmdCallback(const geometry_msgs::Twist & cmd_msg)
   {
     speed *= -1;
   }
-  double beta = 0;
+  float beta = 0;
   if (speed > 0.0001)
   {
     beta = asin(cmd_msg.angular.z / (speed /(WHEEL_TO_WHEEL_DIST / 2)));
   }
-  steering_angle = atan((tan(beta) * (WHEEL_TO_WHEEL_DIST)) / (WHEEL_TO_WHEEL_DIST / 2));
+  steering_angle_raw = atan((tan(beta) * (WHEEL_TO_WHEEL_DIST)) / (WHEEL_TO_WHEEL_DIST / 2));
 
   autonomous_throttle = speed > 0 ? speed* 21.5 + 1530: 1500;
   autonomous_throttle = constrain(autonomous_throttle, 1300, 1650);
   velDebug.data = autonomous_throttle;
 
   //!limits steering input from -30 to 30 degrees
-  steering_angle = ((((-1*(steering_angle))+ 0.5236)/(2* 0.5236))*(2000-1000))+ 960;
-  steering_angle = constrain(steering_angle,980,2000);
+  steering_angle_signal = ((((-1*(steering_angle_raw))+ 0.5236)/(2* 0.5236))*(2000-1000))+ 960;
+  steering_angle_signal = constrain(steering_angle_raw,980,2000);
 }
 
