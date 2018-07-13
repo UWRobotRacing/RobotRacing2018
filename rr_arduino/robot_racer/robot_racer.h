@@ -4,7 +4,10 @@
 #include "Servo.h"
 #include "Arduino.h"
 #include <nav_msgs/Odometry.h>
+<<<<<<< HEAD
 #include <tf/transform_broadcaster.h>
+=======
+>>>>>>> 1fe2bb45e0ef94b994ae7d3f479f9e0dec3b012c
 #include <geometry_msgs/TransformStamped.h>
 
 // #define BRAKE
@@ -67,7 +70,10 @@ class Car
     float theta_;
     geometry_msgs::TransformStamped odom_trans_;
     nav_msgs::Odometry odom_;
+<<<<<<< HEAD
     tf::TransformBroadcaster odom_broadcaster_;
+=======
+>>>>>>> 1fe2bb45e0ef94b994ae7d3f479f9e0dec3b012c
 
     Servo ThrottleServo_, SteerServo_;
 #ifdef BRAKE
