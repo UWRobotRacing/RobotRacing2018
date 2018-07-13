@@ -1,0 +1,29 @@
+<!--@file lane_detection_cam.launch
+ -  @brief This launch file is used to run the lane detection node on each camera
+ -  @author Matthew Post
+ -  @author Toni Ogunmade(oluwatoni)
+ -  @competition IARRC 2018
+ -->
+<launch>
+  <arg name="camera" default=""/>
+  <arg name="config_file" default=""/>
+
+  <group ns="$(arg camera)">
+    <node pkg="rr_lane_detection" type="lane_detection" name="lane_detection_$(arg camera)" output="screen"/>
+    <param name="Debug_Flag" type="bool" value="true" />
+
+    <param name="Camera_Source_Topic" type="string" value="/rr_vehicle/$(arg camera)/image_raw" />
+    <param name="Output_Image_topic" type="string" value="/output_video_$(arg camera)" />
+    <param name="Output_Pointlist_topic" type ="string" value="/output_point_list_$(arg camera)"/>
+    <param name="PointListOut" type="bool" value="true" />
+
+    <param name="Blob_Size" type="int" value="8" />
+    <param name="Fixed_Threshold" type="int" value="0" />
+    <param name="Adaptive_HSV_Max_S" type ="int" value = "16"/>
+    <param name="Adaptive_HSV_Min_V" type ="int" value = "-20"/>
+    <param name="Adaptive_HSV_MPatch_Size" type ="int" value = "25"/>
+
+    <param name="OpenCVMatFile" type="string" value="$(arg config_file)"/>
+  </group>
+  <!-- FYI: OpenCV Image coordinates are in [x,y], where X is a column index (0 left), and Y is a row index (0 top) -->
+</launch>

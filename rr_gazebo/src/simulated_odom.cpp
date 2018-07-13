@@ -36,7 +36,7 @@ SimulatedOdom::SimulatedOdom() {
   }
 
   // initialize the odometry message
-  odom_.header.frame_id = "odom";
+  odom_.header.frame_id = "simulated_odom";
   odom_.child_frame_id = "base_link";
   odom_.pose.pose.position.x = 0;
   odom_.pose.pose.position.y = 0;
@@ -65,10 +65,10 @@ SimulatedOdom::SimulatedOdom() {
                             0, 0, 0, 0, 0, 0,
                             0, 0, 0, 0, 0, 0,
                             0, 0, 0, 0, 0, angular_vel_sd_};
-  odom_pub_ = nh_.advertise<nav_msgs::Odometry>("odom", 1);
+  odom_pub_ = nh_.advertise<nav_msgs::Odometry>("simulated_odom", 1);
 
   // create the subscriber
-  joint_sub_ = nh_.subscribe("/rr_vehicle/joint_states", 1, &SimulatedOdom::jointStateCb, this);
+  joint_sub_ = nh_.subscribe(rr_sensor_topics::joint_states, 1, &SimulatedOdom::jointStateCb, this);
 
   then_ = ros::Time::now();
 }
@@ -119,7 +119,7 @@ void SimulatedOdom::jointStateCb(const sensor_msgs::JointState::ConstPtr &msg) {
   // transform details
   geometry_msgs::TransformStamped odom_trans;
   odom_trans.header.stamp = msg->header.stamp;
-  odom_trans.header.frame_id = "odom";
+  odom_trans.header.frame_id = "simulated_odom";
   odom_trans.child_frame_id = "base_link";
   odom_trans.transform.translation.x = odom_.pose.pose.position.x;
   odom_trans.transform.translation.y = odom_.pose.pose.position.y;

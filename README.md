@@ -25,7 +25,7 @@ Please fill out this header above all functions (Doxygen style)
  *         column will be written.
  *  @return Void.
  */
-void get_cursor(int* row, int* col);
+void GetCursor(int* row, int* col);
 ```
 Please fill this header out above every source code file(including launch files and xml files)
 ```
@@ -51,6 +51,11 @@ This code base should be integrated with the overall UWRobotics code such that m
 * Angela Gu
 * Brian Tran
 * Adrian Malaran
+* Tsugumi Murata
+* Andrew Jin
+* Waleed Ahmed
+* Brian Kibazohi
+* Jun-Ha Jung
 
 ### Past Contributers (2014-2017):
 * Matthew Post(Software Lead)
