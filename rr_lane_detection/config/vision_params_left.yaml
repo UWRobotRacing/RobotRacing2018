@@ -10,8 +10,8 @@
 # @competition IARRC 2018
 
 #Size of Bird's Eye View grid
-bev_width: 270
-bev_height: 314
+bev_width: 415
+bev_height: 500
 bev_resolution: 0.01
 grid_offset_y: 0
 grid_offset_x: 0
@@ -30,7 +30,7 @@ world_coords: !!opencv-matrix
    rows: 4
    cols: 2
    dt: f
-   data: [ 0., 170., 240., 0., 186., 314., 240., 291.]
+   data: [ 0., 207., 415., 0., 356., 483., 419., 456.]
 
 multibounds: !!opencv-matrix
    rows: 3

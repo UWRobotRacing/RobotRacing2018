@@ -22,7 +22,7 @@ image_coords: !!opencv-matrix
    rows: 4
    cols: 2
    dt: f
-   data: [ 2., 0., 398., 157., 0, 372, 56, 400]
+   data: [ 0., 0., 640., 0., 0., 480., 640., 480]
 
 # 4 corresponding world coordinates, same format
 # world_coords: [[0, 0], [254, 178], [0 , 303], [52, 329]]
@@ -30,7 +30,7 @@ world_coords: !!opencv-matrix
    rows: 4
    cols: 2
    dt: f
-   data: [ 0., 0., 254., 178., 0, 303, 52, 329]
+   data: [ 473., 481., 410., 457., 871., 177., 415., 0]
 
 multibounds: !!opencv-matrix
    rows: 3
