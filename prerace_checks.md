@@ -6,7 +6,7 @@ This is a list of everything required to be prepared prior to raceday.
 Ensure every member of the team knows how to operate the robot.
 
 #### Mechanical:
-- toolkit [ ]
+- [ ] toolkit 
    - screwdrivers
    - all allen keys
    - phillips
