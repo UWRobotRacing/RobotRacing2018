@@ -117,9 +117,7 @@ bool TrafficLightProcessor::FindTrafficLightColorState(const cv::Mat& traffic_li
     consecutive_green_detection ++;
 
     if (consecutive_green_detection > 3) { 
-      client_.call(srv);
-      
-      if (!test_mode_)
+      if (client_.call(srv) && !test_mode_)
         ShutdownTrafficLightNodes();
     }
   } else if (red_pixel_count > red_pixel_threshold && green_pixel_count < green_pixel_threshold) {
