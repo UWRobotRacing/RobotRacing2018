@@ -59,8 +59,8 @@ void LaserMapper::InitMap() {
   full_map_.info.resolution = map_res_;
   full_map_.info.width = map_width_;
   full_map_.info.height = map_height_;
-  full_map_.info.origin.position.x = map_width_/2*map_res_;//-map_width_/2*map_res_; //map_width_/2*map_res_
-  full_map_.info.origin.position.y = 0;//-map_height_/2*map_res_; //map_height_*map_res_
+  full_map_.info.origin.position.x = map_width_/2*map_res_; //map_width_/2*map_res_
+  full_map_.info.origin.position.y = 0; //map_height_*map_res_
   full_map_.info.origin.orientation =
              tf::createQuaternionMsgFromRollPitchYaw(M_PI, -1*M_PI, 0);
   full_map_.data.resize(map_width_*map_height_);
@@ -102,10 +102,14 @@ void LaserMapper::GetParam() {
  * @return NONE
  */
 void LaserMapper::PublishMap() {
+  // prev_time_ = GetCPUTime();
   //Checks for lidar msg
   int n = floor(abs(min_angle_-laser_msg_.angle_min)/laser_msg_.angle_increment)+mech_offset_;
   double increment = (samplerate_)*laser_msg_.angle_increment;
 
+  // out_file_ << "Initialization timediff: " << GetCPUTime() - prev_time_ << std::endl;
+
+  // prev_time_ = GetCPUTime();
   if (prev_header_.seq != laser_msg_.header.seq)
   {
     for (double i = min_angle_; i < max_angle_; i+= increment)
@@ -119,16 +123,22 @@ void LaserMapper::PublishMap() {
     }
     prev_header_ = laser_msg_.header;
   }
+  // out_file_ << "IfCond timediff: " << GetCPUTime() - prev_time_ << std::endl;
 
   //Deletes Values based on new position
   //belief_map_ = ShiftMap(belief_map_);
   
   // prev_time_ = GetCPUTime();
 
+  // prev_time_ = GetCPUTime();
+
+  std::copy(belief_map_.begin(), belief_map_.end(), full_map_.data.begin());
   
-  for (int i = 0; i < map_width_*map_height_; i++) {
-    full_map_.data[i] = belief_map_[i];
-  }
+  // out_file_ << "copyfunc timediff: " << GetCPUTime() - prev_time_ << std::endl;
+
+  // for (int i = 0; i < map_width_*map_height_; i++) {
+  //   full_map_.data[i] = belief_map_[i];
+  // }
 
   // out_file_ << "static_cast timediff: " << GetCPUTime() - prev_time_ << std::endl;
 
@@ -185,10 +195,13 @@ void LaserMapper::PublishMap() {
   // else
   //   ROS_WARN("No Right Lane Data Detected");
   
+  // prev_time_ = GetCPUTime();
+
   map_pub_.publish(full_map_);
   belief_map_.clear();
+  //belief_map_.reserve(map_width_*map_height_);
   belief_map_.resize(map_width_*map_height_);
-
+  // out_file_ << "Pubtime timediff: " << GetCPUTime() - prev_time_ << std::endl;
 }
 
 /**
@@ -200,13 +213,6 @@ void LaserMapper::PublishMap() {
  */
 void LaserMapper::LidarCallback(const sensor_msgs::LaserScan::ConstPtr& msg)
 {
-  /* 
-    Lidar, Left Lane, Right Lane callbacks all require
-    DeleteValues - Deletes values of the 
-                  belief map based on how much it moved
-    StitchMap - Attaches the new map onto the front of the map
-  */
-
   laser_msg_ = *msg;
   PublishMap();
 }
@@ -300,6 +306,7 @@ void LaserMapper::RayTracing(const float& angle, const float& range, const int& 
   int err = dx-dy;
   int x = 0;
   int y = 0;
+  int e2 = err*2;
 
   while (true) {
     if (CheckMap(x, y) < OBS_)
@@ -314,7 +321,7 @@ void LaserMapper::RayTracing(const float& angle, const float& range, const int& 
       return;
     }
 
-    int e2 = 2*err;
+    e2 = err*2;
     if (e2 > -dy) {
       err -= dy;
       x += sx;
@@ -330,7 +337,7 @@ void LaserMapper::RayTracing(const float& angle, const float& range, const int& 
       err += dx;
       y += sy;
     }
-  } 
+  }
 }
 
 /**
@@ -377,14 +384,6 @@ std::vector<int> LaserMapper::ShiftMap(std::vector<int> prev_map) {
         std::fill(temp.rbegin(), temp.rbegin()+abs(diff_x), UNKNOWN_);
         std::copy(temp.begin(), temp.end(), shift_map.begin());
       }
-
-      // Replaces functionality with std::fill()
-      // for(int i = 1; i <= map_height_; i++) {
-      //   for(int j = 1; j <= abs(diff_x); j++) {
-      //     shift_map[(j*i)-1] = UNKNOWN_;
-      //   }
-      // }
-
     }
     else {
       for(int i = 0; i < map_height_; i++) {
@@ -394,13 +393,6 @@ std::vector<int> LaserMapper::ShiftMap(std::vector<int> prev_map) {
         std::fill(temp.begin(), temp.begin()+abs(diff_x), UNKNOWN_);
         std::copy(temp.begin(), temp.end(), shift_map.begin());
       }
-
-      // Replaces functionality with std::fill()
-      // for(int i = map_height_; i >= 1; i--) {
-      //   for(int j = abs(diff_x); j >= 1; j--) {
-      //     shift_map[(j*i)-1] = UNKNOWN_;
-      //   }
-      // }
     }
     
     //Filling UNKNOWN for y
