@@ -27,8 +27,8 @@ Car::Car()
   x_ = 0.0;
   y_ = 0.0;
   theta_ = 0.0;
-  odom_trans.header.frame_id = "odom";
-  odom_trans.child_frame_id = "base_link";
+  odom_trans_.header.frame_id = "odom";
+  odom_trans_.child_frame_id = "base_link";
 }
 /*
  *@brief assigns pin values
