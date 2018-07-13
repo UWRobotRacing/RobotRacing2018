@@ -12,7 +12,10 @@ find_package(catkin REQUIRED COMPONENTS
   cv_bridge
 )
 
-find_package(OpenCV REQUIRED)
+find_package(OpenCV REQUIRED
+NO_MODULE # should be optional, tells CMake to use config mode
+PATHS /usr/local # look here
+NO_DEFAULT_PATH) # and don't look anywhere else
 
 catkin_package()
 
