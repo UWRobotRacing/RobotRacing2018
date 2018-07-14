@@ -105,7 +105,7 @@ ros::Publisher imu_pub("/arduino/imu_data", &imu_msg);
 ros::Publisher magnetic_pub("/arduino/mag_data", &magnetic_msg);
 ros::Subscriber <geometry_msgs::Twist> cmd_sub ("/rr_vehicle/vel_cmd", cmdCallback);
 
-int steering_angle = 1500;
+float steering_angle = 1500;
 int ROS_watchdog = 0;
 
 /**
@@ -156,6 +156,9 @@ void setup() {
   delay(1000);
   sei();
   bno.setExtCrystalUse(true);
+
+  // Wheel Calibration
+  robot_racer.SetSteering(1460);
 }
 
 /**
@@ -190,20 +193,18 @@ void loop()
     case ESTOP:
       robot_racer.Estop();
       break;
-//case for RC control
 
+//case for RC control
     case RC:
       robot_racer.RCMode();
       break;
 
 //case for autonomous mode
- 
     case AUTO:
       // ThrottlePID.Compute();
       robot_racer.SetThrottle((int)autonomous_throttle);
       //maps angle from -30 to 30 deg to MIN_STEER_VAL to MAX_STEER_VAL
       robot_racer.SetSteering((int)steering_angle);
-
       break;
   }
   state_msg.data = robot_racer.GetState();

@@ -3,6 +3,8 @@
 
 #include "Servo.h"
 #include "Arduino.h"
+// #include <geometry_msgs/TransformStamped.h>
+
 
 //! #define BRAKE
 #define TEST_OUTPUT 1
@@ -18,13 +20,25 @@
 #define MAX_RC_VAL            1738
 #define MIN_RC_VAL            304
 #define REST_RC_VAL           874
-#define MAX_RC_STEER_VAL      1726
-#define MIN_RC_STEER_VAL      306
-#define REST_STEER_VAL        982
-#define MAX_STEERING          2000
-#define MIN_STEERING          1000
-#define NEUTRAL               1500
+
+// RC Steering
 #define STEER_NEUTRAL         1460
+
+
+// Default Servo Parameters
+#define STEERING_OFFSET       100
+#define MAX_STEERING          2000 - STEERING_OFFSET
+#define NEUTRAL               1500
+#define MIN_STEERING          1000 + STEERING_OFFSET
+
+// Actual Servo Parameters
+#define REST_STEER_VAL        795 // 982
+#define MAX_RC_STEER_VAL      1566
+#define MIN_RC_STEER_VAL      281
+#define DEADZONE_LOWER_BOUND  760 // 950
+#define DEADZONE_UPPER_BOUND  830 // 1020
+
+
 #define MAX_STEERING_ANGLE    0.5236
 #define MIN_STEERING_ANGLE    (-0.5236)
 #define THROTTLE_REDUCTION    25
@@ -59,6 +73,11 @@ class Car
     float left_steering_multiplier_;
     float right_steering_multiplier_;
     long previous_;
+
+    float x_;
+    float y_;
+    float theta_;
+    // geometry_msgs::TransformStamped odom_trans_;
     
     Servo ThrottleServo_, SteerServo_;
 #ifdef BRAKE
@@ -79,5 +98,9 @@ class Car
     void WriteToServos();
     long GetPreviousTime();
     void SetPreviousTime(long time);
+
+    void GetOdomTrans();
+    void GetOdomMsg();
+    void RawToOdom(float vel, float str_angle);
 };
 #endif

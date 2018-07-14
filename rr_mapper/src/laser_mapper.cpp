@@ -93,6 +93,7 @@ void LaserMapper::PublishMap()
   nav_msgs::OccupancyGrid full_map;
 
   //Checks for lidar msg
+
   int n = floor(abs(min_angle_-laser_msg_.angle_min)/laser_msg_.angle_increment)+mech_offset_;
   double increment = (samplerate_)*laser_msg_.angle_increment;
 
@@ -108,17 +109,17 @@ void LaserMapper::PublishMap()
       n += samplerate_;
     }
     prev_header_ = laser_msg_.header;
-  }
+  } 
 
   full_map.header.frame_id = "base_link";
   full_map.info.resolution = map_res_;
   full_map.info.width = map_width_;
   full_map.info.height = map_height_;
-  full_map.info.origin.position.x = map_width_ / 2 * map_res_;
-  full_map.info.origin.position.y = map_height_ * map_res_;
+  full_map.info.origin.position.x = -map_width_ * map_res_ / 2;//map_height_ * map_res_;
+  full_map.info.origin.position.y = 0;//-map_width_ * map_res_ / 2;
   full_map.info.origin.orientation =
-             tf::createQuaternionMsgFromRollPitchYaw(0, 0, M_PI);
-  full_map.data.resize(map_width_*map_height_);
+             tf::createQuaternionMsgFromRollPitchYaw(0, 0, 0);
+  full_map.data.resize(map_width_ * map_height_);
 
   for (int i = 0; i < map_width_*map_height_; i++)
   {
@@ -193,7 +194,7 @@ void LaserMapper::DetectRightLaneCallback(const nav_msgs::OccupancyGrid::ConstPt
  */
 void LaserMapper::UpdateLaserMap(const int& x, const int& y, const double& value) {
   if (abs(x) < map_width_/2 && y < map_height_ && y > 0) {
-    int map_index = (map_width_/2 - x) + (map_height_ - y)*map_width_;
+    int map_index = (map_width_/2 - x) + (y)*map_width_;
     belief_map_[map_index] = value;
   }
 }

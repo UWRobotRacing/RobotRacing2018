@@ -8,7 +8,7 @@ Car::Car()
   steering_rc_    = NEUTRAL;
   brake_rc_       = NEUTRAL;
   throttle_       = NEUTRAL;
-  steering_       = NEUTRAL;
+  steering_       = STEER_NEUTRAL;
   brake_          = NEUTRAL;
   prev_steering_ = NEUTRAL;
   reverse_throttle_multiplier_ = (MIN_RC_VAL - REST_RC_VAL) / (float)(MANUAL_REV_MAX - NEUTRAL);
@@ -59,7 +59,7 @@ void Car::SetState(CarState set)
 void Car::Estop()
 {
 #ifdef TEST_OUTPUT
-	Serial.println("EStop");
+	//Serial.println("EStop");
 #endif    
   while (throttle_ >= NEUTRAL) //!< Slow down gradually until stationary
   {
@@ -185,20 +185,29 @@ min 306, when the joy stick is pushed to the rightmost.
 //! Many of the numerical values were previously defined values
   int steering_read = RC_signal_[3];  //!<left-right joystick
 
+  // Serial.print("Steering Read: ");
+  // Serial.println(steering_read);
+
 //! Give range for steering so that it stays neutral through fluctuations in RC values
-  if (steering_read >= 950 && steering_read <= 1020)
+  if (steering_read >= DEADZONE_LOWER_BOUND && steering_read <= DEADZONE_UPPER_BOUND)
   {
     steering_rc_ = STEER_NEUTRAL;
     //! steering_rc_ = round(-1*(steering_read-960)/1.308)+NEUTRAL;
   }
   
   //! for a steering value over the range given previously
-  else if (steering_read > 1020)
+  else if (steering_read > DEADZONE_UPPER_BOUND)
   {
-    steering_rc_ = round(-1 * (steering_read - REST_STEER_VAL) / left_steering_multiplier_) + STEER_NEUTRAL;
+    steering_rc_ = round(1 * (steering_read - REST_STEER_VAL) / left_steering_multiplier_) + STEER_NEUTRAL;
+    // steering_rc = (MAX)
+
   }
   else
-    steering_rc_ = round(-1 * (steering_read - REST_STEER_VAL) / right_steering_multiplier_) + STEER_NEUTRAL;
+    steering_rc_ = round(1 * (steering_read - REST_STEER_VAL) / right_steering_multiplier_) + STEER_NEUTRAL;
+
+  //Serial.print("Steering RC: ");
+ // Serial.println(steering_rc_);
+
 #ifdef BRAKE
   brake_rc_ = round((RC_signal_[0] - 1022) / 1.432) + NEUTRAL;
   brake_ = brake_rc_;
@@ -228,3 +237,43 @@ long Car::GetPreviousTime(){
 void Car::SetPreviousTime(long time){
 	previous_ = time;
 }
+
+// void Car::GetOdomTrans() {
+//    return odom_trans_;
+//  }
+ 
+//  void Car::RawToOdom(float vel, float str_angle) {
+//    // Length of the car is 0.335 m
+//    double L = 0.335;
+//    long current_time = millis();
+//    long time_diff = current_time - GetPreviousTime();
+//    // If the robot is at the origin, calculate the position using steering angle and the velocity
+//    if (str_angle != 0.0 && x_ == 0.0 && y_ == 0.0) {
+//      // store str_angle in radians
+//      theta_ = str_angle * M_PI / 180.0;
+//      x_ = vel * cos(theta_) * time_diff;
+//      y_ = vel * sin(theta_) * time_diff;
+ 
+//    } else {
+//      // Kinematic equations used: https://nabinsharma.wordpress.com/2014/01/02/kinematics-of-a-robot-bicycle-model/
+//      // Calculate turning angle beta
+//      double d = vel * time_diff;
+//      double R = L / tan(str_angle);
+//      double beta = d / R;
+//      double xc = x_ - R * sin(theta_);
+//      double yc = y_ + R * cos(theta_);
+ 
+//      x_ = xc + R * sin(theta_ + beta);
+//      y_ = yc - R * cos(theta_ + beta);
+//      theta_ = fmod((theta_ + beta),(2 * M_PI));
+//    }
+ 
+//    geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(theta_);
+ 
+//    odom_trans_.header.stamp = current_time;
+//    odom_trans_.transform.translation.x = x_;
+//    odom_trans_.transform.translation.y = y_;
+//    odom_trans_.transform.translation.z = 0.0;
+//    odom_trans_.transform.rotation = odom_quat;
+
+//  }

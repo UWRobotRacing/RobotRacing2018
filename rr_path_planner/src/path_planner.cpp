@@ -517,8 +517,8 @@ int PathPlanner::xyToMapIndex(double x, double y)
   double grid_y = round(y/resolution_);
 
   // Convert [pixel] in car coordinate to [pixel] in image frame
-  double map_x  = grid_x + round( map_W_/2 );
-  double map_y  = -grid_y + map_H_;
+  double map_x  = -grid_x + round( map_W_/2 );
+  double map_y  = grid_y;
 
   // Convert [pixel] in image frame to index in occupancy grid format
   int Map_index = (map_x-1)+(map_y-1)*map_W_;   //**map index starts from 0,0 from top left
