@@ -15,6 +15,10 @@ catkin_make
 ```
 
 ### Simulation Instructions
+- Run the following to install required ROS packages
+``` bash
+sudo apt-get install ros-kinetic-gazebo-ros* ros-kinetic-effort-controller ros-kinetic-joint-* ros-kinetic-controller*
+```
 - Navigate to the competition_launch_files/ folder in the repository.
 - Run the command 
 ``` bash

@@ -60,10 +60,10 @@ void LaserMapper::InitMap() {
   full_map_.info.width = map_width_;
   full_map_.info.height = map_height_;
   full_map_.info.origin.position.x = map_width_/2*map_res_; //map_width_/2*map_res_
-  full_map_.info.origin.position.y = 0; //map_height_*map_res_
+  full_map_.info.origin.position.y = map_height_*map_res_; //map_height_*map_res_
   full_map_.info.origin.orientation =
              tf::createQuaternionMsgFromRollPitchYaw(M_PI, -1*M_PI, 0);
-  full_map_.data.resize(map_width_*map_height_);
+  full_map_.data.reserve(map_width_*map_height_);
 }
 
 /**
@@ -199,7 +199,6 @@ void LaserMapper::PublishMap() {
 
   map_pub_.publish(full_map_);
   belief_map_.clear();
-  //belief_map_.reserve(map_width_*map_height_);
   belief_map_.resize(map_width_*map_height_);
   // out_file_ << "Pubtime timediff: " << GetCPUTime() - prev_time_ << std::endl;
 }
