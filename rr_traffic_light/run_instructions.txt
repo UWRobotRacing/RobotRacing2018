@@ -1,0 +1,11 @@
+Test Run Instructions for RobotRacing 2018 darknet ros node
+@Author: Adrian Malaran
+
+// Launch Darknet Object Detector
+roslaunch darknet_ros darknet_ros.launch
+
+// Launch Traffic Light Node
+roslaunch rr_traffic_light rr_traffic_light.launch
+
+// Play ROS bag named "traffic_light1.bag"
+rosbag play traffic_light1.bag

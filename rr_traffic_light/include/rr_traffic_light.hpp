@@ -4,6 +4,7 @@
  * @author Jamie Kim
  * @author Jason Leung
  * @author Toni Ogunmade(oluwatoni)
+ * @author Adrian Malaran
  * @competition IARRC 2018
  */
 
@@ -24,61 +25,59 @@
 #include <ros/console.h>
 #include <std_msgs/Int8.h>
 #include <std_msgs/Float32.h>
+#include <std_srvs/Empty.h>
+#include <std_srvs/Trigger.h>
 
 // OPENCV includes
 #include <opencv2/opencv.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
+#include <sensor_msgs/Image.h>
+#include <std_msgs/Int8.h>
+
+#include <darknet_ros_msgs/BoundingBoxes.h>
+#include <darknet_ros_msgs/BoundingBox.h>
 
 class TrafficLightProcessor
 {
     private:
-        ros::NodeHandle nh_;
+    
+    ros::NodeHandle nh_;
 
-        // Subsribe to an traffic light image 
-        std_msgs::Int8 tl_sub_;
-        std::string tl_sub_name_;
-        image_transport::Subscriber tl_sub_sub_;
+    ros::ServiceClient client_;
 
-        // Publish the traffic light state
-        std_msgs::Int8 tl_state;
-        std_msgs::Float32 red_value;
-        std_msgs::Float32 green_value;
-        std::string tl_pub_name_;
-        ros::Publisher tl_state_pub;
-        ros::Publisher red_pub;
-        ros::Publisher green_pub;
+    ros::Subscriber image_sub_;
+    ros::Subscriber found_object_sub_;
+    ros::Subscriber bounding_box_sub_;
+    ros::Subscriber traffic_light_image_sub_;
 
-        // Other variables
-        cv_bridge::CvImagePtr cv_input_bridge_;
-        cv_bridge::CvImage cv_output_bridge_;
-    	std::string binary_out_im_;
-	    image_transport::Publisher image_pub_; 
-        std::vector<cv::Mat> images;
-        std::vector<double> gPixel, rPixel;
-        image_transport::ImageTransport it_;
+    ros::Publisher shutdown_yolo_pub_;
 
-        int checkback;
-        int framenum;
-        int curr_vec_index;
-        int prev_vec_index;
-        bool traffic_light_detected;
-        bool red_drop;
-        bool green_rise;
+    int traffic_light_state_;
 
-        // Threshold params for filtered image
-        double red_thresh,green_thresh;
-    	int diffThresh;
+    int consecutive_green_detection;
 
-        double traffic_light_coords[4];
+    int test_mode_;
 
     public:
-    	TrafficLightProcessor();
-        TrafficLightProcessor(ros::NodeHandle nh);
-    	void imageCallback(const sensor_msgs::Image::ConstPtr& msg);
-        bool FindTL();
-        int FindTLState();
-        int GetTLState();
+
+    TrafficLightProcessor();
+    TrafficLightProcessor(ros::NodeHandle nh);
+
+    void Initialize();
+    void InitializePubsAndSubs();
+
+    bool FindTrafficLightColorState(const cv::Mat& trafic_light_image);
+    bool GetTrafficLightState();
+
+    void TrafficLightImageCallback(const sensor_msgs::ImageConstPtr& msg);
+    void ImageReceivedCallback(const sensor_msgs::Image::ConstPtr& msg);
+    void BoundingBoxCallback(const darknet_ros_msgs::BoundingBoxes& msg);
+
+    void TrafficLightDetectedCallback(const sensor_msgs::ImageConstPtr& image, 
+    const darknet_ros_msgs::BoundingBoxes& bounding_box);
+
+    void ShutdownTrafficLightNodes();
 };
 
 #endif

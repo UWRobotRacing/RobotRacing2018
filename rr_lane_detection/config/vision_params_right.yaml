@@ -31,7 +31,7 @@ world_coords: !!opencv-matrix
    rows: 4
    cols: 2
    dt: f
-   data: [ 0., 0., 510., 260., 55., 527., 110, 550]
+   data: [ 473., 481., 410., 457., 871., 177., 415., 0]
 
 multibounds: !!opencv-matrix
    rows: 3

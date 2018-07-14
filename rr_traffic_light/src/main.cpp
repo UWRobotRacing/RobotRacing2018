@@ -22,8 +22,8 @@
 #define CAMERA_FRAMERATE 15
 
 /**
- * @brief initializes and starts the traffic light detection node 
- * @return int 
+ * @brief initializes and starts the traffic light detection node
+ * @return int
  */
 int main(int argc, char **argv)
 {
@@ -31,21 +31,18 @@ int main(int argc, char **argv)
   ros::init(argc, argv, "trafficLightNode");
   ros::NodeHandle nh_;
   std::cout << "Starting trafficLightNode\n";
-  
+
   std::string camera_source;
-  nh_.param<std::string>("Camera_Source_Topic", camera_source, "/traffic_light/image_raw");///traffic_light/usb_cam_traffic_light/image_raw");
-  int testmode;
-  nh_.param<int>("Testmode", testmode, 0);
-  
+  nh_.param<std::string>("Camera_Source_Topic", camera_source, "/traffic_light/image_raw");
+
   image_transport::ImageTransport it_(nh_);
   TrafficLightProcessor tlproc(nh_);
-  image_transport::Subscriber image_sub_ = it_.subscribe(camera_source, 1, &TrafficLightProcessor::imageCallback, &tlproc);
 
   ROS_INFO("Traffic Light Node: Exposure Delay Ended. Ready for Detection.");
 
   ros::Rate r(CAMERA_FRAMERATE);
 
-  while (ros::ok() && (tlproc.GetTLState() != GREEN || testmode ))
+  while (ros::ok())
   {
     ros::spinOnce();
     r.sleep();
