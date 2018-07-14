@@ -14,6 +14,7 @@
 #include <sensor_msgs/image_encodings.h>
 #include <opencv2/opencv.hpp>
 #include <std_srvs/Trigger.h>
+#include "msg_srv_names.hpp"
 
 class EndlineCounter {
   private :

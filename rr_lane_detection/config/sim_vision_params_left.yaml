@@ -37,5 +37,5 @@ multibounds: !!opencv-matrix
   rows: 3
   cols: 6
   dt: d
-  data: [0,100,186,120,255,255,0,0,250,255,25,255,25,5,186,130,50,255]
+  data: [0,100,150,120,255,255,0,0,250,255,25,255,25,5,186,130,50,255]
   #     yellow generic,             white generic,      yellow green

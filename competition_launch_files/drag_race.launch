@@ -1,7 +1,13 @@
 <launch>
   <!-- Controller wt/ Arduino -->
   <include file="arduino.launch" />
+
+  <!-- Supervisory System -->
+  <include file="$(find rr_supervisor)/launch/supervisor.launch" />
     
+  <!-- Endline Detection System -->
+  <include file="$(find rr_endline_detection)/launch/endline_node.launch" />
+
   <!-- Traffic Light Detection -->
   <include file="$(find rr_traffic_light)/launch/rr_traffic_light.launch" />
 
@@ -12,6 +18,6 @@
   <include file="$(find rr_mapper)/launch/mapper.launch" />
     
   <!-- Path Planner -->
-  <include file="$(find rr_path_planner)/launch/drag_race_planner.launch" />	
+  <include file="$(find rr_path_planner)/launch/drag_race_planner.launch" />  
 
 </launch>
