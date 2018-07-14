@@ -1,26 +1,23 @@
 <launch>
-  <!-- Controller wt/ Arduino -->
-  <node pkg="rosserial_python" type="serial_node.py" name="serial_node" output="screen" required="true">
-    <param name="~port" value="/dev/ttyACM1" />
-    <param name="~baud" value="115200" />
-  </node>
-
   <param name="Launch/race_type" value="circuit" />
+
+  <!-- Controller wt/ Arduino -->
+  <include file="arduino.launch" />
 
   <!-- Supervisory System -->
   <include file="$(find rr_supervisor)/launch/supervisor.launch" />
-
-  <!-- Traffic Light Detection -->
-  <include file="$(find rr_traffic_light)/launch/rr_traffic_light.launch" />
-
+    
   <!-- Endline Detection System -->
   <include file="$(find rr_endline_detection)/launch/endline_node.launch" />
+
+  <!-- Traffic Light Detection -->
+  <include file="$(find rr_traffic_light)/launch/rr_traffic_light.launch" /> 
 
   <!-- Camera -->
   <include file="$(find rr_lane_detection)/launch/dual_cam_lane_detection.launch" />
  
   <!-- Laser Mapper -->
-  <!-- include file="$(find rr_mapper)/launch/mapper.launch" /> -->
+  <include file="$(find rr_mapper)/launch/mapper.launch" />
    
   <!-- Path Planner -->
   <include file="$(find rr_path_planner)/launch/circuit_race_planner.launch" />

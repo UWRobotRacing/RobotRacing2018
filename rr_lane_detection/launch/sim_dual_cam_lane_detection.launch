@@ -7,18 +7,12 @@
  -  @competition IARRC 2018
  -->
 <launch>
-<!-- Output the camera streams
-  <node ns ="left" name="output_video_cam_left" pkg="image_view" type="image_view" respawn="false" output="screen">
-       <remap from="image" to="/left/usb_cam_left/image_raw" />
-       <param name="autosize" value="true" />
-   </node>
-
-   <node ns ="right" name="output_video_cam_right" pkg="image_view" type="image_view" respawn="false" output="screen">
-       <remap from="image" to="/right/usb_cam_right/image_raw" />
-       <param name="autosize" value="true" />
-   </node>
--->
-    <!-- TODO pass left or right into this launch file -->
-   <include file="$(find rr_lane_detection)/launch/lane_detection_left_cam.launch" />
-   <!-- <include ns ="right" file="$(find lane_detection)/launch/lane_detection_right_cam.launch" /> -->
+  <include file="$(find rr_lane_detection)/launch/lane_detection_cam.launch">
+    <arg name="config_file" default="$(find rr_lane_detection)/config/sim_vision_params_left.yaml"/>
+    <arg name="camera" default="left_cam"/>
+  </include>
+  <include file="$(find rr_lane_detection)/launch/lane_detection_cam.launch">
+    <arg name="config_file" default="$(find rr_lane_detection)/config/sim_vision_params_right.yaml"/>
+    <arg name="camera" default="right_cam"/>
+  </include>
 </launch>

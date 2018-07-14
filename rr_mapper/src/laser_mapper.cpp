@@ -1,77 +1,78 @@
-/** @file lane_detection.cpp
+/** @file laser_mapper.cpp
  *  @author Jungwook Lee
+ *  @author Andrew Jin (DongJunJin)
  *  @author Toni Ogunmade(oluwatoni)
  *  @competition IARRC 2018
  */
 
+// CPP
+#include <algorithm>
+
+// Local
 #include "laser_mapper.hpp"
 #include <occupancy_grid_utils.hpp>
-#include <stdio.h>
-#include <math.h>
-#include <vector>
-#include <algorithm>
-#include <string>
-
-// OpenCV libraries
-#include <ros/ros.h>
-#include <std_msgs/Bool.h>
-#include <geometry_msgs/Pose2D.h>
-#include <nav_msgs/OccupancyGrid.h>
-#include <sensor_msgs/LaserScan.h>
-#include <tf/transform_datatypes.h>
 
 /**
+ * @name LaserMapper
  * @brief initiliazes the LaserMapper class
  * @return NONE
  */
-LaserMapper::LaserMapper()
-{
-  // Initialize variables
-  ready2Maplane_detectionLeft_ = false;
-  ready2Maplane_detectionRight_ = false;
-  ready2Map_ = true;
-
+LaserMapper::LaserMapper() {
   // Load Parameters
   GetParam();
 
-  // Setup Publisher and Subscriber
+  // PUBLISHERS
   map_pub_ = nh_.advertise<nav_msgs::OccupancyGrid>(occupancy_grid_name_, 1);
-  scan_sub_ = nh_.subscribe<sensor_msgs::LaserScan>
-                      (laser_scan_name_, 1, &LaserMapper::CallBack, this);
+  
+  // SUBSCRIBERS
+  scan_sub_ = nh_.subscribe(laser_scan_name_, 1, &LaserMapper::LidarCallback, this);
+  lane_detection_left_sub_ = nh_.subscribe("/output_point_list_left_cam", 1, &LaserMapper::DetectLeftLaneCallback, this);
+  lane_detection_right_sub_ = nh_.subscribe("/output_point_list_right_cam", 1, &LaserMapper::DetectRightLaneCallback, this);
 
-  lane_detection_left_sub_ = nh_.subscribe("/output_point_list_left", 1, &LaserMapper::DetectLeftLane, this);
-  lane_detection_right_sub_ = nh_.subscribe("/output_point_list_right", 1, &LaserMapper::DetectRightLane, this);
-
-  // Initialize an occupancy grid
+  // Initialize an occupancy grid (std::vector<int>)
   InitMap();
 }
 
-/** @brief get the rosparams
- *  @return NONE
+/**
+ * @name ~LaserMapper
+ * @brief destructs the LaserMapper class
+ * @return NONE
  */
-void LaserMapper::GetParam()
-{
+LaserMapper::~LaserMapper() {
+  belief_map_.clear();
+}
+
+/**
+ * @name InitMap
+ * @brief initiliazes the belief_map_ with UNKNOWNS
+ * @return NONE
+ */
+void LaserMapper::InitMap() {
+  //Fills the map with Unknown values in the vector
+  belief_map_.resize(map_width_*map_height_, UNKNOWN_);
+  ROS_INFO("Map Initialized with UNKNOWN, Height: %d, Width: %d", map_height_, map_width_);
+}
+
+/**
+ * @name GetParam
+ * @brief Obtains ROS Params
+ * @return NONE
+ */
+void LaserMapper::GetParam() {
   nh_.param<std::string>("LaserMapper/Occupancy_Grid_Name", occupancy_grid_name_, "/map");
   nh_.param<std::string>("LaserMapper/Laser_Scan_Name", laser_scan_name_, "/scan");
 
-  nh_.param<double>("LaserMapper/NO_OBS", NO_OBS_, 0);
-  nh_.param<double>("LaserMapper/OBS", OBS_, 200);
-  nh_.param<double>("LaserMapper/UNKNOWN", UNKNOWN_, -1);
-  nh_.param<double>("LaserMapper/OBS_SCALE", OBS_SCALE_, 1);
-  nh_.param<int>("LaserMapper/INFLATE_OBS", inflate_obstacle_, 2);
-
-  nh_.param<double>("LaserMapper/map_res", map_res_, 0.01);
-  nh_.param<int>("LaserMapper/map_W", map_W_, 800);
-  nh_.param<int>("LaserMapper/map_H", map_H_, 300);
-  nh_.param<double>("LaserMapper/map_orientation", map_orientation_, M_PI);
+  nh_.param<double>("LaserMapper/map_res", map_res_, 5);
+  nh_.param<int>("LaserMapper/map_W", map_width_, 800);
+  nh_.param<int>("LaserMapper/map_H", map_height_, 300);
   nh_.param<double>("LaserMapper/LASER_ORIENTATION", LASER_ORIENTATION_, -1);
+  nh_.param<int>("LaserMapper/INFLATE_OBS", inflate_obstacle_, 1);
 
   nh_.param<double>("LaserMapper/max_angle", max_angle_, 3.14/2.0);
   nh_.param<double>("LaserMapper/min_angle", min_angle_, -3.14/2.0);
-  nh_.param<double>("LaserMapper/minrange", minrange_, 0.001);
-  nh_.param<double>("LaserMapper/maxrange", maxrange_, 4);
+  nh_.param<double>("LaserMapper/minrange", min_range_, 0.001);
+  nh_.param<double>("LaserMapper/maxrange", max_range_, 4);
   nh_.param<int>("LaserMapper/samplerate", samplerate_, 1);
-  nh_.param<bool>("LaserMapper/DEBUG", DEBUG_, false);
   nh_.param<int>("LaserMapper/scan_processing_subsample", scan_subsample_, 0);
   nh_.param<int>("LaserMapper/mechanical_offset", mech_offset_, 0);
 
@@ -81,100 +82,153 @@ void LaserMapper::GetParam()
   nh_.param<int>("LaserMapper/lane_detection_right_msg/offset_width", offset_width_right_, 500);
 }
 
-/** @brief callback for the left lane grid
- *  @param msg the occupancy grid message
- *  @return NONE
+/**
+ * @name PublishMap
+ * @brief Joins the entire map together
+ *        & Publishes the full_map
+ * @return NONE
  */
-void LaserMapper::DetectLeftLane(const nav_msgs::OccupancyGrid::ConstPtr& msg)
+void LaserMapper::PublishMap()
 {
-  lane_detection_left_msg_ = *msg;
+  nav_msgs::OccupancyGrid full_map;
 
-  if (!ready2Maplane_detectionLeft_)
-    ready2Maplane_detectionLeft_ = true;
-  // Assumes laser is much faster than lane_detection data
-  // Note: modify this function after camera integration
-}
+  //Checks for lidar msg
+  int n = floor(abs(min_angle_-laser_msg_.angle_min)/laser_msg_.angle_increment)+mech_offset_;
+  double increment = (samplerate_)*laser_msg_.angle_increment;
 
-/** @brief callback for the right lane grid
- *  @param msg the occupancy grid message
- *  @return NONE
- */
-void LaserMapper::DetectRightLane(const nav_msgs::OccupancyGrid::ConstPtr& msg)
-{
-  lane_detection_right_msg_ = *msg;
-
-  if (!ready2Maplane_detectionRight_)
-    ready2Maplane_detectionRight_ = true;
-  // Assumes laser is much faster than lane_detection data
-  // Note: modify this function after camera integration
-}
-
-/** @brief initiliazes an occupancy grid and sets all the cells to unknown
- *  @return NONE
- */
-void LaserMapper::InitMap()
-{
-  belief_map_.resize(map_W_*map_H_, UNKNOWN_);
-  ROS_INFO("Map Initialization Done. Size(%d,%d).", map_H_,map_W_);
-}
-
-/** @brief empties the underlying vector of the map
- *  @return NONE
- */
-void LaserMapper::DeleteMap()
-{
-  belief_map_.clear();
-}
-
-/** @brief sets cell at location x and y to value passed in
- *  @param x the x-axis value
- *  @param y the y-axis value
- *  @param value the new value for the cell on the map
- *  @return NONE
- */ 
-void LaserMapper::UpdateLaserMap(int x, int y, double value)
-{
-  // In occupancy grid scale, not world scale
-  // Change it to update using vectors, and then put it into a 1D array.
-  if (abs(x) < map_W_/2 && y < map_H_ && y > 0)
+  if (prev_header_.seq != laser_msg_.header.seq)
   {
-    int Map_index = (map_W_/2-x)+(map_H_ - y)*map_W_;
-    belief_map_[Map_index] = value;
-    // ROS_INFO("map update with value %f", value);
+    for (double i = min_angle_; i < max_angle_; i+= increment)
+    {
+      // Check for NaN ranges
+      if (std::isnan (laser_msg_.ranges[n]) == false)
+      {
+        RayTracing(i, laser_msg_.ranges[n], inflate_obstacle_);
+      }
+      n += samplerate_;
+    }
+    prev_header_ = laser_msg_.header;
+  }
+
+  full_map.header.frame_id = "base_link";
+  full_map.info.resolution = map_res_;
+  full_map.info.width = map_width_;
+  full_map.info.height = map_height_;
+  full_map.info.origin.position.x = map_width_ / 2 * map_res_;
+  full_map.info.origin.position.y = map_height_ * map_res_;
+  full_map.info.origin.orientation =
+             tf::createQuaternionMsgFromRollPitchYaw(0, 0, M_PI);
+  full_map.data.resize(map_width_*map_height_);
+
+  for (int i = 0; i < map_width_*map_height_; i++)
+  {
+    full_map.data[i] = belief_map_[i];
+  }
+
+  //Checks for left lane msg
+  {
+    JoinOccupancyGrid(full_map, lane_detection_left_msg_, 
+                      offset_height_left_, offset_width_left_);
+  }
+
+  //Checks for right lane msg
+  {
+    JoinOccupancyGrid(full_map, lane_detection_right_msg_,
+                      offset_height_right_, offset_width_right_);
+  } 
+
+  map_pub_.publish(full_map);
+  belief_map_.clear();
+  belief_map_.resize(map_width_*map_height_);
+}
+
+/**
+ * @name LidarCallback
+ * @brief Obtains message sent by Lidar
+ *        & Processes it to belief_map_
+ * @param[in] msg: Lidar Message
+ * @return NONE
+ */
+void LaserMapper::LidarCallback(const sensor_msgs::LaserScan::ConstPtr& msg)
+{
+  /* 
+    Lidar, Left Lane, Right Lane callbacks all require
+    DeleteValues - Deletes values of the 
+                  belief map based on how much it moved
+    StitchMap - Attaches the new map onto the front of the map
+  */
+
+  laser_msg_ = *msg;
+  PublishMap();
+}
+
+/**
+ * @name DetectLeftLaneCallback
+ * @brief Retrieves the leftlanecallback message and stores it
+ * @param[in] msg: Left lane message
+ * @return NONE
+ */
+void LaserMapper::DetectLeftLaneCallback(const nav_msgs::OccupancyGrid::ConstPtr& msg) {
+  lane_detection_left_msg_ = *msg;
+}
+
+/**
+ * @name DetectRightLaneCallback
+ * @brief Retrieves the rightlanecallback message and stores it
+ * @param[in] msg: Right lane message
+ * @return NONE
+ */
+void LaserMapper::DetectRightLaneCallback(const nav_msgs::OccupancyGrid::ConstPtr& msg) {
+  lane_detection_right_msg_ = *msg;
+}
+
+/**
+ * @name UpdateLaserMap
+ * @brief Updates the belief map with 
+ *        new occupany grid value if valid
+ * @param[in] x: width comparator
+ * @param[in] y: height comparator
+ * @param[in] value: occupancy grid value
+ * @return NONE
+ */
+void LaserMapper::UpdateLaserMap(const int& x, const int& y, const double& value) {
+  if (abs(x) < map_width_/2 && y < map_height_ && y > 0) {
+    int map_index = (map_width_/2 - x) + (map_height_ - y)*map_width_;
+    belief_map_[map_index] = value;
   }
 }
 
-/** @brief returns the value of the cell with the cell coordinates
- *  @param x the x-axis value
- *  @param y the y-axis value
- *  @return NONE
+/**
+ * @name CheckMap
+ * @brief Checks value of the cell of occupancy grid 
+ * @param[in] x: width comparator
+ * @param[in] y: height comparator
+ * @return double: value of occupany grid at belief map
  */
-double LaserMapper::CheckMap(int x, int y)
+//TODO Change this function to have less redundant code (Duplicate with UpdateLaserMap)
+double LaserMapper::CheckMap(const int& x, const int& y)
 {
-  if (abs(x) < map_W_/2 && y < map_H_ && y > 0)
+  if (abs(x) < map_width_/2 && y < map_height_ && y > 0)
   {
-    int Map_index = (map_W_/2-x)+(map_H_ - y)*map_W_;
-    return belief_map_[Map_index];
+    int map_index = (map_width_/2 - x) + (map_height_ - y)*map_width_;
+    return belief_map_[map_index];
   }
   return OBS_;
 }
 
-/** @brief places a single line of the laser data unto the map
- *  @param angle the line 
- *  @param range the distance reading of the laser
- *  @param inflate_factor the number of cells used to inflate the map
+/**
+ * @name RayTracing
+ * @brief Checks value of the cell of occupancy grid 
+ * @param[in] angle: width comparator
+ * @param[in] range: height comparator
+ * @param[in] inflate_factor: magnification value
  *  @return NONE
  */
-void LaserMapper::RayTracing(float angle, float range, int inflate_factor)
+void LaserMapper::RayTracing(const float& angle, const float& range, const int& inflate_factor)
 {
-  if (range < minrange_)
+  if (range < min_range_ || range > max_range_)
     return;
-  else if (range > maxrange_)
-    return;
-
-  // x1, y1 is are the end position of the ray
-  // If dis(x0,y0, x1,y1) < range, it hit an obstacle, else, its unknown
-
+  
   int x1 = LASER_ORIENTATION_*round(sin(angle)*range/map_res_);
   int y1 = round(cos(angle)*range/map_res_);
 
@@ -198,13 +252,11 @@ void LaserMapper::RayTracing(float angle, float range, int inflate_factor)
   int x = 0;
   int y = 0;
 
-  while (true)
-  {
+  while (true) {
     if (CheckMap(x, y) < OBS_)
       UpdateLaserMap(x, y, NO_OBS_);
 
-    if (x == x1 && y == y1)
-    {
+    if (x == x1 && y == y1) {
       for (int i = -inflate_factor; i < inflate_factor; i++) {
         for (int j = -inflate_factor; j < inflate_factor; j++) {
           UpdateLaserMap(x+i, y+j, OBS_);
@@ -214,129 +266,171 @@ void LaserMapper::RayTracing(float angle, float range, int inflate_factor)
     }
 
     int e2 = 2*err;
-    if (e2 > -dy)
-    {
-      err = err -dy;
-      x = x + sx;
+    if (e2 > -dy) {
+      err -= dy;
+      x += sx;
     }
 
-    if (x == x1 && y == y1)
-    {
+    if (x == x1 && y == y1) {
       for (int i = -inflate_factor; i < inflate_factor; i++)
         for (int j = -inflate_factor; j < inflate_factor; j++)
           UpdateLaserMap(x+i, y+j, OBS_);
         return;
     }
-    if (e2 < dx)
-    {
-      err = err + dx;
-      y = y+sy;
+    if (e2 < dx) {
+      err += dx;
+      y += sy;
     }
-  }
+  } 
 }
 
-/** @brief copies the recieved lidar data
- *  @param msg the laser scan data
- *  @return NONE
+/**
+ * @name ShiftMap
+ * @brief Shifts the map based on x y movement
+ * @param[in] prev_map: map that needs to be updated
+ * @return Updates the prev_map with shifting map
  */
-void LaserMapper::CallBack(const sensor_msgs::LaserScan::ConstPtr& msg)
-{
-  static int scan_subsample_counter = 0;
-  ++scan_subsample_counter;
-  if (msg->angle_min > min_angle_)
-  {
-    min_angle_= msg->angle_min;
+std::vector<int> LaserMapper::ShiftMap(std::vector<int> prev_map) {
+  std::vector<int> shift_map(map_width_*map_height_);
+  if(prev_map.empty()){
+    ROS_ERROR("There is no map to shift!");
+    return shift_map;
+  } 
+  else {
+    shift_map = prev_map;
   }
-  else if (msg->angle_max < max_angle_)
-  {
-    max_angle_ = msg->angle_max;
-  }
-  if (scan_subsample_counter >= scan_subsample_)
-  {
-    scan_subsample_counter = 0;
-  }
+  
+  tf::StampedTransform transform;
+  try {
+    position_listener_.lookupTransform("/odom", "/base_link",
+                              ros::Time(0), transform);
 
-  if (scan_subsample_counter != 0)
-  {
-    return;
+  } catch (tf::TransformException ex) {
+      ROS_ERROR("%s",ex.what());
+      return shift_map;
   }
 
-  laser_msg_ = *msg;
+  // Assumes previous value is given
+  if (prev_x_ != 0 && prev_y_ != 0) {
+    /*Gains the difference in x and y transition
+      If the diff value is negative it is 
+      either fill left or bottom (vice versa)
+    */
+    int diff_x = transform.getOrigin().x() - prev_x_;
+    int diff_y = transform.getOrigin().y() - prev_y_;
 
-  // ROS_INFO ("Mapper: Copied laser data");
-
-  if (!ready2Map_)
-    ready2Map_ = true;
-
-  // Assumes laser is much faster than lane_detection data
-  // Note: modify this function after camera integration
-}
-
-/** @brief combines the sensor data together into a single map and 
- *  then publishes it
- * 
- *  if laser data is saved it starts the process of creating a map
- *  it raytraces the lidar data over the occupancy grid and adds the lanes 
- *  detected if they're available
- *
- *  @return NONE
- */
-void LaserMapper::ProcessMap()
-{
-  if (!ready2Map_)
-    return;
-
-  int n = floor(abs(min_angle_-laser_msg_.angle_min)/laser_msg_.angle_increment)+mech_offset_;    
-  // for (double i = laser_msg.angle_min; i < laser_msg.angle_max; i+= increment)
-  double increment = (samplerate_)*laser_msg_.angle_increment;
-  // ROS_INFO ("Value of pre seq is : %d", prev_header_.seq);
-  // ROS_INFO ("Value of cur seq is : %d", laser_msg_.header.seq);
-  if (prev_header_.seq != laser_msg_.header.seq)
-  {
-    // ROS_INFO ("Value of obs is : %f", OBS);
-    // ROS_INFO ("Value of no_obs is : %f", NO_OBS);
-
-    for (double i = min_angle_; i < max_angle_; i+= increment)
-    {
-      // Check for NaN ranges
-      if (isnan (laser_msg_.ranges[n]) == false)
-      {
-        RayTracing(i, laser_msg_.ranges[n], inflate_obstacle_);
-        // ROS_INFO ("1");
+    //Filling UNKNOWN for x
+    if (diff_x > 0) {
+      for(int i = 0; i < map_height_; i++) {
+        std::vector<int> temp(map_width_);
+        std::copy(shift_map.begin(), shift_map.begin()+map_width_, temp.begin());
+        std::rotate(temp.begin(), temp.begin()+abs(diff_x), temp.end());
+        std::fill(temp.rbegin(), temp.rbegin()+abs(diff_x), UNKNOWN_);
+        std::copy(temp.begin(), temp.end(), shift_map.begin());
       }
-      n+= samplerate_;
+
+      // Replaces functionality with std::fill()
+      // for(int i = 1; i <= map_height_; i++) {
+      //   for(int j = 1; j <= abs(diff_x); j++) {
+      //     shift_map[(j*i)-1] = UNKNOWN_;
+      //   }
+      // }
+
     }
-    prev_header_ = laser_msg_.header;
+    else {
+      for(int i = 0; i < map_height_; i++) {
+        std::vector<int> temp(map_width_);
+        std::copy(shift_map.begin(), shift_map.begin()+map_width_, temp.begin());
+        std::rotate(temp.begin(), temp.begin()+abs(diff_x), temp.end());
+        std::fill(temp.begin(), temp.begin()+abs(diff_x), UNKNOWN_);
+        std::copy(temp.begin(), temp.end(), shift_map.begin());
+      }
+
+      // Replaces functionality with std::fill()
+      // for(int i = map_height_; i >= 1; i--) {
+      //   for(int j = abs(diff_x); j >= 1; j--) {
+      //     shift_map[(j*i)-1] = UNKNOWN_;
+      //   }
+      // }
+    }
+    
+    //Filling UNKNOWN for y
+    if (diff_y > 0) {
+      //'Rotates' the map dragging all values 
+      //By abs(diff_y)*map_width_ amount
+      std::rotate(shift_map.begin(), 
+          shift_map.begin()+(abs(diff_y)*map_width_), 
+          shift_map.end());
+
+      for(int i = 0; i < abs(diff_y)*map_width_; i++) {
+        shift_map[i] = UNKNOWN_;
+      }
+    }
+    else {
+      std::rotate(shift_map.rbegin(), 
+          shift_map.rbegin()+(abs(diff_y)*map_width_), 
+          shift_map.rend());
+
+      for(int i = (abs(diff_y)*map_width_)-1; i >= 0; i--) {
+        shift_map[i] = UNKNOWN_;
+      }
+    }
   }
 
-  occu_msg_.header.frame_id = "/map";
-  occu_msg_.info.resolution = map_res_;
-  occu_msg_.info.width = map_W_;
-  occu_msg_.info.height = map_H_;
-  occu_msg_.info.origin.position.x = map_W_/2*map_res_;//-map_W_/2*map_res_; //map_W_/2*map_res_
-  occu_msg_.info.origin.position.y = map_H_/2*map_res_;//-map_H_/2*map_res_; //map_H_*map_res_
-  occu_msg_.info.origin.orientation =
-             tf::createQuaternionMsgFromRollPitchYaw(M_PI, -1*M_PI, 0);
-  occu_msg_.data.resize(map_W_*map_H_);
+  prev_x_ = transform.getOrigin().x();
+  prev_y_ = transform.getOrigin().y();
 
-  for (int i = 0; i < map_W_*map_H_; i++)
-  {
-    double weight = std::min(100.0, OBS_SCALE_*belief_map_[i]);
-    weight = std::max(0.0, weight);
+  //Rotation
+  double diff_ang = transform.getRotation().getAngle() - prev_ang_;
+  shift_map = RotateMap(shift_map, diff_ang);
+  prev_ang_ = transform.getRotation().getAngle();
+  return shift_map;
+}
 
-    occu_msg_.data[i] =
-    std::max(static_cast<int>(weight), static_cast<int>(belief_map_[i]));
+/**
+ * @name RotateMap
+ * @brief Rotates the map based on angular rotation
+ * @param[in] curr_map: current map to analyze
+ * @param[in] new_ang: angular difference from previous location
+ * @return rot_map: newly rotated map
+ */
+std::vector<int> LaserMapper::RotateMap(std::vector<int> curr_map, double new_ang){
+  std::vector<LaserMapper::CellEntity> cell_map;
+  std::vector<int> rot_map;
+  //Return a empty Cell Map if no value is input
+  if(curr_map.empty()){
+    ROS_ERROR("LaserMapper::RotateMap: Map is empty!");
+    return rot_map;
   }
 
-  // Join the lane_detection occupancy and the laser occupancy together.
-  if (ready2Map_ && ready2Maplane_detectionLeft_ && ready2Maplane_detectionRight_)
-  {
-    // ROS_INFO("Joining maps");
-    JoinOccupancyGrid(occu_msg_, lane_detection_left_msg_, offset_height_left_, offset_width_left_);
-    JoinOccupancyGrid(occu_msg_, lane_detection_right_msg_, offset_height_right_, offset_width_right_);
+  //Generate CellEntity Vector & Rotate
+  for(int i = 0; i < map_height_; i++){
+    for(int j = 1; j <= map_width_; j++){
+      int curr_x = j - map_width_/2;
+      int curr_y = map_height_ - i;
+      LaserMapper::CellEntity curr_en;
+      curr_en.val = curr_map.at(i*map_height_ + j - 1);
+      curr_en.length = sqrt(curr_x*curr_x +
+                        curr_y*curr_y);
+      curr_en.angle = atan2(curr_y, curr_y) + new_ang;
+      curr_en.xloc = rint(curr_en.length*cos(curr_en.angle));
+      curr_en.yloc = rint(curr_en.length*sin(curr_en.angle));
+      cell_map.push_back(curr_en);
+    }
   }
 
-  map_pub_.publish(occu_msg_);
-  DeleteMap();
-  InitMap();
+  //Generates a map of unknwons same size as the belief map
+  rot_map.resize(map_width_*map_height_, UNKNOWN_);
+
+  //Fills in values based on criteria  
+  for(int i = 0; i < rot_map.size(); i++){
+    LaserMapper::CellEntity curr_en = cell_map.at(i);
+    //Checks for bounds of x & y
+    if((curr_en.xloc >= 0 && curr_en.xloc <= map_width_) && 
+        (curr_en.yloc >= 0 && curr_en.yloc <= map_height_)){
+      rot_map[i] = curr_en.val;
+    }
+  }
+
+  return rot_map;
 }

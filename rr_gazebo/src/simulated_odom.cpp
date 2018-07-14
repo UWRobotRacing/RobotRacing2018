@@ -36,7 +36,7 @@ SimulatedOdom::SimulatedOdom() {
   }
 
   // initialize the odometry message
-  odom_.header.frame_id = "odom";
+  odom_.header.frame_id = "simulated_odom";
   odom_.child_frame_id = "base_link";
   odom_.pose.pose.position.x = 0;
   odom_.pose.pose.position.y = 0;

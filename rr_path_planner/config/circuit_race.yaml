@@ -1,0 +1,30 @@
+# @file circuit_race.yaml
+# @author Sirui Song
+# @author Jungwook Lee
+# @author Toni Ogunmade(oluwatoni)
+# @competition IARRC 2018
+
+#Map Size
+TrajRoll/MAP_WIDTH:            1100
+TrajRoll/MAP_HEIGHT:           700
+TrajRoll/RESOLUTION:           0.01
+
+#Trajectory Generation Parameters
+TrajRoll/NUM_PATHS:            71
+TrajRoll/TRAJECTORY_STEPS:     70
+TrajRoll/MIN_STOPPING_DIST:    0.2
+TrajRoll/STOPPING_FACTOR:      0.15
+
+#Desired Velocity Setup
+TrajRoll/STRAIGHT_SPEED:       3.5
+
+#Vehicle Parameters
+TrajRoll/MAX_STEERING_ANGLE:   0.5
+TrajRoll/CAR_WIDTH:            0.30
+TrajRoll/DIST_REWARD_FACTOR:   3.0
+TrajRoll/MIN_OFFSET_DIST:      0.05
+
+#For Debugging 
+#Visualization
+TrajRoll/VISUALIZATION:        true
+TrajRoll/DEBUG_ON:             false
