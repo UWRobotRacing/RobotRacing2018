@@ -10,18 +10,18 @@ TrajRoll/MAP_HEIGHT:           700  # in cm
 TrajRoll/RESOLUTION:           0.01 # in cm
 
 #Trajectory Generation Parameters
-TrajRoll/NUM_PATHS:            51
+TrajRoll/NUM_PATHS:            81
 TrajRoll/TRAJECTORY_STEPS:     50
 TrajRoll/MIN_STOPPING_DIST:    0.2
 TrajRoll/STOPPING_FACTOR:      0.15
 
 #Desired Velocity Setup
-TrajRoll/STRAIGHT_SPEED:       2.0
+TrajRoll/STRAIGHT_SPEED:       3.0
 
 #Vehicle Parameters
 TrajRoll/MAX_STEERING_ANGLE:   0.4
 TrajRoll/CAR_WIDTH:            0.15
-TrajRoll/DIST_REWARD_FACTOR:   1.0
+TrajRoll/DIST_REWARD_FACTOR:   2.0
 TrajRoll/MIN_OFFSET_DIST:      0.05
 
 #For Debugging 

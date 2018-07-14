@@ -496,7 +496,8 @@ double PathPlanner::Velocity(double dist, double steer)
   else
   {
     //turning radius break point at
-    vel = std::min(STRAIGHT_SPEED_/(1 + 2.3 * abs(steer)), STRAIGHT_SPEED_);
+    vel = std::min(STRAIGHT_SPEED_/(1 + 5 * abs(steer)), STRAIGHT_SPEED_);
+    vel = std::max(0.3, vel);
     //ROS_INFO("PathPlanner: Velocity = %f", vel);
   }
   return vel;
