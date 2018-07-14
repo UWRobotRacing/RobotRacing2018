@@ -1,1 +1,2 @@
-rosbag record /clock /diagnostics /rosout /rr_vehicle/front_cam/camera_info /rr_vehicle/front_cam/image_raw /rr_vehicle/imu/data /rr_vehicle/joint_states /rr_vehicle/laserscan /rr_vehicle/left_cam/camera_info /rr_vehicle/left_cam/image_raw /rr_vehicle/right_cam/camera_info /rr_vehicle/right_cam/image_raw /rr_vehicle/vel_cmd /tf /tf_static /rr_vehicle/simulated_odom
+rosbag record /clock /diagnostics /rosout /rr_vehicle/front_cam/camera_info /rr_vehicle/front_cam/image_raw /rr_vehicle/imu/data /rr_vehicle/joint_states /rr_vehicle/laserscan /rr_vehicle/left_cam/camera_info /rr_vehicle/left_cam/image_raw /rr_vehicle/right_cam/camera_info /rr_vehicle/right_cam/image_raw /rr_vehicle/vel_cmd /tf /tf_static /rr_vehicle/simulated_odom /scan
+rosparam set /use_sim_time false
