@@ -3,10 +3,10 @@
   <include file="arduino.launch" />
   
   <!-- Darknet Object Detection -->
-  <include file="$(find darknet_ros)/launch/darknet_ros.launch" />
+  <!-- <include file="$(find darknet_ros)/launch/darknet_ros.launch" />-->
 
   <!-- Traffic Light Detection -->
-  <include file="$(find rr_traffic_light)/launch/rr_traffic_light.launch" />
+  <!-- <include file="$(find rr_traffic_light)/launch/rr_traffic_light.launch" />-->
 
   <!-- Camera -->
   <include file="$(find rr_lane_detection)/launch/dual_cam_lane_detection.launch" />

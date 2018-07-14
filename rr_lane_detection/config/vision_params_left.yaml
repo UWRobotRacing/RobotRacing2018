@@ -31,11 +31,12 @@ world_coords: !!opencv-matrix
    rows: 4
    cols: 2
    dt: f
-   # data: [ -415, 293., 0., 500., -59., 17., 4., 44.]
    data: [ 0, 293., 415., 500., 392., 17., 419., 44.]
 
 multibounds: !!opencv-matrix
    rows: 3
    cols: 6
    dt: d
-   data: [0, 128, 140, 120, 255, 255,0,0,250,255,25,255, 25, 5, 186, 130, 50, 255]
+   data: [0, 100, 140, 120, 255, 255,0,0,250,255,25,255, 25, 5, 186, 130, 50, 255]
+   #      lH  lS  lV    hH  hS   hV  H S V   H   S  V    H   S  V    H    S   V
+   #      yellow                     white              green-yellow

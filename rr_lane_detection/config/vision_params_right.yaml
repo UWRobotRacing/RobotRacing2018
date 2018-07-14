@@ -38,4 +38,6 @@ multibounds: !!opencv-matrix
    cols: 6
    dt: d
    # the first three out of the six in the row values are the lower bound and the higher ones are the last three 
-   data: [0, 128, 140, 120, 255, 255,0,0,250,255,25,255, 25, 5, 186, 130, 50, 255]
+   data: [0, 100, 140, 120, 255, 255,0,0,250,255,25,255, 25, 5, 186, 130, 50, 255]
+   #      lH  lS  lV    hH  hS   hV
+   #      yellow                     white              green-yellow

@@ -59,7 +59,7 @@ void Car::SetState(CarState set)
 void Car::Estop()
 {
 #ifdef TEST_OUTPUT
-	Serial.println("EStop");
+	//Serial.println("EStop");
 #endif    
   while (throttle_ >= NEUTRAL) //!< Slow down gradually until stationary
   {
@@ -205,8 +205,8 @@ min 306, when the joy stick is pushed to the rightmost.
   else
     steering_rc_ = round(1 * (steering_read - REST_STEER_VAL) / right_steering_multiplier_) + STEER_NEUTRAL;
 
-  // Serial.print("Steering RC: ");
-  // Serial.println(steering_rc_);
+  //Serial.print("Steering RC: ");
+ // Serial.println(steering_rc_);
 
 #ifdef BRAKE
   brake_rc_ = round((RC_signal_[0] - 1022) / 1.432) + NEUTRAL;
