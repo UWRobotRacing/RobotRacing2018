@@ -1,4 +1,12 @@
 <launch>
+	<param name="Launch/race_type" value="circuit" />
+
+  <!-- Supervisory System -->
+  <include file="$(find rr_supervisor)/launch/supervisor.launch" />
+    
+  <!-- Endline Detection System -->
+  <include file="$(find rr_endline_detection)/launch/endline_node.launch" />
+
   <!-- Simulated World -->
   <include file="$(find rr_gazebo)/launch/rr_oval_race_sim.launch" />
 

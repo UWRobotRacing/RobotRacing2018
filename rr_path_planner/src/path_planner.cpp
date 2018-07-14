@@ -41,7 +41,7 @@ PathPlanner::PathPlanner()
   //ros topics init
   //Normal Pub and Subscriber
   map_sub_ = nh_.subscribe(rr_processed_topics::fused_map, 1, &PathPlanner::ProcessMap, this);
-  cmd_pub_ = nh_.advertise<geometry_msgs::Twist>(rr_cmd_topics::vel_cmd, 1, true);
+  cmd_pub_ = nh_.advertise<geometry_msgs::Twist>(rr_cmd_topics::path_planner_cmd, 1, true);
 }
 
 /** @brief get the parameters and initialize the member variables
@@ -496,7 +496,7 @@ double PathPlanner::Velocity(double dist, double steer)
   else
   {
     //turning radius break point at
-    vel = std::min(STRAIGHT_SPEED_/(1 + 2 * abs(steer)), STRAIGHT_SPEED_);
+    vel = std::min(STRAIGHT_SPEED_/(1 + 2.3 * abs(steer)), STRAIGHT_SPEED_);
     //ROS_INFO("PathPlanner: Velocity = %f", vel);
   }
   return vel;

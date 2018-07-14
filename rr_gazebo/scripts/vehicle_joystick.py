@@ -44,7 +44,7 @@ class PS3Controller:
         self._max_velocity = 4 #m/s to make the car easier to control in simulation
         self._max_steering_angle = 0.524 #rad
 
-        self._joy_cmd_publisher = rospy.Publisher('vel_cmd', Twist,queue_size = 1)
+        self._joy_cmd_publisher = rospy.Publisher('joy_cmd', Twist,queue_size = 1)
         self._joy = rospy.Subscriber('joy', Joy, self.joy_callback)
         self._joy_cmd = Twist()
         self._joy_cmd_publisher.publish(self._joy_cmd)

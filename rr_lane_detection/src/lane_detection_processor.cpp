@@ -121,11 +121,11 @@ void lane_detection_processor::FindLanes(const sensor_msgs::Image::ConstPtr &msg
     cv::Mat src = GetContours(mask_warped_1_ &mask_, blob_size_);
     cv::flip(src, out, 1);
     
-    cv::Mat1b element1(2, 2, uchar(1));
+    //cv::Mat1b element1(2, 2, uchar(1));
 
 		// use square as mask
-		cv::erode(out, out, element1);
-    cv::Mat1b element2(7, 7, uchar(1));
+		//cv::erode(out, out, element1);
+    cv::Mat1b element2(5, 5, uchar(1));
 		cv::dilate(out, out, element2);
   }
   else
