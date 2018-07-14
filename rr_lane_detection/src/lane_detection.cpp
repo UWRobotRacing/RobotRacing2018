@@ -18,6 +18,7 @@
 
 //Helper includes
 #include "thresholding.hpp"
+#include "shadow_removal.hpp"
 #include "lane_detection_processor.hpp"
 
 /** @brief main file that starts the subscribers and calls spin

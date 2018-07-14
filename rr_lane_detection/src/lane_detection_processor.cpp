@@ -6,6 +6,9 @@
 
 #include "lane_detection_processor.hpp"
 #include "thresholding.hpp"
+#include "shadow_removal.hpp"
+#include <iostream>
+#include <sstream>
 
 /** @brief sets the rosparams and obtains the perspective transforms
  *  @param nh is the node handle of the node
@@ -100,6 +103,8 @@ void lane_detection_processor::FindLanes(const sensor_msgs::Image::ConstPtr &msg
     cv_input_bridge_ = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
     cv_input_bridge_->image.copyTo(im_input_);
 
+    RemoveShadows(im_input_, Im1_Shadows_Removed);
+
     cvtColor(im_input_, Im1_HSV_, CV_BGR2HSV, 3);
     cv::warpPerspective(Im1_HSV_, Im1_HSV_warped_, transform_matrix_, BEV_size_, cv::INTER_LINEAR, cv::BORDER_REPLICATE);
 
@@ -117,20 +122,20 @@ void lane_detection_processor::FindLanes(const sensor_msgs::Image::ConstPtr &msg
 
     cv::Mat out;               // dst must be a different Mat
 
-  if (simulation_) {
-    cv::Mat src = GetContours(mask_warped_1_ &mask_, blob_size_);
-    cv::flip(src, out, 1);
-    
-    cv::Mat1b element(4, 4, uchar(1));
+    if (simulation_) {
+      cv::Mat src = GetContours(mask_warped_1_ &mask_, blob_size_);
+      cv::flip(src, out, 1);
+      
+      cv::Mat1b element(4, 4, uchar(1));
 
-		// use square as mask
-		cv::erode(out, out, element);
-		cv::dilate(out, out, element);
-  }
-  else
-  {
-    out = GetContours(mask_warped_1_ &mask_, blob_size_);
-  }
+      // use square as mask
+      cv::erode(out, out, element);
+      cv::dilate(out, out, element);
+    }
+    else
+    {
+      out = GetContours(mask_warped_1_ &mask_, blob_size_);
+    }
 
     //find mask_
     //Copy to output bridge

@@ -53,7 +53,7 @@ class lane_detection_processor
     int adapt_hsv_patch_size_;
     cv::Scalar bounds_;
     cv::Mat multibounds_;
-    cv::Mat Im1_HSV_, Im1_HSV_warped_, mask_warped_1_,mask_warped_2_, mask_;
+    cv::Mat Im1_Shadows_Removed, Im1_HSV_, Im1_HSV_warped_, mask_warped_1_,mask_warped_2_, mask_;
     
     std::string opencv_file_name_;
     cv::Mat image_coords_;
